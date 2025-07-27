@@ -66,8 +66,8 @@ class ProfileScreen extends StatelessWidget {
                 children: <Widget>[
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: themeColors[colorSliderIdx.value],
-                      onPrimary: textColorDynamic.value,
+                      foregroundColor: textColorDynamic.value,
+                      backgroundColor: themeColors[colorSliderIdx.value],
                       textStyle: const TextStyle(fontSize: 20,),
                     ),
                     onPressed: () {
@@ -77,8 +77,8 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: themeColors[colorSliderIdx.value],
-                      onPrimary: textColorDynamic.value,
+                      foregroundColor: textColorDynamic.value,
+                      backgroundColor: themeColors[colorSliderIdx.value],
                       textStyle: const TextStyle(fontSize: 20,),
                     ),
                     onPressed: () {

@@ -13,24 +13,6 @@ class AdmobService {
     return null;
   }
 
-  // static String? get interstitialAdUnitID {
-  //   if(Platform.isAndroid){
-  //     return "ca-app-pub-1884428053001869~5558121465";
-  //   } else if (Platform.isIOS) {
-  //     return "ca-app-pub-1884428053001869~3179370137";
-  //   }
-  //   return null;
-  // }
-  //
-  // static String? get rewardedAdUnitID {
-  //   if(Platform.isAndroid){
-  //     return "ca-app-pub-1884428053001869~5558121465";
-  //   } else if (Platform.isIOS) {
-  //     return "ca-app-pub-1884428053001869~3179370137";
-  //   }
-  //   return null;
-  // }
-
   static final BannerAdListener bannerAdListener = BannerAdListener(
       onAdLoaded: (ad) => debugPrint('Ad loaded.'),
       onAdFailedToLoad: (ad, error) => {

@@ -1,5 +1,5 @@
 name: simple_bible
-description: A new Flutter project.
+description: An easy-use Bible app
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 2.0.0+6
 
 environment:
   sdk: ">=2.16.1 <3.0.0"
@@ -34,36 +34,48 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  flutter_native_splash: ^2.2.3
+  flutter_native_splash: ^2.3.8
   get: ^4.6.5
   outline_search_bar: ^2.3.0
+#  simple_text_field: ^3.0.0
   substring_highlight: ^1.0.33
-  flutter_sticky_header: ^0.6.1
+  flutter_sticky_header: ^0.8.0
   scrollable_positioned_list: ^0.3.1
   adaptive_theme: ^3.0.0
   settings_ui: ^2.0.2
-  flutter_font_picker: ^1.0.0
-  google_fonts: ^3.0.1
-  carousel_slider: ^4.1.1
+  flutter_font_picker: ^1.4.0
+  google_fonts: ^5.0.0
+  carousel_slider: ^5.0.0
   hive: ^2.1.0
   hive_flutter: ^1.1.0
-  intl: ^0.18.0
-  flutter_launcher_icons: ^0.11.0
+  intl: ^0.20.2
+  flutter_launcher_icons: ^0.14.3
 #  flutter_login: ^4.0.0-beta.1
   font_awesome_flutter: ^10.0.0
-  package_info_plus: ^3.0.2
+  package_info_plus: ^8.0.2
 #  readmore: ^2.1.0
-  google_mobile_ads: ^2.3.0
-  rename: ^2.0.1
+  google_mobile_ads: ^6.0.0
+  rename: ^3.0.2
+  flutter_offline: ^5.0.0
+#  material_floating_search_bar_2: ^0.5.0
+  change_app_package_name: ^1.5.0
 
-flutter_icons:
-  android: true
+flutter_launcher_icons:
+  android: "launcher_icon"
   ios: true
+  adaptive_icon_background: "#000000"
   image_path: "assets/app_logo.png"
+  min_sdk_android: 21
 
 flutter_native_splash:
   color: "#000000"
   image: assets/app_logo.png
+
+  android_12:
+    image: assets/app_logo.png
+    icon_background_color: "#000000"
+
+  web: false
 
 dev_dependencies:
   flutter_test:
@@ -74,7 +86,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.1
+  flutter_lints: ^6.0.0
   build_runner: ^2.1.10
   hive_generator: ^2.0.0
 
@@ -120,3 +132,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+
+#      plugins {
+#      id("com.android.application") version "8.2.0" // Or your AGP version
+#      kotlin("android") version "1.9.0" // Ensure this matches what's expected
+#      }

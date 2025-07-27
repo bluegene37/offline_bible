@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -52,29 +53,34 @@ class SettingsLocalPageState extends State<SettingsLocalPage> {
                     ),
                     SettingsTile(
                       title: const Text('Text Preview:'),
-                      value: Expanded(
+                      value: Platform.isAndroid
+                            ?
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                  'In the beginning God created the heaven and the earth. ',
+                                  style: GoogleFonts.getFont(globalFont.value,
+                                   fontSize: 15 + fontSize.value)
+                              ),
+                            ),
+                          ],
+                        )
+                          :
+                      Expanded(
                         child: Text(
                             'In the beginning God created the heaven and the earth. ',
                             style: GoogleFonts.getFont(globalFont.value,
-                            fontSize: 15 + fontSize.value)
-                          ),
+                                fontSize: 15 + fontSize.value)
                         ),
                       ),
-                    // SettingsTile(
-                    //   title: const Text('Font:'),
-                    // ),
+                    ),
                   ],
                 ),
                 SettingsSection(
                     tiles: <SettingsTile>[
                       SettingsTile(
                         title: const Text('Font:'),
-                        // value: Expanded(
-                        //   child: Container(
-                        //     padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                        //     child: fontPicker(),
-                        //   ),
-                        // ),
                       ),
                     ]
                 ),
@@ -115,7 +121,7 @@ class SettingsLocalPageState extends State<SettingsLocalPage> {
 }
 
 Widget fontPicker(){
-  CarouselController scrollCarouselController = CarouselController();
+  CarouselSliderController scrollCarouselController = CarouselSliderController();
   return CarouselSlider(
     carouselController: scrollCarouselController,
     options: CarouselOptions(
@@ -136,7 +142,7 @@ Widget fontPicker(){
             child: Obx(()=> Card(
               elevation:5,
               // margin: const EdgeInsets.fromLTRB(0.0, 1.0, 0.0, 1.0),
-              color: globalFont.value == i ? themeColorShades[colorSliderIdx.value] : Colors.white,
+              color: globalFont.value == i ? themeColorShades[colorSliderIdx.value] : Colors.white ,
               child: InkWell(
                 onTap: () {
                   globalFont.value = i;
@@ -145,7 +151,7 @@ Widget fontPicker(){
                   box.put('globalFontIdx', fontLists.indexWhere((list) => list.contains(i)));
                 },
                 child: ListTile(
-                    title: Text(i, style: GoogleFonts.getFont(i, fontSize: 20, ),textAlign: TextAlign.center )),
+                    title: Text(i, style: GoogleFonts.getFont(i, fontSize: 20, color: brightness == Brightness.dark || brightness == Brightness.light ? Colors.black : Colors.white ),textAlign: TextAlign.center )),
               ),
               ),
             ),

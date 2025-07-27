@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,6 +53,8 @@ var statusBarChanged = false;
 var textUnderline = [].obs;
 var hideFloatingBtn = false.obs;
 var refreshChapter = false;
+var showAdds = true.obs;
+var showAddsTime = 10.obs;
 var loginpage = false.obs;
 var loggedIn = false;
 var userName = '';
@@ -145,6 +149,7 @@ void main() async {
   loggedIn = box.get('loggedIn',defaultValue: false);
   userName = box.get('userName',defaultValue: 'John Doe');
   profileIMG = box.get('profileIMG',defaultValue: 'https://picsum.photos/200/300');
+  showAdds.value = true;
 
   brightness = ThemeData.estimateBrightnessForColor(themeColors[colorSliderIdx.value]);
   textColorDynamic.value = brightness == Brightness.light ? Colors.black : Colors.white;
@@ -175,11 +180,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return AdaptiveTheme(
         light: ThemeData(
+          useMaterial3: false,
           brightness: Brightness.light,
           primaryColor: themeColors[colorSliderIdx.value],
           fontFamily: globalFont.value,
         ),
         dark: ThemeData(
+          useMaterial3: false,
           brightness: Brightness.dark,
           primaryColor: themeColors[colorSliderIdx.value],
           fontFamily: globalFont.value,
@@ -214,21 +221,27 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState(){
     super.initState();
-    _createBannerAd();
+    // _createBannerAd();
     init();
   }
 
-  void _createBannerAd(){
-    _bannerAd = BannerAd(
-        size: AdSize.fullBanner,
-        adUnitId: AdmobService.bannerAddUnitID!,
-        listener: AdmobService.bannerAdListener,
-        request: const AdRequest()
-    )..load();
-  }
+  // void _createBannerAd(){
+  //   _bannerAd = BannerAd(
+  //       size: AdSize.fullBanner,
+  //       adUnitId: AdmobService.bannerAddUnitID!,
+  //       listener: AdmobService.bannerAdListener,
+  //       request: const AdRequest()
+  //   )..load();
+  // }
 
   Future init() async {
     barTitle.value = '$bookSelected $selectedChapter';
+    Timer.periodic(const Duration(seconds: 2), (timer) {
+      showAddsTime.value--;
+      if (showAddsTime.value == 0) {
+        timer.cancel();
+      }
+    });
   }
 
   void onTabTapped(index) {
@@ -241,7 +254,18 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() => Scaffold(
-      appBar: PreferredSize(
+      appBar:
+      // AppBar(
+      //     flexibleSpace: SizedBox(
+      //       height: 100,
+      //       child: AdWidget(ad: _bannerAd!),
+      //     ),
+      //     toolbarHeight: 100,
+      //     centerTitle: true,
+      //     backgroundColor: themeColors[colorSliderIdx.value],
+      //     title: Text(barTitle.value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, color: textColorDynamic.value,),),
+      //   ),
+      PreferredSize(
         preferredSize: const Size.fromHeight(35.0),
         child: Obx(() => AppBar(
               centerTitle: true,
@@ -253,23 +277,47 @@ class _MyHomePageState extends State<MyHomePage> {
       key: _key,
       body: SafeArea(child: pages[0]),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: globalIndex.value == 2 && !hideFloatingBtn.value && textUnderline.value.isEmpty ? floatingNextPage() : null,
+      floatingActionButton: globalIndex.value == 2 && !hideFloatingBtn.value && textUnderline.isEmpty ? floatingNextPage() : null,
       bottomNavigationBar:
-      // navigationBar(),
+        // navigationBar(),
         SizedBox(
-          height: _bannerAd != null ? Platform.isAndroid ? 120 : 160 : 100,
+          // height: (_bannerAd != null && showAdds.value) ? Platform.isAndroid ? 120 : 160 : Platform.isAndroid ? 60 : 94,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               // navigationBar(),
-              Visibility(
-                visible: _bannerAd != null,
-                  child:  SizedBox(
-                    height: 60,
-                    child: _bannerAd != null ? AdWidget(ad: _bannerAd!) : const Text('No Ads'),
-                  ),
-              ),
+              // Obx(() => Visibility(
+              //   visible: _bannerAd != null && showAdds.value,
+              //     child:  SizedBox(
+              //       height: 60,
+              //       child: Row(
+              //         children: [
+              //           Flexible(
+              //             child: _bannerAd != null ? AdWidget(ad: _bannerAd!) : const Text('No Ads'),
+              //           ),
+              //           ElevatedButton(
+              //             onPressed: () {
+              //               if(showAddsTime.value == 0){
+              //                 showAdds.value = false;
+              //               }
+              //             },
+              //             style: ElevatedButton.styleFrom(
+              //               shape: const CircleBorder(),
+              //               padding: const EdgeInsets.all(10),
+              //               backgroundColor: themeColorShades[colorSliderIdx.value]
+              //             ),
+              //             child: showAddsTime.value == 0
+              //                 ?
+              //             Icon(Icons.close_rounded, color: textColorDynamic.value)
+              //                 :
+              //             Obx(() => Text('${showAddsTime.value}', style: TextStyle(color: textColorDynamic.value),)),
+              //           )
+              //         ]
+              //       )
+              //     ),
+              //   ),
+              // ),
               navigationBar(),
             ],
           )
@@ -282,7 +330,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return NavigationBarTheme(
       data: NavigationBarThemeData(
           indicatorColor: themeColorShades[colorSliderIdx.value],
-          labelTextStyle: MaterialStateProperty.all(
+          labelTextStyle: WidgetStateProperty.all(
             const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
           )
       ),

@@ -1,4 +1,3 @@
-import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:simple_bible/main.dart';
@@ -170,6 +169,6 @@ class BooksSelectionPage extends StatelessWidget {
               ),
              ]
           );
-        }
+        }, future: null,
     ),
   );

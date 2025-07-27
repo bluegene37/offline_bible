@@ -1,4 +1,4 @@
-package com.example.simple_bible
+package com.qhodegray.simplebible
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -6,8 +6,8 @@ Widget buildOTHeader(BuildContext context) => Container(
     top: 12 + MediaQuery.of(context).padding.top,
     bottom: 12,
   ),
-  child: Column(
-    children: const [
+  child: const Column(
+    children: [
       Text('New Testament',
           style: TextStyle(fontSize: 28, color: Colors.white)
       )
@@ -195,8 +195,8 @@ Widget buildNTHeader(BuildContext context) => Container(
     top: 13,
     bottom: 12,
   ),
-  child: Column(
-    children: const [
+  child: const Column(
+    children: [
       Text('New Testament',
           style: TextStyle(fontSize: 28, color: Colors.white)
       )
