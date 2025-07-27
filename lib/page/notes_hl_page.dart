@@ -275,29 +275,29 @@ Widget buildNotes(pNotesJson,context){
   //   },
   // ),
 
-      // OutlineSearchBar(
-      //   focusNode: FocusNode() ,
-      //   clearButtonColor: colorSliderIdx.value == 0 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
-      //   cursorColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
-      //   searchButtonIconColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
-      //   borderColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
-      //   margin: const EdgeInsets.all(8.0),
-      //   textEditingController: searchTexts,
-      //   initText: searchTexts.text,
-      //   hintText: 'Search here...',
-      //   onSearchButtonPressed: (query) async => {
-      //     notesText.value = await filterNotes(query),
-      //   },
-      //   onClearButtonPressed: (query) async => {
-      //     searchTexts.text = '',
-      //     notesText.value = await filterNotes(''),
-      //     SystemChannels.textInput.invokeMethod('TextInput.hide'),
-      //     FocusScope.of(context).unfocus(),
-      //   },
-      //   onKeywordChanged: (query) => {
-      //
-      //   },
-      // ),
+      OutlineSearchBar(
+        focusNode: FocusNode() ,
+        clearButtonColor: colorSliderIdx.value == 0 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
+        cursorColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
+        searchButtonIconColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
+        borderColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
+        margin: const EdgeInsets.all(8.0),
+        textEditingController: searchTexts,
+        initText: searchTexts.text,
+        hintText: 'Search here...',
+        onSearchButtonPressed: (query) async => {
+          notesText.value = await filterNotes(query),
+        },
+        onClearButtonPressed: (query) async => {
+          searchTexts.text = '',
+          notesText.value = await filterNotes(''),
+          SystemChannels.textInput.invokeMethod('TextInput.hide'),
+          FocusScope.of(context).unfocus(),
+        },
+        onKeywordChanged: (query) => {
+
+        },
+      ),
       Obx(() => Expanded(
         child: ListView.builder(
           shrinkWrap: true,

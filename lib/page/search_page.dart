@@ -80,47 +80,47 @@ class SearchLocalPage extends StatelessWidget {
           //     );
           //   },
           // ),
-          // Obx(() => OutlineSearchBar(
-          //     focusNode: FocusNode() ,
-          //     clearButtonColor: colorSliderIdx.value == 0 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
-          //     cursorColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
-          //     searchButtonIconColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
-          //     borderColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
-          //     margin: const EdgeInsets.all(8.0),
-          //     textEditingController: txt,
-          //     initText: searchQueryMain.value,
-          //     hintText: 'Search here...',
-          //     onSearchButtonPressed: (query) => {
-          //       searchQueryMain.value = query,
-          //       if(query.isNotEmpty){
-          //         hideHistory.value = true,
-          //         if(historyBox.values.contains(query)){
-          //             historyBox.toMap().forEach((key, value){
-          //                 if(value == query) {
-          //                   historyBox.delete(key);
-          //                 }
-          //             }),
-          //           historyBox.put(DateFormat.yMMMMEEEEd().add_jms().format(DateTime.now()), query),
-          //         }else{
-          //           historyBox.put(DateFormat.yMMMMEEEEd().add_jms().format(DateTime.now()), query),
-          //         }
-          //       }
-          //     },
-          //     onClearButtonPressed: (query) => {
-          //       searchQueryMain.value = '',
-          //       searchIdxSel.value = 99999999,
-          //       barTitle.value = "Search",
-          //       hideHistory.value = false,
-          //       SystemChannels.textInput.invokeMethod('TextInput.hide'),
-          //       FocusScope.of(context).unfocus(),
-          //     },
-          //     onKeywordChanged: (query) => {
-          //       if(query.isEmpty){
-          //       searchQueryMain.value = query,
-          //     }
-          //   },
-          // )
-          // ),
+          Obx(() => OutlineSearchBar(
+              focusNode: FocusNode() ,
+              clearButtonColor: colorSliderIdx.value == 0 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
+              cursorColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
+              searchButtonIconColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
+              borderColor: colorSliderIdx.value == 0 || colorSliderIdx.value == 1 ? globalTextColors[textColorIdx.value] : themeColors[colorSliderIdx.value],
+              margin: const EdgeInsets.all(8.0),
+              textEditingController: txt,
+              initText: searchQueryMain.value,
+              hintText: 'Search here...',
+              onSearchButtonPressed: (query) => {
+                searchQueryMain.value = query,
+                if(query.isNotEmpty){
+                  hideHistory.value = true,
+                  if(historyBox.values.contains(query)){
+                      historyBox.toMap().forEach((key, value){
+                          if(value == query) {
+                            historyBox.delete(key);
+                          }
+                      }),
+                    historyBox.put(DateFormat.yMMMMEEEEd().add_jms().format(DateTime.now()), query),
+                  }else{
+                    historyBox.put(DateFormat.yMMMMEEEEd().add_jms().format(DateTime.now()), query),
+                  }
+                }
+              },
+              onClearButtonPressed: (query) => {
+                searchQueryMain.value = '',
+                searchIdxSel.value = 99999999,
+                barTitle.value = "Search",
+                hideHistory.value = false,
+                SystemChannels.textInput.invokeMethod('TextInput.hide'),
+                FocusScope.of(context).unfocus(),
+              },
+              onKeywordChanged: (query) => {
+                if(query.isEmpty){
+                searchQueryMain.value = query,
+              }
+            },
+          )
+          ),
         ],
         )
       )
