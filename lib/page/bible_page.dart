@@ -65,6 +65,8 @@ class BooksLocalPage extends StatelessWidget {
 
   const BooksLocalPage(this.jsonName,this.bookTitle, this.bookChapter, this.jumpTo, {Key? key} ) : super(key: key);
 
+  void jumpToFunc() =>  itemScrollController.jumpTo(index: jumpTo > 0 ? jumpTo : 0);
+
   @override
   Widget build(BuildContext context) => Scaffold(
     body: FutureBuilder<List<Book>>(
@@ -78,7 +80,7 @@ class BooksLocalPage extends StatelessWidget {
               Navigator.of(context).maybePop(),
               barTitle.value = '$bookTitle $bookChapter',
               textUnderline.value = [],
-              itemPositionsListener.itemPositions.addListener((){
+              itemPositionsListener.itemPositions.addListener(() {
                 if(itemPositionsListener.itemPositions.value.first.index > scrollChecker){
                   // print('Up')
                   hideFloatingBtn.value = true;
@@ -89,7 +91,7 @@ class BooksLocalPage extends StatelessWidget {
                 }
                 scrollChecker = itemPositionsListener.itemPositions.value.first.index;
               }),
-              jumpToFunc(jumpTo),
+              jumpToFunc(),
           }
         );
 
@@ -123,7 +125,7 @@ class BooksLocalPage extends StatelessWidget {
     itemCount: books.length,
     itemBuilder: (context, index) {
       final book = books[index];
-      var globalKey = '${book.book}:${book.chapter}:${book.verse}';
+      var globalKey = book.book+':'+book.chapter.toString()+':'+book.verse.toString();
       Future.delayed(Duration.zero, () async => {
         // jumpToFunc(),
       });
@@ -274,7 +276,7 @@ class BooksLocalPage extends StatelessWidget {
                                                   var datetime = DateFormat.yMMMMEEEEd().add_jms().format(DateTime.now());
                                                   var resBody = {};
                                                   vID = getUniqueID().toString();
-                                                  resBody["book"] = textUnderline.toString();
+                                                  resBody["book"] = textUnderline.value.toString();
                                                   resBody["stamp"] = datetime;
                                                   resBody["notes"] = notesController.text;
                                                   notesBox.put(vID,resBody);
@@ -368,8 +370,8 @@ class BooksLocalPage extends StatelessWidget {
                   },
                   style: GoogleFonts.getFont(globalFont.value, fontSize: 15+fontSize.value,
                     color: !hiLightBox.containsKey(globalKey) && brightness == Brightness.dark ?  globalTextColors[textColorIdx.value] : Colors.black ,
-                    decoration: textUnderline.contains(globalKey) ? TextDecoration.underline : null,
-                    decorationStyle: textUnderline.contains(globalKey) ? TextDecorationStyle.dashed : null,
+                    decoration: textUnderline.value.contains(globalKey) ? TextDecoration.underline : null,
+                    decorationStyle: textUnderline.value.contains(globalKey) ? TextDecorationStyle.dashed : null,
                     backgroundColor: !hiLightBox.containsKey(globalKey)
                         ? null
                         : highLightColors[hiLightBox.get(globalKey,defaultValue: 0)],
@@ -508,7 +510,3 @@ Widget highLighter(){
           }
       );
   }
-
-void jumpToFunc(jumpTo) {
-  return itemScrollController.jumpTo(index: jumpTo ?? 0);
-}
