@@ -1,6 +1,6 @@
 # simple_bible
 
-A new Flutter project.
+Offline SImple Bible.
 
 ## Getting Started
 
