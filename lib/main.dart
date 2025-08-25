@@ -1,174 +1,29 @@
-import 'dart:async';
-
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:simple_bible/page/notes_hl_page.dart';
-import 'package:simple_bible/page/search_page.dart';
-import 'package:simple_bible/page/settings_page.dart';
-import 'package:simple_bible/page/books_page.dart';
-import 'package:simple_bible/page/chapter_page.dart';
-import 'package:simple_bible/page/bible_page.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:simple_bible/service/ad_mob_service.dart';
-import 'dart:io' show Platform;
-
-var box = Hive.box('settingsDB');
-var hiLightBox = Hive.box('hiLightDB');
-var historyBox = Hive.box('searchHistoryDB');
-var notesBox = Hive.box('notesBoxDB');
-var textsBox = Hive.box('textsBoxDB');
-
-var pages = [].obs;
-var mainBooks = '';
-var mainBooksMenu = '';
-var bibleVersions = 'kjv';
-var barTitle = 'Simple Bible'.obs;
-var bookSelectedHist = '';
-var bookSelected = 'Genesis';
-int selectedChapterHist = 0;
-int selectedChapter = 1;
-int lastChapter = 1;
-var searchResultHist = '';
-var searchQueryMain = ''.obs;
-var shouldShowLeft = true;
-var shouldShowRight = true;
-var themeMode = false.obs;
-var globalIndex = 2.obs;
-var colorIndex = 999;
-var textColorIdx = 1.obs;
-var colorSliderIdx = 0.obs;
-var globalFont = 'Roboto'.obs;
-var globalFontIdx = 9;
-var fontSize = 2.0.obs;
-var chaptersScreen = [];
-var bibleScreen = [];
-var searchScreen = [];
-var textColorDynamic = Colors.black.obs;
-var brightness = ThemeData.estimateBrightnessForColor(themeColors[colorSliderIdx.value]);
-var statusBarChanged = false;
-var textUnderline = [].obs;
-var hideFloatingBtn = false.obs;
-var refreshChapter = false;
-var showAdds = true.obs;
-var showAddsTime = 10.obs;
-var loginpage = false.obs;
-var loggedIn = false;
-var userName = '';
-var accessToken = '';
-var profileIMG = '';
-var users = {
-  'test@gmail.com': '12345',
-};
-var searchTexts = TextEditingController();
-String appName = '';
-String packageName = '';
-String version = '';
-String buildNumber = '';
-
-var globalTextColors = const [
-  Colors.white,
-  Colors.black
-];
-
-var themeColors = const [
-  Colors.white,
-  Colors.black,
-  Colors.red,
-  Colors.pink,
-  Colors.purple,
-  Colors.deepPurpleAccent,
-  Colors.indigo,
-  Colors.blue,
-  Colors.lightBlue,
-  Colors.cyan,
-  Colors.teal,
-  Colors.green,
-  Colors.lightGreen,
-  Colors.lime,
-  // Colors.yellow,
-  Colors.amber,
-  Colors.orange,
-  Colors.deepOrange,
-  Colors.brown,
-  Colors.grey,
-  Colors.blueGrey,
-];
-
-var themeColorShades = [
-  Colors.grey.shade300,
-  Colors.grey,
-  Colors.red.shade100,
-  Colors.pink.shade100,
-  Colors.purple.shade100,
-  Colors.deepPurpleAccent.shade100,
-  Colors.indigo.shade100,
-  Colors.blue.shade100,
-  Colors.lightBlue.shade100,
-  Colors.cyan.shade100,
-  Colors.teal.shade100,
-  Colors.green.shade100,
-  Colors.lightGreen.shade100,
-  Colors.lime.shade100,
-  // Colors.yellow.shade100,
-  Colors.amber.shade100,
-  Colors.orange.shade100,
-  Colors.deepOrange.shade100,
-  Colors.brown.shade100,
-  Colors.grey.shade100,
-  Colors.blueGrey.shade100,
-];
+import 'core/controllers/app_controller.dart';
+import 'core/services/storage_service.dart';
+import 'core/theme/app_colors.dart';
+import 'core/constants/app_constants.dart';
+import 'features/bible/controllers/bible_controller.dart';
+import 'features/home/pages/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  await Hive.openBox("settingsDB");
-  await Hive.openBox("hiLightDB");
-  await Hive.openBox("searchHistoryDB");
-  await Hive.openBox("notesBoxDB");
-  await Hive.openBox("textsBoxDB");
-
-  // box.clear();
-  // hiLightBox.clear();
-  // historyBox.clear();
-  // notesBox.clear();
-  // textsBox.clear();
-
-  themeMode.value = box.get('themeMode',defaultValue:false);
-  bibleVersions = box.get('bibleVersions',defaultValue: 'kjv');
-  bookSelected = box.get('bookSelected',defaultValue: 'Genesis');
-  selectedChapter = box.get('selectedChapter',defaultValue: 1);
-  colorSliderIdx.value = box.get('colorSliderIdx',defaultValue: 8);
-  textColorIdx.value = box.get('textColorIdx',defaultValue: 1);
-  globalFont.value = box.get('globalFont',defaultValue:'Raleway');
-  globalFontIdx = box.get('globalFontIdx',defaultValue: 8);
-  fontSize.value = box.get('fontSize',defaultValue: 2.0);
-  loggedIn = box.get('loggedIn',defaultValue: false);
-  userName = box.get('userName',defaultValue: 'John Doe');
-  profileIMG = box.get('profileIMG',defaultValue: 'https://picsum.photos/200/300');
-  showAdds.value = true;
-
-  brightness = ThemeData.estimateBrightnessForColor(themeColors[colorSliderIdx.value]);
-  textColorDynamic.value = brightness == Brightness.light ? Colors.black : Colors.white;
-
-  pages.value = [BooksLocalPage(bibleVersions, bookSelected, selectedChapter, 0)];
+  
+  // Initialize storage
+  await StorageService.init();
+  
+  // Initialize controllers
+  Get.put(AppController());
+  Get.put(BibleController());
 
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]
+    [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]
   );
-
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    appName = packageInfo.appName;
-    packageName = packageInfo.packageName;
-    version = packageInfo.version;
-    buildNumber = packageInfo.buildNumber;
-
-    WidgetsFlutterBinding.ensureInitialized();
-    MobileAds.instance.initialize();
 
   runApp(const MyApp());
 }
@@ -178,26 +33,38 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appController = Get.find<AppController>();
+    
     return AdaptiveTheme(
-        light: ThemeData(
+      light: GetBuilder<AppController>(
+        builder: (controller) => ThemeData(
           useMaterial3: false,
           brightness: Brightness.light,
-          primaryColor: themeColors[colorSliderIdx.value],
-          fontFamily: globalFont.value,
+          primaryColor: AppColors.themeColors[controller.colorSliderIdx.value],
+          fontFamily: controller.globalFont.value,
         ),
-        dark: ThemeData(
+      ),
+      dark: GetBuilder<AppController>(
+        builder: (controller) => ThemeData(
           useMaterial3: false,
           brightness: Brightness.dark,
-          primaryColor: themeColors[colorSliderIdx.value],
-          fontFamily: globalFont.value,
+          primaryColor: AppColors.themeColors[controller.colorSliderIdx.value],
+          fontFamily: controller.globalFont.value,
         ),
-        initial: themeMode.value ? AdaptiveThemeMode.dark : AdaptiveThemeMode.light,
-        builder: (theme, darkTheme) => GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: theme,
-          darkTheme: darkTheme,
-          home: const MyHomePage(
-            title:'Simple Bible',
+      ),
+      initial: appController.themeMode.value 
+          ? AdaptiveThemeMode.dark 
+          : AdaptiveThemeMode.light,
+      builder: (theme, darkTheme) => GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: theme,
+        darkTheme: darkTheme,
+        home: const HomePage(),
+      ),
+    );
+  }
+}
+
           ),
         )
     );
