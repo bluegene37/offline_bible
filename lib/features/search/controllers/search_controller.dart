@@ -6,7 +6,7 @@ import '../../../core/services/storage_service.dart';
 import '../../../core/utils/date_utils.dart';
 import '../../bible/controllers/bible_controller.dart';
 
-class SearchController extends GetxController {
+class BibleSearchController extends GetxController {
   final TextEditingController textController = TextEditingController();
   final RxString searchQuery = ''.obs;
   final RxBool hideHistory = false.obs;

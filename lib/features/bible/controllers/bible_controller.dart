@@ -23,6 +23,7 @@ class BibleController extends GetxController {
   final RxBool isLoading = false.obs;
   
   int scrollChecker = 0;
+  int scrollChapter = 0;
   int colorIndex = 999;
 
   @override

@@ -7,9 +7,9 @@ class SearchHistoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final searchController = Get.find<SearchController>();
+    final searchController = Get.find<BibleSearchController>();
 
-    return GetBuilder<SearchController>(
+    return GetBuilder<BibleSearchController>(
       builder: (controller) {
         return Column(
           children: [

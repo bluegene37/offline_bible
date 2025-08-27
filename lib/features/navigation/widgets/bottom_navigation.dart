@@ -3,12 +3,6 @@ import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../bible/pages/bible_page.dart';
-import '../../bible/pages/books_page.dart';
-import '../../bible/pages/chapter_page.dart';
-import '../../search/pages/search_page.dart';
-import '../../notes/pages/notes_page.dart';
-import '../../settings/pages/settings_page.dart';
 
 class BottomNavigation extends StatelessWidget {
   final Function(int) onTabSelected;
@@ -74,31 +68,22 @@ class BottomNavigation extends StatelessWidget {
     switch (index) {
       case AppConstants.booksPageIndex:
         controller.barTitle.value = "Books (66)";
-        Get.to(() => const BooksPage());
         break;
       case AppConstants.chaptersPageIndex:
         controller.barTitle.value = "Chapters";
-        Get.to(() => const ChapterPage());
         break;
       case AppConstants.biblePageIndex:
         controller.barTitle.value = 
             '${controller.bookSelected.value} ${controller.selectedChapter.value}';
-        Get.to(() => BiblePage(
-          bookTitle: controller.bookSelected.value,
-          chapter: controller.selectedChapter.value,
-        ));
         break;
       case AppConstants.searchPageIndex:
         controller.barTitle.value = "Search";
-        Get.to(() => const SearchPage());
         break;
       case AppConstants.notesPageIndex:
         controller.barTitle.value = "Notes | Highlights";
-        Get.to(() => const NotesPage());
         break;
       case AppConstants.settingsPageIndex:
         controller.barTitle.value = "Settings";
-        Get.to(() => const SettingsPage());
         break;
     }
   }

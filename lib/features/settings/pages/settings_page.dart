@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:settings_ui/settings_ui.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/constants/app_constants.dart';
@@ -63,9 +64,15 @@ class SettingsPage extends StatelessWidget {
 
   SettingsSection _buildThemeSection() {
     return SettingsSection(
+      title: const Text('Appearance'),
       tiles: [
         const SettingsTile(
-          title: Text('Font:'),
+          title: Text('Font'),
+          value: FontPicker(),
+        ),
+        const SettingsTile(
+          title: Text('Theme Colors'),
+          value: ColorPicker(),
         ),
       ],
     );
@@ -73,9 +80,10 @@ class SettingsPage extends StatelessWidget {
 
   SettingsSection _buildAppInfoSection() {
     return SettingsSection(
+      title: const Text('About'),
       tiles: [
         SettingsTile(
-          title: const Text('Build:'),
+          title: const Text('App Version'),
           value: FutureBuilder<String>(
             future: _getVersionInfo(),
             builder: (context, snapshot) {
@@ -88,7 +96,11 @@ class SettingsPage extends StatelessWidget {
   }
 
   Future<String> _getVersionInfo() async {
-    // This would need to be implemented to get package info
-    return 'Version 2.0.0+6';
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      return '${packageInfo.version}+${packageInfo.buildNumber}';
+    } catch (e) {
+      return '2.0.0+6';
+    }
   }
 }

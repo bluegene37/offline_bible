@@ -5,6 +5,11 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../navigation/widgets/bottom_navigation.dart';
 import '../../bible/pages/bible_page.dart';
+import '../../bible/pages/books_page.dart';
+import '../../bible/pages/chapter_page.dart';
+import '../../search/pages/search_page.dart';
+import '../../notes/pages/notes_page.dart';
+import '../../settings/pages/settings_page.dart';
 import '../../bible/widgets/floating_navigation.dart';
 
 class HomePage extends StatefulWidget {
@@ -44,10 +49,10 @@ class _HomePageState extends State<HomePage> {
   void _updateCurrentPage(int index) {
     switch (index) {
       case AppConstants.booksPageIndex:
-        // currentPage = const BooksPage();
+        currentPage = const BooksPage();
         break;
       case AppConstants.chaptersPageIndex:
-        // currentPage = const ChapterPage();
+        currentPage = const ChapterPage();
         break;
       case AppConstants.biblePageIndex:
         currentPage = BiblePage(
@@ -56,13 +61,13 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case AppConstants.searchPageIndex:
-        // currentPage = const SearchPage();
+        currentPage = const SearchPage();
         break;
       case AppConstants.notesPageIndex:
-        // currentPage = const NotesPage();
+        currentPage = const NotesPage();
         break;
       case AppConstants.settingsPageIndex:
-        // currentPage = const SettingsPage();
+        currentPage = const SettingsPage();
         break;
     }
   }

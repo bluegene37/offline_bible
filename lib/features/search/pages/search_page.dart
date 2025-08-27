@@ -13,7 +13,7 @@ class SearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appController = Get.find<AppController>();
-    final searchController = Get.put(SearchController());
+    final searchController = Get.put(BibleSearchController());
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -32,7 +32,7 @@ class SearchPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar(AppController appController, SearchController searchController, 
+  Widget _buildSearchBar(AppController appController, BibleSearchController searchController, 
                         BuildContext context) {
     return Obx(() => OutlineSearchBar(
       focusNode: FocusNode(),

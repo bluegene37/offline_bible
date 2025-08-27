@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../constants/app_constants.dart';
 import '../services/storage_service.dart';
 import '../theme/app_colors.dart';
+import '../../features/bible/services/bible_service.dart';
 
 class AppController extends GetxController {
   // Observable variables
@@ -33,6 +34,11 @@ class AppController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    await BibleService.initialize();
     _loadSettings();
     _updateTextColor();
   }
