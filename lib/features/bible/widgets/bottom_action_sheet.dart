@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../controllers/bible_controller.dart';
+import '../../notes/widgets/note_editor_sheet.dart';
 
 class BottomActionSheet extends StatelessWidget {
   final List<String> selectedVerses;
@@ -20,187 +21,181 @@ class BottomActionSheet extends StatelessWidget {
 
     return GetBuilder<AppController>(
       builder: (controller) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Obx(() => SizedBox(
-            height: 120 + bibleController.sheetHeight.value,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (bibleController.sheetHeight.value > 0) _buildNotesField(controller),
-                _buildActionButtons(controller, bibleController),
-                const SizedBox(height: 5),
-                _buildCopyButtons(controller),
-                _buildHighlightColors(controller, bibleController),
-              ],
-            ),
-          )),
+        return Container(
+          padding: EdgeInsets.only(
+            left: 20.0,
+            right: 20.0,
+            top: 20.0,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20.0,
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. Actions Row (Copy, Note, Share)
+              _buildActionRow(context, controller, bibleController),
+              const SizedBox(height: 25),
+
+              // 2. Divider or Label (Optional, keeping it clean for now)
+
+              // 3. Highlight Colors
+              _buildHighlightColors(controller, bibleController),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildNotesField(AppController controller) {
-    return SizedBox(
-      height: Get.find<BibleController>().sheetHeight.value,
-      child: TextFormField(
-        controller: Get.find<BibleController>().notesController,
-        textAlignVertical: TextAlignVertical.top,
-        keyboardType: TextInputType.multiline,
-        maxLines: null,
-        expands: true,
-        decoration: InputDecoration(
-          labelText: "Enter Notes",
-          fillColor: Colors.white,
-          labelStyle: TextStyle(
-            color: AppColors.themeColorShades[controller.colorSliderIdx.value],
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25.0),
-          ),
+  Widget _buildActionRow(BuildContext context, AppController controller,
+      BibleController bibleController) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distribute evenly
+      children: [
+        _buildActionButton(
+          context,
+          icon: Icons.copy_all_rounded,
+          label: 'Copy',
+          onTap: () => bibleController.copyVerses(selectedVerses),
+        ),
+        _buildActionButton(
+          context,
+          icon: Icons.edit_note_rounded,
+          label: 'Note',
+          onTap: () => _openNoteEditor(context),
+        ),
+        _buildActionButton(
+          context,
+          icon: Icons.share_rounded,
+          label: 'Share',
+          onTap: () {
+            bibleController.copyVerses(selectedVerses);
+            Get.snackbar('Share', 'Verses copied for sharing');
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    // Use the primary theme color for actions to make them pop
+    final primaryColor =
+        AppColors.themeColors[Get.find<AppController>().colorThemeName.value];
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: 80,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: primaryColor!
+              .withOpacity(0.1), // Value 0.1 opacity for subtle background
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 28, color: primaryColor),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: primaryColor,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildActionButtons(AppController controller, BibleController bibleController) {
-    return Row(
-      children: [
-        const Spacer(),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.themeColors[controller.colorSliderIdx.value],
-          ),
-          onPressed: () => _saveNotes(bibleController),
-          child: Text(
-            'Save',
-            style: TextStyle(color: controller.textColorDynamic.value),
-          ),
-        ),
-        const Spacer(),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.themeColors[controller.colorSliderIdx.value],
-          ),
-          onPressed: () => _toggleNotesField(bibleController),
-          child: Text(
-            'Close',
-            style: TextStyle(color: controller.textColorDynamic.value),
-          ),
-        ),
-        const Spacer(),
-      ],
-    );
-  }
-
-  Widget _buildCopyButtons(AppController controller) {
-    return Row(
-      children: [
-        const Spacer(),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.themeColors[controller.colorSliderIdx.value],
-          ),
-          onPressed: () => _copyText(false),
-          child: Text(
-            'Copy texts',
-            style: TextStyle(color: controller.textColorDynamic.value),
-          ),
-        ),
-        const Spacer(),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.themeColors[controller.colorSliderIdx.value],
-          ),
-          onPressed: () => _copyText(true),
-          child: Text(
-            'Copy w/ verse no.',
-            style: TextStyle(color: controller.textColorDynamic.value),
-          ),
-        ),
-        const Spacer(),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.themeColors[controller.colorSliderIdx.value],
-          ),
-          onPressed: () => _toggleNotesField(Get.find<BibleController>()),
-          child: Text(
-            'Notes',
-            style: TextStyle(color: controller.textColorDynamic.value),
-          ),
-        ),
-        const Spacer(),
-      ],
-    );
-  }
-
-  Widget _buildHighlightColors(AppController controller, BibleController bibleController) {
+  Widget _buildHighlightColors(
+      AppController controller, BibleController bibleController) {
     return SizedBox(
-      height: 70,
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      height: 50,
+      child: ListView(
         scrollDirection: Axis.horizontal,
-        itemCount: AppColors.highlightColors.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 5),
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: () => _applyHighlight(index, bibleController),
-            child: CircleAvatar(
-              radius: 22.5,
-              backgroundColor: AppColors.highlightColors[index],
-              child: _isColorSelected(index) 
-                  ? const Icon(Icons.close, color: Colors.black)
-                  : null,
+        physics: const BouncingScrollPhysics(),
+        children: [
+          // Clear Button
+          InkWell(
+            onTap: () => _applyHighlight(-1, bibleController),
+            borderRadius: BorderRadius.circular(25),
+            child: Container(
+              width: 50,
+              height: 50,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border:
+                    Border.all(color: Colors.grey.withOpacity(0.4), width: 1.5),
+              ),
+              child: const Icon(Icons.format_color_reset_rounded,
+                  size: 22, color: Colors.grey),
             ),
-          );
-        },
+          ),
+          ...List.generate(AppColors.highlightColors.length, (index) {
+            return Container(
+              margin: const EdgeInsets.only(right: 12),
+              child: InkWell(
+                onTap: () => _applyHighlight(index, bibleController),
+                borderRadius: BorderRadius.circular(25),
+                child: CircleAvatar(
+                  radius: 25, // Slightly larger for easier tapping
+                  backgroundColor: AppColors.highlightColors[index],
+                  child: _isColorSelected(index)
+                      ? const Icon(Icons.check, color: Colors.black, size: 22)
+                      : null,
+                ),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
 
   bool _isColorSelected(int colorIndex) {
-    // This would need to be implemented based on current selection logic
+    // Note: Implementing true selection logic would require checking the BibleController state.
+    // For now, stateless return false is acceptable as the action is immediate.
     return false;
   }
 
-  void _copyText(bool includeVerseNumbers) {
-    final bibleController = Get.find<BibleController>();
-    String copyText = '';
-    
-    for (final verse in bibleController.currentVerses) {
-      if (selectedVerses.any((key) => key.endsWith(':${verse.verse}'))) {
-        if (includeVerseNumbers) {
-          copyText += '${verse.verse}. ${verse.text} ';
-        } else {
-          copyText += '${verse.text} ';
-        }
-      }
-    }
-    
-    Clipboard.setData(ClipboardData(text: copyText.trim()));
-    Get.snackbar('Copied', 'Text copied to clipboard');
-  }
-
-  void _saveNotes(BibleController bibleController) {
-    final notes = bibleController.notesController.text.trim();
-    if (notes.isNotEmpty) {
-      bibleController.saveNotes(selectedVerses, notes);
-      Get.back();
-    }
-  }
-
-  void _toggleNotesField(BibleController bibleController) {
-    if (bibleController.sheetHeight.value == 300.0) {
-      bibleController.sheetHeight.value = 0.0;
-      bibleController.notesController.clear();
-      SystemChannels.textInput.invokeMethod('TextInput.hide');
-    } else {
-      bibleController.sheetHeight.value = 300.0;
-    }
-  }
-
   void _applyHighlight(int colorIndex, BibleController bibleController) {
-    bibleController.saveHighlight(selectedVerses, colorIndex);
+    if (colorIndex == -1) {
+      for (final key in selectedVerses) {
+        bibleController.deleteHighlight(key);
+      }
+    } else {
+      bibleController.saveHighlight(selectedVerses, colorIndex);
+    }
     Get.back();
+  }
+
+  void _openNoteEditor(BuildContext context) {
+    if (selectedVerses.isEmpty) return;
+    Get.bottomSheet(
+      NoteEditorSheet(verseKeys: selectedVerses),
+      isScrollControlled: true,
+    );
   }
 }

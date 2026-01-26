@@ -4,6 +4,7 @@ import '../constants/app_constants.dart';
 import '../services/storage_service.dart';
 import '../theme/app_colors.dart';
 import '../../features/bible/services/bible_service.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
 
 class AppController extends GetxController {
   // Observable variables
@@ -12,7 +13,7 @@ class AppController extends GetxController {
   final RxInt selectedChapter = AppConstants.defaultChapter.obs;
   final RxString searchQuery = ''.obs;
   final RxInt globalIndex = AppConstants.biblePageIndex.obs;
-  final RxInt colorSliderIdx = AppConstants.defaultColorIndex.obs;
+  final RxString colorThemeName = AppConstants.defaultColorTheme.obs;
   final RxInt textColorIdx = AppConstants.defaultTextColorIndex.obs;
   final RxString globalFont = AppConstants.defaultFont.obs;
   final RxDouble fontSize = AppConstants.defaultFontSize.obs;
@@ -21,6 +22,10 @@ class AppController extends GetxController {
   final RxBool showAds = true.obs;
   final RxList<String> textUnderline = <String>[].obs;
   final Rx<Color> textColorDynamic = Colors.black.obs;
+
+  // Caching
+  String cachedBibleData = '';
+  String cachedBookTitles = '';
 
   // Non-reactive variables
   String bibleVersion = AppConstants.defaultBibleVersion;
@@ -38,33 +43,41 @@ class AppController extends GetxController {
   }
 
   Future<void> _initializeApp() async {
-    await BibleService.initialize();
+    await BibleService.initialize(this);
     _loadSettings();
     _updateTextColor();
   }
 
   void _loadSettings() {
     themeMode.value = StorageService.getSetting('themeMode', false);
-    bibleVersion = StorageService.getSetting('bibleVersions', AppConstants.defaultBibleVersion);
-    bookSelected.value = StorageService.getSetting('bookSelected', AppConstants.defaultBook);
-    selectedChapter.value = StorageService.getSetting('selectedChapter', AppConstants.defaultChapter);
-    colorSliderIdx.value = StorageService.getSetting('colorSliderIdx', AppConstants.defaultColorIndex);
-    textColorIdx.value = StorageService.getSetting('textColorIdx', AppConstants.defaultTextColorIndex);
-    globalFont.value = StorageService.getSetting('globalFont', AppConstants.defaultFont);
+    bibleVersion = StorageService.getSetting(
+        'bibleVersions', AppConstants.defaultBibleVersion);
+    bookSelected.value =
+        StorageService.getSetting('bookSelected', AppConstants.defaultBook);
+    selectedChapter.value = StorageService.getSetting(
+        'selectedChapter', AppConstants.defaultChapter);
+    colorThemeName.value = StorageService.getSetting(
+        'colorThemeName', AppConstants.defaultColorTheme);
+    textColorIdx.value = StorageService.getSetting(
+        'textColorIdx', AppConstants.defaultTextColorIndex);
+    globalFont.value =
+        StorageService.getSetting('globalFont', AppConstants.defaultFont);
     globalFontIdx = StorageService.getSetting('globalFontIdx', 8);
-    fontSize.value = StorageService.getSetting('fontSize', AppConstants.defaultFontSize);
+    fontSize.value =
+        StorageService.getSetting('fontSize', AppConstants.defaultFontSize);
   }
 
   void _updateTextColor() {
     final brightness = ThemeData.estimateBrightnessForColor(
-      AppColors.themeColors[colorSliderIdx.value]
+      AppColors.themeColors[colorThemeName.value]!,
     );
-    textColorDynamic.value = brightness == Brightness.light ? Colors.black : Colors.white;
+    textColorDynamic.value =
+        brightness == Brightness.light ? Colors.black : Colors.white;
   }
 
-  void updateColorTheme(int index) {
-    colorSliderIdx.value = index;
-    StorageService.setSetting('colorSliderIdx', index);
+  void updateColorTheme(String themeName) {
+    colorThemeName.value = themeName;
+    StorageService.setSetting('colorThemeName', themeName);
     _updateTextColor();
   }
 
@@ -100,5 +113,15 @@ class AppController extends GetxController {
 
   void clearTextSelection() {
     textUnderline.clear();
+  }
+
+  void toggleThemeMode(bool isDark, BuildContext context) {
+    themeMode.value = isDark;
+    StorageService.setSetting('themeMode', isDark);
+    if (isDark) {
+      AdaptiveTheme.of(context).setDark();
+    } else {
+      AdaptiveTheme.of(context).setLight();
+    }
   }
 }

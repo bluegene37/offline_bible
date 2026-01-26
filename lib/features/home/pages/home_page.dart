@@ -12,95 +12,68 @@ import '../../notes/pages/notes_page.dart';
 import '../../settings/pages/settings_page.dart';
 import '../../bible/widgets/floating_navigation.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final AppController appController = Get.find<AppController>();
-  Widget currentPage = Container();
-
-  @override
-  void initState() {
-    super.initState();
-    _initializePage();
-  }
-
-  void _initializePage() {
-    // Initialize with Bible page
-    currentPage = BiblePage(
-      bookTitle: appController.bookSelected.value,
-      chapter: appController.selectedChapter.value,
-    );
-    appController.barTitle.value = 
-        '${appController.bookSelected.value} ${appController.selectedChapter.value}';
-  }
-
-  void _onTabTapped(int index) {
-    setState(() {
-      appController.globalIndex.value = index;
-      _updateCurrentPage(index);
-    });
-  }
-
-  void _updateCurrentPage(int index) {
-    switch (index) {
-      case AppConstants.booksPageIndex:
-        currentPage = const BooksPage();
-        break;
-      case AppConstants.chaptersPageIndex:
-        currentPage = const ChapterPage();
-        break;
-      case AppConstants.biblePageIndex:
-        currentPage = BiblePage(
-          bookTitle: appController.bookSelected.value,
-          chapter: appController.selectedChapter.value,
-        );
-        break;
-      case AppConstants.searchPageIndex:
-        currentPage = const SearchPage();
-        break;
-      case AppConstants.notesPageIndex:
-        currentPage = const NotesPage();
-        break;
-      case AppConstants.settingsPageIndex:
-        currentPage = const SettingsPage();
-        break;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return GetBuilder<AppController>(
-      builder: (controller) {
-        return Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(35.0),
-            child: AppBar(
-              centerTitle: true,
-              backgroundColor: AppColors.themeColors[controller.colorSliderIdx.value],
-              title: Text(
-                controller.barTitle.value,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300,
-                  color: controller.textColorDynamic.value,
-                ),
+    final AppController appController = Get.find<AppController>();
+
+    return Obx(() {
+      final int currentIndex = appController.globalIndex.value;
+
+      return Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(35.0),
+          child: AppBar(
+            centerTitle: true,
+            backgroundColor: AppColors.themeColors[appController.colorThemeName.value],
+            title: Text(
+              appController.barTitle.value,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w300,
+                color: appController.textColorDynamic.value,
               ),
             ),
           ),
-          body: SafeArea(child: currentPage),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: _shouldShowFloatingButton(controller)
-              ? const FloatingNavigation()
-              : null,
-          bottomNavigationBar: BottomNavigation(onTabSelected: _onTabTapped),
+        ),
+        body: SafeArea(child: _getCurrentPage(currentIndex)),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: _shouldShowFloatingButton(appController)
+            ? const FloatingNavigation()
+            : null,
+        bottomNavigationBar: BottomNavigation(
+          onTabSelected: (index) => appController.navigateToPage(index),
+        ),
+      );
+    });
+  }
+
+  Widget _getCurrentPage(int index) {
+    final AppController appController = Get.find<AppController>();
+    switch (index) {
+      case AppConstants.booksPageIndex:
+        return const BooksPage();
+      case AppConstants.chaptersPageIndex:
+        return const ChapterPage();
+      case AppConstants.biblePageIndex:
+        return BiblePage(
+          bookTitle: appController.bookSelected.value,
+          chapter: appController.selectedChapter.value,
         );
-      },
-    );
+      case AppConstants.searchPageIndex:
+        return const SearchPage();
+      case AppConstants.notesPageIndex:
+        return const NotesPage();
+      case AppConstants.settingsPageIndex:
+        return const SettingsPage();
+      default:
+        return BiblePage(
+          bookTitle: appController.bookSelected.value,
+          chapter: appController.selectedChapter.value,
+        );
+    }
   }
 
   bool _shouldShowFloatingButton(AppController controller) {

@@ -10,12 +10,6 @@ class ChapterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appController = Get.find<AppController>();
-    final bibleController = Get.find<BibleController>();
-
-    // Load chapters when page is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      bibleController.loadChapters(appController.bookSelected.value);
-    });
 
     return Scaffold(
       body: GetBuilder<BibleController>(
@@ -44,7 +38,8 @@ class ChapterPage extends StatelessWidget {
           itemCount: chapters.length,
           itemBuilder: (context, index) {
             final chapter = chapters[index];
-            final isSelected = controller.selectedChapter.value == chapter.chapter;
+            final isSelected =
+                controller.selectedChapter.value == chapter.chapter;
 
             return GridTile(
               child: InkWell(
@@ -53,8 +48,9 @@ class ChapterPage extends StatelessWidget {
                   margin: const EdgeInsets.all(5.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isSelected 
-                        ? AppColors.themeColorShades[controller.colorSliderIdx.value] 
+                    color: isSelected
+                        ? AppColors
+                            .themeColorShades[controller.colorThemeName.value]
                         : null,
                   ),
                   child: Column(

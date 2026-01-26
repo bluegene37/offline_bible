@@ -20,15 +20,32 @@ class BottomNavigation extends StatelessWidget {
       builder: (controller) {
         return NavigationBarTheme(
           data: NavigationBarThemeData(
-            indicatorColor: AppColors.themeColorShades[controller.colorSliderIdx.value],
-            labelTextStyle: WidgetStateProperty.all(
-              const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
-            ),
+            indicatorColor:
+                AppColors.themeColorShades[controller.colorThemeName.value],
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black, // Dark text on light indicator
+                );
+              }
+              return const TextStyle(fontSize: 14, fontWeight: FontWeight.w400);
+            }),
+            iconTheme: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return const IconThemeData(
+                  color: Colors.black, // Dark icon on light indicator
+                );
+              }
+              return null; // Default theme color (White in dark mode, Black in light mode)
+            }),
           ),
           child: NavigationBar(
             height: 60,
             selectedIndex: controller.globalIndex.value,
-            onDestinationSelected: (index) => _handleNavigation(index, controller),
+            onDestinationSelected: (index) =>
+                _handleNavigation(index, controller),
             destinations: const [
               NavigationDestination(
                 icon: Icon(Icons.menu_book_outlined),
@@ -64,7 +81,7 @@ class BottomNavigation extends StatelessWidget {
   void _handleNavigation(int index, AppController controller) {
     onTabSelected(index);
     controller.navigateToPage(index);
-    
+
     switch (index) {
       case AppConstants.booksPageIndex:
         controller.barTitle.value = "Books (66)";
@@ -73,7 +90,7 @@ class BottomNavigation extends StatelessWidget {
         controller.barTitle.value = "Chapters";
         break;
       case AppConstants.biblePageIndex:
-        controller.barTitle.value = 
+        controller.barTitle.value =
             '${controller.bookSelected.value} ${controller.selectedChapter.value}';
         break;
       case AppConstants.searchPageIndex:

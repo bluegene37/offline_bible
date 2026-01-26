@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:settings_ui/settings_ui.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/constants/app_constants.dart';
 import '../widgets/font_picker.dart';
 import '../widgets/color_picker.dart';
 import '../widgets/font_preview.dart';
@@ -13,21 +12,17 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appController = Get.find<AppController>();
+    final AppController appController = Get.find<AppController>();
 
     return Scaffold(
-      body: GetBuilder<AppController>(
-        builder: (controller) {
-          return SettingsList(
+      body: Obx(() => SettingsList(
             sections: [
-              _buildVersionSection(controller),
-              _buildFontSection(controller),
+              _buildVersionSection(appController),
+              _buildFontSection(appController),
               _buildThemeSection(),
               _buildAppInfoSection(),
             ],
-          );
-        },
-      ),
+          )),
     );
   }
 
@@ -46,15 +41,16 @@ class SettingsPage extends StatelessWidget {
     return SettingsSection(
       tiles: [
         SettingsTile(
-          title: Text('Font Size: ${(controller.fontSize.value + 15).toStringAsFixed(2)}'),
-          value: Slider(
-            min: 0.0,
-            max: 15.0,
-            value: controller.fontSize.value,
-            onChanged: (value) => controller.updateFontSize(value),
-          ),
+          title: Obx(() => Text(
+              'Font Size: ${(controller.fontSize.value + 15).toStringAsFixed(2)}')),
+          value: Obx(() => Slider(
+                min: 0.0,
+                max: 15.0,
+                value: controller.fontSize.value,
+                onChanged: (value) => controller.updateFontSize(value),
+              )),
         ),
-        const SettingsTile(
+        SettingsTile(
           title: Text('Text Preview:'),
           value: FontPreview(),
         ),
@@ -66,11 +62,17 @@ class SettingsPage extends StatelessWidget {
     return SettingsSection(
       title: const Text('Appearance'),
       tiles: [
-        const SettingsTile(
+        SettingsTile.switchTile(
+          title: const Text('Dark Mode'),
+          initialValue: Get.find<AppController>().themeMode.value,
+          onToggle: (value) =>
+              Get.find<AppController>().toggleThemeMode(value, Get.context!),
+        ),
+        SettingsTile(
           title: Text('Font'),
           value: FontPicker(),
         ),
-        const SettingsTile(
+        SettingsTile(
           title: Text('Theme Colors'),
           value: ColorPicker(),
         ),

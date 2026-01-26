@@ -15,7 +15,7 @@ class FloatingNavigation extends StatelessWidget {
     return GetBuilder<AppController>(
       builder: (controller) {
         final canGoBack = controller.selectedChapter.value > 1;
-        final canGoForward = controller.selectedChapter.value < bibleController.lastChapter;
+        final canGoForward = controller.selectedChapter.value < appController.lastChapter;
 
         return Stack(
           fit: StackFit.expand,
@@ -26,7 +26,7 @@ class FloatingNavigation extends StatelessWidget {
               width: 40,
               height: 40,
               child: FloatingActionButton(
-                backgroundColor: AppColors.themeColors[controller.colorSliderIdx.value],
+                backgroundColor: AppColors.themeColors[controller.colorThemeName.value],
                 heroTag: 'back',
                 onPressed: canGoBack ? () => bibleController.navigateToPreviousChapter() : null,
                 child: Icon(
@@ -44,7 +44,7 @@ class FloatingNavigation extends StatelessWidget {
               width: 40,
               height: 40,
               child: FloatingActionButton(
-                backgroundColor: AppColors.themeColors[controller.colorSliderIdx.value],
+                backgroundColor: AppColors.themeColors[controller.colorThemeName.value],
                 heroTag: 'next',
                 onPressed: canGoForward ? () => bibleController.navigateToNextChapter() : null,
                 child: Icon(

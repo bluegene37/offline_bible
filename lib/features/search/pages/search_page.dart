@@ -51,26 +51,24 @@ class SearchPage extends StatelessWidget {
   }
 
   Color _getClearButtonColor(AppController controller) {
-    return controller.colorSliderIdx.value == 0
-        ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorSliderIdx.value];
+    return AppColors.themeColors[controller.colorThemeName.value]!;
   }
 
   Color _getCursorColor(AppController controller) {
-    return controller.colorSliderIdx.value == 0 || controller.colorSliderIdx.value == 1
+    return controller.colorThemeName.value == 'Black'
         ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorSliderIdx.value];
+        : AppColors.themeColors[controller.colorThemeName.value]!;
   }
 
   Color _getSearchIconColor(AppController controller) {
-    return controller.colorSliderIdx.value == 0 || controller.colorSliderIdx.value == 1
+    return controller.colorThemeName.value == 'Black'
         ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorSliderIdx.value];
+        : AppColors.themeColors[controller.colorThemeName.value]!;
   }
 
   Color _getBorderColor(AppController controller) {
-    return controller.colorSliderIdx.value == 0 || controller.colorSliderIdx.value == 1
+    return controller.colorThemeName.value == 'Black'
         ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorSliderIdx.value];
+        : AppColors.themeColors[controller.colorThemeName.value]!;
   }
 }

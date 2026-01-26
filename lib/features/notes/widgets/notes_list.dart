@@ -5,7 +5,9 @@ import 'package:outline_search_bar/outline_search_bar.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/text_utils.dart';
+import '../../../core/utils/ui_utils.dart';
 import '../controllers/notes_controller.dart';
+import 'note_editor_sheet.dart';
 
 class NotesList extends StatelessWidget {
   const NotesList({Key? key}) : super(key: key);
@@ -30,10 +32,10 @@ class NotesList extends StatelessWidget {
                 itemCount: controller.filteredNotes.length,
                 itemBuilder: (context, index) {
                   final note = controller.filteredNotes[index];
-                  final noteKeys = controller.notes.keys.toList();
-                  final noteId = noteKeys[index];
+                  final noteId = note['id'] as String;
 
-                  return _buildNoteCard(note, noteId, appController, notesController);
+                  return _buildNoteCard(
+                      note, noteId, appController, notesController);
                 },
               );
             },
@@ -43,8 +45,8 @@ class NotesList extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar(AppController appController, NotesController notesController,
-                        BuildContext context) {
+  Widget _buildSearchBar(AppController appController,
+      NotesController notesController, BuildContext context) {
     return GetBuilder<AppController>(
       builder: (controller) {
         return OutlineSearchBar(
@@ -57,17 +59,17 @@ class NotesList extends StatelessWidget {
           textEditingController: notesController.searchController,
           hintText: 'Search notes...',
           onSearchButtonPressed: (query) => notesController.filterNotes(query),
-          onClearButtonPressed: (query) => _clearSearch(notesController, context),
+          onClearButtonPressed: (query) =>
+              _clearSearch(notesController, context),
         );
       },
     );
   }
 
   Widget _buildNoteCard(Map note, String noteId, AppController appController,
-                       NotesController notesController) {
+      NotesController notesController) {
     final verseText = TextUtils.formatMultipleVerses(
-      TextUtils.cleanNotesText(note['book']?.toString() ?? '').split(',')
-    );
+        TextUtils.cleanNotesText(note['book']?.toString() ?? '').split(','));
 
     return GetBuilder<AppController>(
       builder: (controller) {
@@ -79,7 +81,8 @@ class NotesList extends StatelessWidget {
                   TextSpan(
                     text: '$verseText - ${appController.bibleVersion}',
                     style: TextStyle(
-                      color: AppColors.textColors[controller.textColorIdx.value],
+                      color:
+                          AppColors.textColors[controller.textColorIdx.value],
                       fontSize: 13,
                       fontStyle: FontStyle.italic,
                     ),
@@ -88,14 +91,16 @@ class NotesList extends StatelessWidget {
                   TextSpan(
                     text: "  ${note['notes']}",
                     style: TextStyle(
-                      color: AppColors.textColors[controller.textColorIdx.value],
+                      color:
+                          AppColors.textColors[controller.textColorIdx.value],
                     ),
                   ),
                   const TextSpan(text: '\n\n'),
                   TextSpan(
                     text: note['stamp']?.toString() ?? '',
                     style: TextStyle(
-                      color: AppColors.textColors[controller.textColorIdx.value],
+                      color:
+                          AppColors.textColors[controller.textColorIdx.value],
                       fontSize: 13,
                       fontStyle: FontStyle.italic,
                     ),
@@ -110,20 +115,20 @@ class NotesList extends StatelessWidget {
     );
   }
 
-  Widget _buildPopupMenu(String noteId, Map note, NotesController notesController) {
+  Widget _buildPopupMenu(
+      String noteId, Map note, NotesController notesController) {
     return PopupMenuButton<String>(
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'edit', child: Text('Edit')),
         const PopupMenuItem(value: 'delete', child: Text('Delete')),
       ],
-      onSelected: (value) => _handleMenuAction(value, noteId, note, notesController),
+      onSelected: (value) =>
+          _handleMenuAction(value, noteId, note, notesController),
     );
   }
 
   Color _getSearchBarColor(AppController controller) {
-    return controller.colorSliderIdx.value == 0
-        ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorSliderIdx.value];
+    return AppColors.themeColors[controller.colorThemeName.value]!;
   }
 
   void _clearSearch(NotesController notesController, BuildContext context) {
@@ -132,68 +137,32 @@ class NotesList extends StatelessWidget {
     FocusScope.of(context).unfocus();
   }
 
-  void _handleMenuAction(String action, String noteId, Map note, 
-                        NotesController notesController) {
+  void _handleMenuAction(
+      String action, String noteId, Map note, NotesController notesController) {
     switch (action) {
       case 'edit':
         _showEditDialog(noteId, note, notesController);
         break;
       case 'delete':
-        _showDeleteDialog(noteId, notesController);
+        UiUtils.showConfirmationDialog(
+          title: 'Delete Note?',
+          content: 'This action cannot be undone.',
+          onConfirm: () => notesController.deleteNote(noteId),
+        );
         break;
     }
   }
 
-  void _showEditDialog(String noteId, Map note, NotesController notesController) {
-    final editController = TextEditingController(text: note['notes']?.toString() ?? '');
-    
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Edit Note'),
-        content: TextField(
-          controller: editController,
-          maxLines: 5,
-          decoration: const InputDecoration(
-            hintText: 'Enter your notes...',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              notesController.updateNote(noteId, editController.text);
-              Get.back();
-            },
-            child: const Text('Save'),
-          ),
-        ],
+  void _showEditDialog(
+      String noteId, Map note, NotesController notesController) {
+    // Parse verses back from string if possible, or just pass noteId
+    Get.bottomSheet(
+      NoteEditorSheet(
+        verseKeys: [], // Logic to parse keys or just load by ID
+        existingNoteId: noteId,
+        initialText: note['notes']?.toString(),
       ),
-    );
-  }
-
-  void _showDeleteDialog(String noteId, NotesController notesController) {
-    Get.dialog(
-      CupertinoAlertDialog(
-        title: const Text('Delete Note?'),
-        content: const Text('This action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              notesController.deleteNote(noteId);
-              Get.back();
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+      isScrollControlled: true,
     );
   }
 }

@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/ui_utils.dart';
+import '../../bible/controllers/bible_controller.dart';
 import '../controllers/notes_controller.dart';
-import '../../bible/pages/bible_page.dart';
 
 class HighlightsList extends StatelessWidget {
   const HighlightsList({Key? key}) : super(key: key);
@@ -25,15 +25,10 @@ class HighlightsList extends StatelessWidget {
           itemCount: controller.highlights.length,
           itemBuilder: (context, index) {
             final highlight = controller.highlights[index];
-            final highlightKeys = controller.highlights.keys.toList();
-            final highlightKey = highlightKeys[index];
+            final highlightKey = highlight['id'] as String;
 
             return _buildHighlightCard(
-              highlight, 
-              highlightKey, 
-              appController, 
-              notesController
-            );
+                highlight, highlightKey, appController, notesController);
           },
         );
       },
@@ -41,7 +36,7 @@ class HighlightsList extends StatelessWidget {
   }
 
   Widget _buildHighlightCard(Map highlight, String highlightKey,
-                           AppController appController, NotesController notesController) {
+      AppController appController, NotesController notesController) {
     return GetBuilder<AppController>(
       builder: (controller) {
         return Card(
@@ -87,17 +82,15 @@ class HighlightsList extends StatelessWidget {
     );
   }
 
-  Widget _buildHighlightPopupMenu(String highlightKey, NotesController notesController) {
+  Widget _buildHighlightPopupMenu(
+      String highlightKey, NotesController notesController) {
     return PopupMenuButton<String>(
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'goto', child: Text('Go to verse')),
         const PopupMenuItem(value: 'delete', child: Text('Delete')),
       ],
-      onSelected: (value) => _handleHighlightMenuAction(
-        value, 
-        highlightKey, 
-        notesController
-      ),
+      onSelected: (value) =>
+          _handleHighlightMenuAction(value, highlightKey, notesController),
     );
   }
 
@@ -109,43 +102,32 @@ class HighlightsList extends StatelessWidget {
       final verse = int.tryParse(parts[2]) ?? 1;
 
       appController.updateBookSelection(bookTitle, chapter);
-      appController.navigateToPage(2);
 
-      Get.to(() => BiblePage(bookTitle: bookTitle, chapter: chapter));
+      final bibleController = Get.find<BibleController>();
+      bibleController.loadChapter(bookTitle, chapter);
+
+      appController.navigateToPage(2); // Switch to Bible tab
+
+      // Jump to specific verse
+      Future.delayed(const Duration(milliseconds: 500), () {
+        bibleController.jumpToVerse(verse - 1);
+      });
     }
   }
 
-  void _handleHighlightMenuAction(String action, String highlightKey,
-                                 NotesController notesController) {
+  void _handleHighlightMenuAction(
+      String action, String highlightKey, NotesController notesController) {
     switch (action) {
       case 'goto':
         _navigateToHighlight(highlightKey, Get.find<AppController>());
         break;
       case 'delete':
-        _showDeleteHighlightDialog(highlightKey, notesController);
+        UiUtils.showConfirmationDialog(
+          title: 'Delete Highlight?',
+          content: 'This action cannot be undone.',
+          onConfirm: () => notesController.deleteHighlight(highlightKey),
+        );
         break;
     }
-  }
-
-  void _showDeleteHighlightDialog(String highlightKey, NotesController notesController) {
-    Get.dialog(
-      CupertinoAlertDialog(
-        title: const Text('Delete Highlight?'),
-        content: const Text('This action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              notesController.deleteHighlight(highlightKey);
-              Get.back();
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
   }
 }

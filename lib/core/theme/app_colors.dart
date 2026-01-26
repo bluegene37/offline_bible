@@ -1,74 +1,63 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const List<Color> themeColors = [
-    Colors.white,
-    Colors.black,
-    Colors.red,
-    Colors.pink,
-    Colors.purple,
-    Colors.deepPurpleAccent,
-    Colors.indigo,
-    Colors.blue,
-    Colors.lightBlue,
-    Colors.cyan,
-    Colors.teal,
-    Colors.green,
-    Colors.lightGreen,
-    Colors.lime,
-    Colors.amber,
-    Colors.orange,
-    Colors.deepOrange,
-    Colors.brown,
-    Colors.grey,
-    Colors.blueGrey,
-  ];
+  // A curated, modern color palette
+  static final Map<String, Color> themeColors = {
+    'Blue': Colors.blue,
+    'Red': Colors.red,
+    'Pink': Colors.pink,
+    'Purple': Colors.purple,
+    'Deep Purple': Colors.deepPurple,
+    'Indigo': Colors.indigo,
+    'Cyan': Colors.cyan,
+    'Teal': Colors.teal,
+    'Green': Colors.green,
+    'Light Green': Colors.lightGreen,
+    'Lime': Colors.lime,
+    'Yellow': Colors.yellow,
+    'Amber': Colors.amber,
+    'Orange': Colors.orange,
+    'Deep Orange': Colors.deepOrange,
+    'Brown': Colors.brown,
+    'Blue Grey': Colors.blueGrey,
+    'Grey': Colors.grey,
+  };
 
-  static final List<Color> themeColorShades = [
-    Colors.grey.shade300,
-    Colors.grey,
-    Colors.red.shade100,
-    Colors.pink.shade100,
-    Colors.purple.shade100,
-    Colors.deepPurpleAccent.shade100,
-    Colors.indigo.shade100,
-    Colors.blue.shade100,
-    Colors.lightBlue.shade100,
-    Colors.cyan.shade100,
-    Colors.teal.shade100,
-    Colors.green.shade100,
-    Colors.lightGreen.shade100,
-    Colors.lime.shade100,
-    Colors.amber.shade100,
-    Colors.orange.shade100,
-    Colors.deepOrange.shade100,
-    Colors.brown.shade100,
-    Colors.grey.shade100,
-    Colors.blueGrey.shade100,
-  ];
+  static final Map<String, Color> themeColorShades = {
+    'Blue': Colors.blue.shade100,
+    'Red': Colors.red.shade100,
+    'Pink': Colors.pink.shade100,
+    'Purple': Colors.purple.shade100,
+    'Deep Purple': Colors.deepPurple.shade100,
+    'Indigo': Colors.indigo.shade100,
+    'Cyan': Colors.cyan.shade100,
+    'Teal': Colors.teal.shade100,
+    'Green': Colors.green.shade100,
+    'Light Green': Colors.lightGreen.shade100,
+    'Lime': Colors.lime.shade100,
+    'Yellow': Colors.yellow.shade100,
+    'Amber': Colors.amber.shade100,
+    'Orange': Colors.orange.shade100,
+    'Deep Orange': Colors.deepOrange.shade100,
+    'Brown': Colors.brown.shade100,
+    'Blue Grey': Colors.blueGrey.shade100,
+    'Grey': Colors.grey.shade400,
+  };
 
   static const List<Color> textColors = [
     Colors.white,
     Colors.black,
   ];
 
+  // Highlight colors are now a subset of the main theme shades
+  // Highlight colors: Premium Pastel Markers
   static final List<Color> highlightColors = [
-    Colors.red.shade100,
-    Colors.pink.shade100,
-    Colors.purple.shade100,
-    Colors.indigo.shade100,
-    Colors.blue.shade100,
-    Colors.lightBlue.shade100,
-    Colors.cyan.shade100,
-    Colors.teal.shade100,
-    Colors.green.shade100,
-    Colors.lightGreen.shade100,
-    Colors.lime.shade100,
-    Colors.yellow.shade100,
-    Colors.amber.shade100,
-    Colors.orange.shade100,
-    Colors.deepOrange.shade100,
-    Colors.brown.shade100,
-    Colors.blueGrey.shade100,
+    const Color(0xFFFFF9C4), // Pastel Yellow (Classic)
+    const Color(0xFFC8E6C9), // Pastel Green
+    const Color(0xFFBBDEFB), // Pastel Blue
+    const Color(0xFFF8BBD0), // Pastel Pink
+    const Color(0xFFE1BEE7), // Pastel Purple
+    const Color(0xFFFFCCBC), // Pastel Deep Orange
+    const Color(0xFFD7CCC8), // Pastel Brown
   ];
 }

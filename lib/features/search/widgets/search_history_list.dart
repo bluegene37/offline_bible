@@ -18,8 +18,8 @@ class SearchHistoryList extends StatelessWidget {
               padding: const EdgeInsets.all(5.0),
               child: Center(
                 child: Text(
-                  controller.searchHistory.isNotEmpty 
-                      ? 'Search History:' 
+                  controller.searchHistory.isNotEmpty
+                      ? 'Search History:'
                       : 'Search History: None',
                   style: const TextStyle(fontSize: 18.0),
                 ),
@@ -32,8 +32,8 @@ class SearchHistoryList extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final reversedIndex = controller.searchHistory.length - 1 - index;
                   final historyItem = controller.searchHistory[reversedIndex];
-                  final historyKeys = controller.searchHistory.keys.toList();
-                  final historyKey = historyKeys[reversedIndex];
+                  final historyKey = historyItem['id'] as String;
+                  final historyQuery = historyItem['query'] as String;
 
                   // Limit history to 25 items
                   if (index > 25) {
@@ -43,13 +43,13 @@ class SearchHistoryList extends StatelessWidget {
 
                   return Card(
                     child: ListTile(
-                      title: Text(historyItem),
+                      title: Text(historyQuery),
                       subtitle: Text(historyKey),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () => controller.deleteHistoryItem(historyKey),
                       ),
-                      onTap: () => controller.selectHistoryItem(historyItem),
+                      onTap: () => controller.selectHistoryItem(historyQuery),
                     ),
                   );
                 },

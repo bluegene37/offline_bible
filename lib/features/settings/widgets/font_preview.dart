@@ -8,16 +8,16 @@ class FontPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<AppController>(
-      builder: (controller) {
-        return Text(
-          'In the beginning God created the heaven and the earth.',
-          style: GoogleFonts.getFont(
-            controller.globalFont.value,
-            fontSize: 15 + controller.fontSize.value,
-          ),
-        );
-      },
-    );
+    final appController = Get.find<AppController>();
+
+    return Obx(() {
+      return Text(
+        'In the beginning God created the heaven and the earth.',
+        style: GoogleFonts.getFont(
+          appController.globalFont.value,
+          fontSize: 15 + appController.fontSize.value,
+        ),
+      );
+    });
   }
 }

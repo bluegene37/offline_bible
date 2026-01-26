@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DateUtils;
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
@@ -25,7 +25,10 @@ class BibleSearchController extends GetxController {
   }
 
   void _loadSearchHistory() {
-    searchHistory.value = StorageService.historyBox.values.toList();
+    final historyMap = StorageService.historyBox.toMap();
+    searchHistory.value = historyMap.entries.map((entry) {
+      return {'id': entry.key, 'query': entry.value};
+    }).toList();
   }
 
   void performSearch(String query) {
@@ -64,11 +67,16 @@ class BibleSearchController extends GetxController {
     final timestamp = DateUtils.formatDateTime(DateTime.now());
     
     // Remove existing entry if it exists
+    String? keyToDelete;
     StorageService.historyBox.toMap().forEach((key, value) {
       if (value == query) {
-        StorageService.historyBox.delete(key);
+        keyToDelete = key;
       }
     });
+
+    if (keyToDelete != null) {
+      StorageService.historyBox.delete(keyToDelete);
+    }
     
     StorageService.historyBox.put(timestamp, query);
     _loadSearchHistory();

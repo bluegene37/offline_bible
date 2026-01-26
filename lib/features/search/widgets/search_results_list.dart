@@ -5,7 +5,6 @@ import 'package:substring_highlight/substring_highlight.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../bible/controllers/bible_controller.dart';
-import '../../bible/pages/bible_page.dart';
 
 class SearchResultsList extends StatelessWidget {
   final String query;
@@ -50,7 +49,7 @@ class SearchResultsList extends StatelessWidget {
             padding: const EdgeInsets.only(top: 10.0),
             itemBuilder: (context, index) {
               final verse = controller.searchResults[index];
-              
+
               return Card(
                 child: GetBuilder<AppController>(
                   builder: (appCtrl) {
@@ -60,7 +59,8 @@ class SearchResultsList extends StatelessWidget {
                         term: query,
                         textStyle: TextStyle(
                           fontSize: 15,
-                          color: AppColors.textColors[appCtrl.textColorIdx.value],
+                          color:
+                              AppColors.textColors[appCtrl.textColorIdx.value],
                           fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.italic,
                         ),
@@ -76,7 +76,8 @@ class SearchResultsList extends StatelessWidget {
                         term: query,
                         textStyle: TextStyle(
                           fontSize: 17,
-                          color: AppColors.textColors[appCtrl.textColorIdx.value],
+                          color:
+                              AppColors.textColors[appCtrl.textColorIdx.value],
                           fontWeight: FontWeight.w300,
                         ),
                         textStyleHighlight: TextStyle(
@@ -92,7 +93,6 @@ class SearchResultsList extends StatelessWidget {
                 ),
               );
             },
-            itemScrollController: controller.itemScrollController,
           ),
         );
       },
@@ -100,22 +100,20 @@ class SearchResultsList extends StatelessWidget {
   }
 
   Color _getHighlightColor(AppController controller) {
-    return controller.colorSliderIdx.value == 0 || controller.colorSliderIdx.value == 1
+    return controller.colorThemeName.value == 'Black'
         ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorSliderIdx.value];
+        : AppColors.themeColors[controller.colorThemeName.value]!;
   }
 
   void _navigateToVerse(verse, AppController controller) {
     controller.updateBookSelection(verse.book, verse.chapter);
-    controller.navigateToPage(2); // Navigate to Bible page
-    
-    Get.to(() => BiblePage(
-      bookTitle: verse.book,
-      chapter: verse.chapter,
-    ));
-    
-    // Jump to specific verse
+
     final bibleController = Get.find<BibleController>();
+    bibleController.loadChapters(verse.book);
+
+    controller.navigateToPage(2); // Navigate to Bible page
+
+    // Jump to specific verse
     Future.delayed(const Duration(milliseconds: 500), () {
       bibleController.jumpToVerse(verse.verse - 1);
     });

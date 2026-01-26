@@ -33,13 +33,14 @@ class VerseTile extends StatelessWidget {
         final isSelected = controller.textUnderline.contains(verseKey);
         final hasHighlight = StorageService.highlightBox.containsKey(verseKey);
         final hasNotes = _hasNotes(verseKey);
-        
+
         return ListTile(
-          tileColor: bibleController.colorIndex == index 
-              ? AppColors.themeColorShades[controller.colorSliderIdx.value] 
+          tileColor: bibleController.colorIndex == index
+              ? AppColors.themeColorShades[controller.colorThemeName.value]
               : null,
           trailing: hasNotes ? _buildNotesIcon(controller) : null,
-          title: _buildVerseText(controller, verseKey, isSelected, hasHighlight),
+          title: _buildVerseText(
+              context, controller, verseKey, isSelected, hasHighlight),
           subtitle: isLastVerse ? _buildCopyrightText() : null,
           onTap: onTap,
         );
@@ -47,12 +48,8 @@ class VerseTile extends StatelessWidget {
     );
   }
 
-  Widget _buildVerseText(AppController controller, String verseKey, 
-                        bool isSelected, bool hasHighlight) {
-    final brightness = ThemeData.estimateBrightnessForColor(
-      AppColors.themeColors[controller.colorSliderIdx.value]
-    );
-    
+  Widget _buildVerseText(BuildContext context, AppController controller,
+      String verseKey, bool isSelected, bool hasHighlight) {
     return Text.rich(
       TextSpan(
         children: [
@@ -61,7 +58,7 @@ class VerseTile extends StatelessWidget {
             style: GoogleFonts.getFont(
               controller.globalFont.value,
               fontSize: 11 + controller.fontSize.value,
-              color: AppColors.textColors[controller.textColorIdx.value],
+              color: _getTextColor(context, hasHighlight).withOpacity(0.7),
               fontWeight: FontWeight.w300,
               fontStyle: FontStyle.italic,
             ),
@@ -73,7 +70,7 @@ class VerseTile extends StatelessWidget {
             style: GoogleFonts.getFont(
               controller.globalFont.value,
               fontSize: 15 + controller.fontSize.value,
-              color: _getTextColor(controller, hasHighlight, brightness),
+              color: _getTextColor(context, hasHighlight),
               decoration: isSelected ? TextDecoration.underline : null,
               decorationStyle: isSelected ? TextDecorationStyle.dashed : null,
               backgroundColor: _getBackgroundColor(verseKey, hasHighlight),
@@ -84,24 +81,34 @@ class VerseTile extends StatelessWidget {
     );
   }
 
-  Color _getTextColor(AppController controller, bool hasHighlight, Brightness brightness) {
-    if (!hasHighlight && brightness == Brightness.dark) {
-      return AppColors.textColors[controller.textColorIdx.value];
+  Color _getTextColor(BuildContext context, bool hasHighlight) {
+    if (hasHighlight) {
+      // Highlights are typically light colors, so use black text for contrast
+      return Colors.black;
     }
-    return Colors.black;
+
+    // For normal text, adapt to the background brightness
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
   }
 
   Color? _getBackgroundColor(String verseKey, bool hasHighlight) {
     if (!hasHighlight) return null;
-    
-    final colorIndex = StorageService.highlightBox.get(verseKey, defaultValue: 0);
-    return AppColors.highlightColors[colorIndex];
+
+    final colorIndex =
+        StorageService.highlightBox.get(verseKey, defaultValue: 0);
+    // Ensure index is within bounds
+    if (colorIndex >= 0 && colorIndex < AppColors.highlightColors.length) {
+      return AppColors.highlightColors[colorIndex];
+    }
+    return AppColors.highlightColors[0];
   }
 
   Widget _buildNotesIcon(AppController controller) {
     return Icon(
       Icons.note,
-      color: AppColors.themeColors[controller.colorSliderIdx.value],
+      color: AppColors.themeColors[controller.colorThemeName.value],
     );
   }
 
@@ -119,15 +126,14 @@ class VerseTile extends StatelessWidget {
 
   bool _hasNotes(String verseKey) {
     final notesValues = StorageService.notesBox.values.toList();
-    return notesValues.any((note) => 
-      note['book'].toString().contains(verseKey)
-    );
+    return notesValues
+        .any((note) => note['book'].toString().contains(verseKey));
   }
 
   void _handleVerseTap(String verseKey) {
     final bibleController = Get.find<BibleController>();
     bibleController.toggleVerseSelection(verseKey);
-    
+
     if (onTap != null) {
       onTap!();
     }

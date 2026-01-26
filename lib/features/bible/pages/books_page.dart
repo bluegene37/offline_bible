@@ -29,8 +29,10 @@ class BooksPage extends StatelessWidget {
           }
 
           final books = snapshot.data ?? [];
-          final oldTestament = books.where((book) => book.testament == 'old').toList();
-          final newTestament = books.where((book) => book.testament == 'new').toList();
+          final oldTestament =
+              books.where((book) => book.testament == 'old').toList();
+          final newTestament =
+              books.where((book) => book.testament == 'new').toList();
 
           return _buildBooksGrid(oldTestament, newTestament, appController);
         },
@@ -38,8 +40,8 @@ class BooksPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBooksGrid(List<BookTitle> oldTestament, List<BookTitle> newTestament, 
-                        AppController controller) {
+  Widget _buildBooksGrid(List<BookTitle> oldTestament,
+      List<BookTitle> newTestament, AppController controller) {
     return Column(
       children: [
         _buildTestamentHeaders(),
@@ -68,7 +70,8 @@ class BooksPage extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  color: AppColors.themeColorShades[controller.colorSliderIdx.value],
+                  color: AppColors
+                      .themeColorShades[controller.colorThemeName.value],
                   child: Text(
                     'Old Testament',
                     textAlign: TextAlign.center,
@@ -77,7 +80,8 @@ class BooksPage extends StatelessWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.all(8),
-                  color: AppColors.themeColorShades[controller.colorSliderIdx.value],
+                  color: AppColors
+                      .themeColorShades[controller.colorThemeName.value],
                   child: Text(
                     'New Testament',
                     textAlign: TextAlign.center,
@@ -109,8 +113,8 @@ class BooksPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 4.0),
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
-                  color: isSelected 
-                      ? AppColors.themeColorShades[ctrl.colorSliderIdx.value] 
+                  color: isSelected
+                      ? AppColors.themeColorShades[ctrl.colorThemeName.value]
                       : null,
                   borderRadius: const BorderRadius.all(Radius.circular(30.0)),
                 ),
@@ -144,6 +148,8 @@ class BooksPage extends StatelessWidget {
 
   void _selectBook(String bookKey, AppController controller) {
     controller.updateBookSelection(bookKey, 1);
+    Get.find<BibleController>()
+        .loadChapters(bookKey); // Load chapters for the selected book
     controller.navigateToPage(1); // Navigate to chapters page
   }
 }

@@ -28,12 +28,39 @@ class NotesController extends GetxController {
   }
 
   void loadNotes() {
-    notes.value = StorageService.notesBox.values.toList();
+    final Map<dynamic, dynamic> rawNotes = StorageService.notesBox.toMap();
+    notes.value = rawNotes.entries.map((entry) {
+      final note = Map<String, dynamic>.from(entry.value as Map);
+      note['id'] = entry.key.toString();
+      return note;
+    }).toList();
+
+    // Sort by timestamp descending (newest first)
+    notes.sort((a, b) {
+      final String? timeA = a['stamp'] as String?;
+      final String? timeB = b['stamp'] as String?;
+      if (timeA == null || timeB == null) return 0;
+      return timeB.compareTo(timeA);
+    });
+
     filteredNotes.value = notes;
   }
 
   void loadHighlights() {
-    highlights.value = StorageService.textsBox.values.toList();
+    final Map<dynamic, dynamic> rawHighlights = StorageService.textsBox.toMap();
+    highlights.value = rawHighlights.entries.map((entry) {
+      final highlight = Map<String, dynamic>.from(entry.value as Map);
+      highlight['id'] = entry.key.toString();
+      return highlight;
+    }).toList();
+
+    // Sort by timestamp descending
+    highlights.sort((a, b) {
+      final String? timeA = a['datetime'] as String?;
+      final String? timeB = b['datetime'] as String?;
+      if (timeA == null || timeB == null) return 0;
+      return timeB.compareTo(timeA);
+    });
   }
 
   void filterNotes(String query) {
@@ -45,7 +72,8 @@ class NotesController extends GetxController {
     final lowerQuery = query.toLowerCase();
     filteredNotes.value = notes.where((note) {
       final noteText = note['notes']?.toString().toLowerCase() ?? '';
-      final bookText = TextUtils.cleanNotesText(note['book']?.toString() ?? '').toLowerCase();
+      final bookText = TextUtils.cleanNotesText(note['book']?.toString() ?? '')
+          .toLowerCase();
       return noteText.contains(lowerQuery) || bookText.contains(lowerQuery);
     }).toList();
   }

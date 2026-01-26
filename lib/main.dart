@@ -38,20 +38,20 @@ class MyApp extends StatelessWidget {
           light: ThemeData(
             useMaterial3: false,
             brightness: Brightness.light,
-            primaryColor: AppColors.themeColors[appController.colorSliderIdx.value],
+            primaryColor: AppColors.themeColors[appController.colorThemeName.value],
             fontFamily: appController.globalFont.value,
             colorScheme: ColorScheme.fromSeed(
-              seedColor: AppColors.themeColors[appController.colorSliderIdx.value],
+              seedColor: AppColors.themeColors[appController.colorThemeName.value]!,
               brightness: Brightness.light,
             ),
           ),
           dark: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
-            primaryColor: AppColors.themeColors[appController.colorSliderIdx.value],
+            primaryColor: AppColors.themeColors[appController.colorThemeName.value],
             fontFamily: appController.globalFont.value,
             colorScheme: ColorScheme.fromSeed(
-              seedColor: AppColors.themeColors[appController.colorSliderIdx.value],
+              seedColor: AppColors.themeColors[appController.colorThemeName.value]!,
               brightness: Brightness.dark,
             ),
           ),
