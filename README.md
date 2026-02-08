@@ -1,4 +1,4 @@
-# simple_bible
+# Offline Bible
 
 Offline SImple Bible.
 

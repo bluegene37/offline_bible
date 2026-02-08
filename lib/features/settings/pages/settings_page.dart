@@ -50,9 +50,18 @@ class SettingsPage extends StatelessWidget {
                 onChanged: (value) => controller.updateFontSize(value),
               )),
         ),
-        SettingsTile(
-          title: Text('Text Preview:'),
-          value: FontPreview(),
+        CustomSettingsTile(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Text Preview:'),
+                const SizedBox(height: 10),
+                FontPreview(),
+              ],
+            ),
+          ),
         ),
       ],
     );
@@ -63,18 +72,45 @@ class SettingsPage extends StatelessWidget {
       title: const Text('Appearance'),
       tiles: [
         SettingsTile.switchTile(
+          title: const Text('Keep Screen On'),
+          initialValue: Get.find<AppController>().keepScreenOn.value,
+          onToggle: (value) =>
+              Get.find<AppController>().toggleKeepScreenOn(value),
+        ),
+        SettingsTile.switchTile(
           title: const Text('Dark Mode'),
           initialValue: Get.find<AppController>().themeMode.value,
           onToggle: (value) =>
               Get.find<AppController>().toggleThemeMode(value, Get.context!),
         ),
-        SettingsTile(
-          title: Text('Font'),
-          value: FontPicker(),
+        CustomSettingsTile(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              children: [
+                const Text('Font'),
+                const Spacer(),
+                SizedBox(
+                  width: 160,
+                  child: FontPicker(),
+                ),
+              ],
+            ),
+          ),
         ),
-        SettingsTile(
-          title: Text('Theme Colors'),
-          value: ColorPicker(),
+        CustomSettingsTile(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Theme Colors'),
+                const SizedBox(height: 10),
+                ColorPicker(),
+              ],
+            ),
+          ),
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
@@ -11,7 +12,6 @@ class FontPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appController = Get.find<AppController>();
-
     return Obx(() {
       final currentFont = appController.globalFont.value;
 
@@ -33,7 +33,9 @@ class FontPicker extends StatelessWidget {
                   style: GoogleFonts.getFont(
                     currentFont,
                     fontSize: 18,
-                    color: Colors.black87,
+                    color: appController.themeMode.value
+                        ? Colors.white
+                        : Colors.black87,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -47,6 +49,16 @@ class FontPicker extends StatelessWidget {
   }
 
   void _showFontSelectionSheet(BuildContext context, AppController controller) {
+    final ItemScrollController itemScrollController = ItemScrollController();
+    final initialIndex =
+        AppConstants.fontOptions.indexOf(controller.globalFont.value);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (itemScrollController.isAttached) {
+        itemScrollController.jumpTo(index: initialIndex, alignment: 0.5);
+      }
+    });
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -76,8 +88,8 @@ class FontPicker extends StatelessWidget {
                 ),
                 const Divider(height: 1),
                 Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
+                  child: ScrollablePositionedList.builder(
+                    itemScrollController: itemScrollController,
                     itemCount: AppConstants.fontOptions.length,
                     itemBuilder: (context, index) {
                       final font = AppConstants.fontOptions[index];
@@ -92,7 +104,9 @@ class FontPicker extends StatelessWidget {
                               color: isSelected
                                   ? AppColors.themeColors[
                                       controller.colorThemeName.value]
-                                  : Colors.black87,
+                                  : (controller.themeMode.value
+                                      ? Colors.white
+                                      : Colors.black87),
                               fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.normal,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
@@ -16,7 +16,6 @@ class BottomActionSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appController = Get.find<AppController>();
     final bibleController = Get.find<BibleController>();
 
     return GetBuilder<AppController>(
@@ -29,13 +28,14 @@ class BottomActionSheet extends StatelessWidget {
             bottom: MediaQuery.of(context).viewInsets.bottom + 20.0,
           ),
           decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                spreadRadius: 0,
+                offset: const Offset(0, -2),
               ),
             ],
           ),
@@ -43,12 +43,21 @@ class BottomActionSheet extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Pull bar for visual cue
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
               // 1. Actions Row (Copy, Note, Share)
               _buildActionRow(context, controller, bibleController),
-              const SizedBox(height: 25),
-
-              // 2. Divider or Label (Optional, keeping it clean for now)
-
+              const SizedBox(height: 24),
+              const Divider(height: 1),
+              const SizedBox(height: 24),
               // 3. Highlight Colors
               _buildHighlightColors(controller, bibleController),
             ],
@@ -80,8 +89,7 @@ class BottomActionSheet extends StatelessWidget {
           icon: Icons.share_rounded,
           label: 'Share',
           onTap: () {
-            bibleController.copyVerses(selectedVerses);
-            Get.snackbar('Share', 'Verses copied for sharing');
+            bibleController.shareVerses(selectedVerses);
           },
         ),
       ],
@@ -105,8 +113,8 @@ class BottomActionSheet extends StatelessWidget {
         width: 80,
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: primaryColor!
-              .withOpacity(0.1), // Value 0.1 opacity for subtle background
+          color: primaryColor!.withValues(
+              alpha: 0.1), // Value 0.1 opacity for subtle background
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -146,22 +154,31 @@ class BottomActionSheet extends StatelessWidget {
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border:
-                    Border.all(color: Colors.grey.withOpacity(0.4), width: 1.5),
+                border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.4), width: 1.5),
               ),
               child: const Icon(Icons.format_color_reset_rounded,
                   size: 22, color: Colors.grey),
             ),
           ),
           ...List.generate(AppColors.highlightColors.length, (index) {
+            final color = AppColors.highlightColors[index];
             return Container(
               margin: const EdgeInsets.only(right: 12),
               child: InkWell(
                 onTap: () => _applyHighlight(index, bibleController),
                 borderRadius: BorderRadius.circular(25),
-                child: CircleAvatar(
-                  radius: 25, // Slightly larger for easier tapping
-                  backgroundColor: AppColors.highlightColors[index],
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.black12,
+                      width: 1,
+                    ),
+                  ),
                   child: _isColorSelected(index)
                       ? const Icon(Icons.check, color: Colors.black, size: 22)
                       : null,

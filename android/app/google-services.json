@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:729612171145:android:b14b56b2b1ea0953819358",
         "android_client_info": {
-          "package_name": "com.qhodegray.simplebible"
+          "package_name": "com.qhodegray.offlinebible"
         }
       },
       "oauth_client": [

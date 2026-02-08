@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'Simple Bible';
+  static const String appName = 'Offline Bible';
   static const String defaultBibleVersion = 'kjv';
   static const String defaultBook = 'Genesis';
   static const int defaultChapter = 1;

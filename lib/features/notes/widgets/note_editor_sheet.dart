@@ -102,7 +102,7 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.themeColorShades[_appController.colorThemeName.value]!
-            .withOpacity(0.3),
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color:
@@ -137,28 +137,69 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
   }
 
   Widget _buildActions() {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor:
-              AppColors.themeColors[_appController.colorThemeName.value],
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 0,
-        ),
-        onPressed: _saveNote,
-        child: Text(
-          'Save Note',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: _appController.textColorDynamic.value,
+    return Row(
+      children: [
+        if (widget.existingNoteId != null) ...[
+          Expanded(
+            child: SizedBox(
+              height: 50,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Colors.red.shade400),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: _deleteNote,
+                child: Text(
+                  'Delete',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red.shade400,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
+        Expanded(
+          child: SizedBox(
+            height: 50,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    AppColors.themeColors[_appController.colorThemeName.value],
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              onPressed: _saveNote,
+              child: Text(
+                'Save Note',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: _appController.textColorDynamic.value,
+                ),
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
+  }
+
+  void _deleteNote() {
+    if (widget.existingNoteId != null) {
+      Get.find<NotesController>().deleteNote(widget.existingNoteId!);
+      // Force BibleController to refresh/update UI if needed,
+      // though GetBuilder in VerseTile might need a trigger.
+      // Usually AppController or BibleController update() will handle it.
+      // Since verse tile listens to AppController, we should trigger an update there or just close.
+      Get.find<AppController>().update();
+      Get.back();
+    }
   }
 
   void _saveNote() {

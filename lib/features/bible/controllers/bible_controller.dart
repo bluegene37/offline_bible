@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:get/get.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../core/controllers/app_controller.dart';
@@ -23,9 +24,7 @@ class BibleController extends GetxController {
   final RxDouble sheetHeight = 0.0.obs;
   final RxBool isLoading = false.obs;
 
-  int scrollChecker = 0;
-  int scrollChapter = 0;
-  int colorIndex = 999;
+  int? pendingScrollVerseIndex;
 
   @override
   void onInit() {
@@ -43,20 +42,14 @@ class BibleController extends GetxController {
     itemScrollController = ItemScrollController();
     itemPositionsListener = ItemPositionsListener.create();
     _setupScrollListener();
-    update(); // Force UI rebuild to attach new controller
+    update();
   }
 
   void _setupScrollListener() {
     itemPositionsListener.itemPositions.addListener(() {
       final positions = itemPositionsListener.itemPositions.value;
       if (positions.isNotEmpty) {
-        final currentIndex = positions.first.index;
-        if (currentIndex > scrollChecker) {
-          appController.hideFloatingBtn.value = true;
-        } else if (currentIndex < scrollChapter) {
-          appController.hideFloatingBtn.value = false;
-        }
-        scrollChecker = currentIndex;
+        // Navigation button hiding logic removed to keep it always visible
       }
     });
   }
@@ -69,9 +62,12 @@ class BibleController extends GetxController {
   }
 
   Future<void> loadChapter(String book, int chapter) async {
+    while (!BibleService.isInitialized) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
     try {
       isLoading.value = true;
-      _resetScrollControllers(); // Reset controllers for new list
+      _resetScrollControllers();
       final verses = await _bibleService.getVerses(book, chapter);
       currentVerses.value = verses;
       appController.updateBookSelection(book, chapter);
@@ -79,6 +75,14 @@ class BibleController extends GetxController {
       Get.snackbar('Error', 'Failed to load chapter: $e');
     } finally {
       isLoading.value = false;
+
+      // Handle pending scroll if any
+      if (pendingScrollVerseIndex != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          jumpToVerse(pendingScrollVerseIndex!);
+          pendingScrollVerseIndex = null;
+        });
+      }
     }
   }
 
@@ -94,7 +98,7 @@ class BibleController extends GetxController {
     }
   }
 
-  Future<void> searchVerses(String query) async {
+  Future<void> searchVerses(String query, {String scope = 'All'}) async {
     if (query.trim().isEmpty) {
       searchResults.clear();
       return;
@@ -102,7 +106,7 @@ class BibleController extends GetxController {
 
     try {
       isLoading.value = true;
-      final results = await _bibleService.searchVerses(query);
+      final results = await _bibleService.searchVerses(query, scope: scope);
       searchResults.value = results;
       _saveSearchHistory(query);
     } catch (e) {
@@ -115,7 +119,6 @@ class BibleController extends GetxController {
   void _saveSearchHistory(String query) {
     final timestamp = DateUtils.formatDateTime(DateTime.now());
 
-    // Remove existing entry if it exists
     StorageService.historyBox.toMap().forEach((key, value) {
       if (value == query) {
         StorageService.historyBox.delete(key);
@@ -194,39 +197,52 @@ class BibleController extends GetxController {
   }
 
   void copyVerses(List<String> verseKeys) {
-    if (verseKeys.isEmpty) return;
+    final text = _formatVerses(verseKeys);
+    if (text == null) return;
+    Clipboard.setData(ClipboardData(text: text));
+    Get.snackbar('Copied', 'Verses copied to clipboard');
+    appController.clearTextSelection();
+  }
 
-    // 1. Sort keys to ensure chronological order
-    verseKeys.sort((a, b) {
-      final indexA = currentVerses
-          .indexWhere((v) => '${v.book}:${v.chapter}:${v.verse}' == a);
-      final indexB = currentVerses
-          .indexWhere((v) => '${v.book}:${v.chapter}:${v.verse}' == b);
-      return indexA.compareTo(indexB);
-    });
+  void shareVerses(List<String> verseKeys) {
+    final text = _formatVerses(verseKeys);
+    if (text == null) return;
+    // ignore: deprecated_member_use
+    Share.share(text);
+    appController.clearTextSelection();
+  }
+
+  String? _formatVerses(List<String> verseKeys) {
+    if (verseKeys.isEmpty) return null;
+
+    final sortedKeys = List<String>.from(verseKeys)
+      ..sort((a, b) {
+        final indexA = currentVerses
+            .indexWhere((v) => '${v.book}:${v.chapter}:${v.verse}' == a);
+        final indexB = currentVerses
+            .indexWhere((v) => '${v.book}:${v.chapter}:${v.verse}' == b);
+        return indexA.compareTo(indexB);
+      });
 
     final StringBuffer buffer = StringBuffer();
     String? currentBook;
     int? currentChapter;
 
-    // Header (e.g. Genesis 1)
-    if (verseKeys.isNotEmpty) {
-      final firstKey = verseKeys.first;
-      final firstVerse = currentVerses.firstWhereOrNull(
-          (v) => '${v.book}:${v.chapter}:${v.verse}' == firstKey);
-      if (firstVerse != null) {
-        buffer.writeln(
-            '${firstVerse.book} ${firstVerse.chapter} (${appController.bibleVersion})\n');
-        currentBook = firstVerse.book;
-        currentChapter = firstVerse.chapter;
-      }
+    final firstKey = sortedKeys.first;
+    final firstVerse = currentVerses.firstWhereOrNull(
+        (v) => '${v.book}:${v.chapter}:${v.verse}' == firstKey);
+
+    if (firstVerse != null) {
+      buffer.writeln(
+          '${firstVerse.book} ${firstVerse.chapter} (${appController.bibleVersion})\n');
+      currentBook = firstVerse.book;
+      currentChapter = firstVerse.chapter;
     }
 
-    for (final key in verseKeys) {
+    for (final key in sortedKeys) {
       final verse = currentVerses
           .firstWhereOrNull((v) => '${v.book}:${v.chapter}:${v.verse}' == key);
       if (verse != null) {
-        // If we crossed into a new chapter (unlikely in single select, but possible in future)
         if (verse.book != currentBook || verse.chapter != currentChapter) {
           buffer.writeln('\n${verse.book} ${verse.chapter}\n');
           currentBook = verse.book;
@@ -235,9 +251,6 @@ class BibleController extends GetxController {
         buffer.write('[${verse.verse}] ${verse.text} ');
       }
     }
-
-    Clipboard.setData(ClipboardData(text: buffer.toString().trim()));
-    Get.snackbar('Copied', 'Verses copied to clipboard');
-    appController.clearTextSelection();
+    return buffer.toString().trim();
   }
 }

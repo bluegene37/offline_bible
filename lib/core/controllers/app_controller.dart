@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:offline_bible/features/bible/controllers/bible_controller.dart';
+import '../../features/bible/models/book_model.dart';
 import '../constants/app_constants.dart';
 import '../services/storage_service.dart';
 import '../theme/app_colors.dart';
 import '../../features/bible/services/bible_service.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class AppController extends GetxController {
   // Observable variables
@@ -22,10 +25,11 @@ class AppController extends GetxController {
   final RxBool showAds = true.obs;
   final RxList<String> textUnderline = <String>[].obs;
   final Rx<Color> textColorDynamic = Colors.black.obs;
+  final RxBool keepScreenOn = false.obs;
 
   // Caching
-  String cachedBibleData = '';
-  String cachedBookTitles = '';
+  List<Book> cachedBibleData = [];
+  List<BookTitle> cachedBookTitles = [];
 
   // Non-reactive variables
   String bibleVersion = AppConstants.defaultBibleVersion;
@@ -36,16 +40,18 @@ class AppController extends GetxController {
   String searchResultHist = '';
   int globalFontIdx = 8;
 
-  @override
-  void onInit() {
-    super.onInit();
-    _initializeApp();
+  Future<void> init() async {
+    await _initializeApp();
   }
 
   Future<void> _initializeApp() async {
     await BibleService.initialize(this);
     _loadSettings();
+    final bibleController = Get.find<BibleController>();
+    bibleController.loadChapter(bookSelected.value, selectedChapter.value);
+    bibleController.loadChapters(bookSelected.value);
     _updateTextColor();
+    if (keepScreenOn.value) WakelockPlus.enable();
   }
 
   void _loadSettings() {
@@ -65,6 +71,7 @@ class AppController extends GetxController {
     globalFontIdx = StorageService.getSetting('globalFontIdx', 8);
     fontSize.value =
         StorageService.getSetting('fontSize', AppConstants.defaultFontSize);
+    keepScreenOn.value = StorageService.getSetting('keepScreenOn', false);
   }
 
   void _updateTextColor() {
@@ -104,6 +111,7 @@ class AppController extends GetxController {
     StorageService.setSetting('bookSelected', book);
     StorageService.setSetting('selectedChapter', chapter);
     barTitle.value = '$book $chapter';
+    Get.find<BibleController>().loadChapters(book);
   }
 
   void navigateToPage(int index) {
@@ -122,6 +130,16 @@ class AppController extends GetxController {
       AdaptiveTheme.of(context).setDark();
     } else {
       AdaptiveTheme.of(context).setLight();
+    }
+  }
+
+  void toggleKeepScreenOn(bool value) {
+    keepScreenOn.value = value;
+    StorageService.setSetting('keepScreenOn', value);
+    if (value) {
+      WakelockPlus.enable();
+    } else {
+      WakelockPlus.disable();
     }
   }
 }

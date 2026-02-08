@@ -1,6 +1,6 @@
 {
-    "name": "simple_bible",
-    "short_name": "simple_bible",
+    "name": "Offline Bible",
+    "short_name": "Offline Bible",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

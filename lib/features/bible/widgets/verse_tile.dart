@@ -1,12 +1,12 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/services/storage_service.dart';
-import '../controllers/bible_controller.dart';
+
 import '../models/book_model.dart';
+import '../../notes/widgets/note_editor_sheet.dart';
 
 class VerseTile extends StatelessWidget {
   final Book verse;
@@ -24,8 +24,6 @@ class VerseTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appController = Get.find<AppController>();
-    final bibleController = Get.find<BibleController>();
     final verseKey = verse.verseKey;
 
     return GetBuilder<AppController>(
@@ -35,14 +33,13 @@ class VerseTile extends StatelessWidget {
         final hasNotes = _hasNotes(verseKey);
 
         return ListTile(
-          tileColor: bibleController.colorIndex == index
-              ? AppColors.themeColorShades[controller.colorThemeName.value]
-              : null,
-          trailing: hasNotes ? _buildNotesIcon(controller) : null,
+          trailing:
+              hasNotes ? _buildNotesIcon(context, verseKey, controller) : null,
           title: _buildVerseText(
               context, controller, verseKey, isSelected, hasHighlight),
           subtitle: isLastVerse ? _buildCopyrightText() : null,
           onTap: onTap,
+          onLongPress: onTap,
         );
       },
     );
@@ -58,15 +55,14 @@ class VerseTile extends StatelessWidget {
             style: GoogleFonts.getFont(
               controller.globalFont.value,
               fontSize: 11 + controller.fontSize.value,
-              color: _getTextColor(context, hasHighlight).withOpacity(0.7),
+              color:
+                  _getTextColor(context, hasHighlight).withValues(alpha: 0.7),
               fontWeight: FontWeight.w300,
               fontStyle: FontStyle.italic,
             ),
           ),
           TextSpan(
             text: verse.text,
-            recognizer: TapGestureRecognizer()
-              ..onTap = () => _handleVerseTap(verseKey),
             style: GoogleFonts.getFont(
               controller.globalFont.value,
               fontSize: 15 + controller.fontSize.value,
@@ -105,11 +101,35 @@ class VerseTile extends StatelessWidget {
     return AppColors.highlightColors[0];
   }
 
-  Widget _buildNotesIcon(AppController controller) {
-    return Icon(
-      Icons.note,
-      color: AppColors.themeColors[controller.colorThemeName.value],
+  Widget _buildNotesIcon(
+      BuildContext context, String verseKey, AppController controller) {
+    return IconButton(
+      icon: Icon(
+        Icons.note,
+        color: AppColors.themeColors[controller.colorThemeName.value],
+      ),
+      onPressed: () => _onNoteIconTap(context, verseKey),
     );
+  }
+
+  void _onNoteIconTap(BuildContext context, String verseKey) {
+    final notesBox = StorageService.notesBox;
+    // Find note containing this verseKey
+    final noteEntry = notesBox.toMap().entries.firstWhere(
+          (e) => e.value['book'].toString().contains(verseKey),
+          orElse: () => MapEntry('', {}),
+        );
+
+    if (noteEntry.key.toString().isNotEmpty) {
+      Get.bottomSheet(
+        NoteEditorSheet(
+          verseKeys: [verseKey],
+          existingNoteId: noteEntry.key.toString(),
+          initialText: noteEntry.value['notes'],
+        ),
+        isScrollControlled: true,
+      );
+    }
   }
 
   Widget _buildCopyrightText() {
@@ -128,14 +148,5 @@ class VerseTile extends StatelessWidget {
     final notesValues = StorageService.notesBox.values.toList();
     return notesValues
         .any((note) => note['book'].toString().contains(verseKey));
-  }
-
-  void _handleVerseTap(String verseKey) {
-    final bibleController = Get.find<BibleController>();
-    bibleController.toggleVerseSelection(verseKey);
-
-    if (onTap != null) {
-      onTap!();
-    }
   }
 }

@@ -58,9 +58,10 @@ class ChapterPage extends StatelessWidget {
                     children: [
                       Text(
                         chapter.chapter.toString(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w300,
+                          color: isSelected ? Colors.black : null,
                         ),
                       ),
                     ],
@@ -75,6 +76,8 @@ class ChapterPage extends StatelessWidget {
   }
 
   void _selectChapter(int chapterNumber, AppController controller) {
+    final bibleController = Get.find<BibleController>();
+    bibleController.loadChapter(controller.bookSelected.value, chapterNumber);
     controller.updateBookSelection(
       controller.bookSelected.value,
       chapterNumber,

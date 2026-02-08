@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:outline_search_bar/outline_search_bar.dart';
@@ -73,7 +72,14 @@ class NotesList extends StatelessWidget {
 
     return GetBuilder<AppController>(
       builder: (controller) {
+        final isDarkMode = controller.themeMode.value;
+        // In dark mode, ensure text is white/light. In light mode, use black or user choice.
+        // For UI lists, standardizing on Black/White is usually better than the reader setting.
+        final textColor = isDarkMode ? Colors.white : Colors.black87;
+        final cardColor = isDarkMode ? Colors.grey[800] : null;
+
         return Card(
+          color: cardColor,
           child: ListTile(
             title: Text.rich(
               TextSpan(
@@ -81,8 +87,7 @@ class NotesList extends StatelessWidget {
                   TextSpan(
                     text: '$verseText - ${appController.bibleVersion}',
                     style: TextStyle(
-                      color:
-                          AppColors.textColors[controller.textColorIdx.value],
+                      color: textColor,
                       fontSize: 13,
                       fontStyle: FontStyle.italic,
                     ),
@@ -91,16 +96,14 @@ class NotesList extends StatelessWidget {
                   TextSpan(
                     text: "  ${note['notes']}",
                     style: TextStyle(
-                      color:
-                          AppColors.textColors[controller.textColorIdx.value],
+                      color: textColor,
                     ),
                   ),
                   const TextSpan(text: '\n\n'),
                   TextSpan(
                     text: note['stamp']?.toString() ?? '',
                     style: TextStyle(
-                      color:
-                          AppColors.textColors[controller.textColorIdx.value],
+                      color: textColor,
                       fontSize: 13,
                       fontStyle: FontStyle.italic,
                     ),
@@ -108,16 +111,19 @@ class NotesList extends StatelessWidget {
                 ],
               ),
             ),
-            trailing: _buildPopupMenu(noteId, note, notesController),
+            trailing:
+                _buildPopupMenu(noteId, note, notesController, isDarkMode),
           ),
         );
       },
     );
   }
 
-  Widget _buildPopupMenu(
-      String noteId, Map note, NotesController notesController) {
+  Widget _buildPopupMenu(String noteId, Map note,
+      NotesController notesController, bool isDarkMode) {
     return PopupMenuButton<String>(
+      icon:
+          Icon(Icons.more_vert, color: isDarkMode ? Colors.white : Colors.grey),
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'edit', child: Text('Edit')),
         const PopupMenuItem(value: 'delete', child: Text('Delete')),

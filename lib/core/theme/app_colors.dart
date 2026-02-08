@@ -59,5 +59,11 @@ class AppColors {
     const Color(0xFFE1BEE7), // Pastel Purple
     const Color(0xFFFFCCBC), // Pastel Deep Orange
     const Color(0xFFD7CCC8), // Pastel Brown
+    const Color(0xFFB2DFDB), // Pastel Teal
+    const Color(0xFFB2EBF2), // Pastel Cyan
+    const Color(0xFFF0F4C3), // Pastel Lime
+    const Color(0xFFC5CAE9), // Pastel Indigo
+    const Color(0xFFFFCDD2), // Pastel Red
+    const Color(0xFFFFECB3), // Pastel Amber
   ];
 }

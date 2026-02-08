@@ -104,14 +104,12 @@ class HighlightsList extends StatelessWidget {
       appController.updateBookSelection(bookTitle, chapter);
 
       final bibleController = Get.find<BibleController>();
+
+      // Set pending scroll index before loading chapter
+      bibleController.pendingScrollVerseIndex = verse - 1;
       bibleController.loadChapter(bookTitle, chapter);
 
       appController.navigateToPage(2); // Switch to Bible tab
-
-      // Jump to specific verse
-      Future.delayed(const Duration(milliseconds: 500), () {
-        bibleController.jumpToVerse(verse - 1);
-      });
     }
   }
 

@@ -11,6 +11,7 @@ class BibleSearchController extends GetxController {
   final RxString searchQuery = ''.obs;
   final RxBool hideHistory = false.obs;
   final RxList searchHistory = [].obs;
+  final RxString searchScope = 'All'.obs;
 
   @override
   void onInit() {
@@ -36,10 +37,10 @@ class BibleSearchController extends GetxController {
 
     searchQuery.value = query;
     hideHistory.value = true;
-    
+
     final bibleController = Get.find<BibleController>();
-    bibleController.searchVerses(query);
-    
+    bibleController.searchVerses(query, scope: searchScope.value);
+
     _saveToHistory(query);
     _updateSearchResults();
   }
@@ -48,10 +49,10 @@ class BibleSearchController extends GetxController {
     searchQuery.value = '';
     textController.clear();
     hideHistory.value = false;
-    
+
     final appController = Get.find<AppController>();
     appController.barTitle.value = "Search";
-    
+
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     FocusScope.of(context).unfocus();
   }
@@ -65,7 +66,7 @@ class BibleSearchController extends GetxController {
 
   void _saveToHistory(String query) {
     final timestamp = DateUtils.formatDateTime(DateTime.now());
-    
+
     // Remove existing entry if it exists
     String? keyToDelete;
     StorageService.historyBox.toMap().forEach((key, value) {
@@ -77,7 +78,7 @@ class BibleSearchController extends GetxController {
     if (keyToDelete != null) {
       StorageService.historyBox.delete(keyToDelete);
     }
-    
+
     StorageService.historyBox.put(timestamp, query);
     _loadSearchHistory();
   }
@@ -85,9 +86,10 @@ class BibleSearchController extends GetxController {
   void _updateSearchResults() {
     final appController = Get.find<AppController>();
     final bibleController = Get.find<BibleController>();
-    
+
     if (bibleController.searchResults.isNotEmpty) {
-      appController.barTitle.value = 'Search result: ${bibleController.searchResults.length}';
+      appController.barTitle.value =
+          'Search result: ${bibleController.searchResults.length}';
     } else {
       appController.barTitle.value = 'Search';
     }
@@ -97,10 +99,10 @@ class BibleSearchController extends GetxController {
     searchQuery.value = query;
     textController.text = query;
     hideHistory.value = true;
-    
+
     final bibleController = Get.find<BibleController>();
-    bibleController.searchVerses(query);
-    
+    bibleController.searchVerses(query, scope: searchScope.value);
+
     _saveToHistory(query);
     _updateSearchResults();
   }
@@ -108,5 +110,12 @@ class BibleSearchController extends GetxController {
   void deleteHistoryItem(String key) {
     StorageService.historyBox.delete(key);
     _loadSearchHistory();
+  }
+
+  void setSearchScope(String scope) {
+    searchScope.value = scope;
+    if (searchQuery.isNotEmpty) {
+      performSearch(searchQuery.value);
+    }
   }
 }

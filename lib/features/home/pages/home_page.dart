@@ -23,18 +23,17 @@ class HomePage extends StatelessWidget {
       final int currentIndex = appController.globalIndex.value;
 
       return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(35.0),
-          child: AppBar(
-            centerTitle: true,
-            backgroundColor: AppColors.themeColors[appController.colorThemeName.value],
-            title: Text(
-              appController.barTitle.value,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w300,
-                color: appController.textColorDynamic.value,
-              ),
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 0,
+          backgroundColor:
+              AppColors.themeColors[appController.colorThemeName.value],
+          title: Text(
+            appController.barTitle.value,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              letterSpacing: 0.5,
             ),
           ),
         ),
@@ -78,7 +77,7 @@ class HomePage extends StatelessWidget {
 
   bool _shouldShowFloatingButton(AppController controller) {
     return controller.globalIndex.value == AppConstants.biblePageIndex &&
-           !controller.hideFloatingBtn.value &&
-           controller.textUnderline.isEmpty;
+        !controller.hideFloatingBtn.value &&
+        controller.textUnderline.isEmpty;
   }
 }

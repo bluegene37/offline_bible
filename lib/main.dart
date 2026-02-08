@@ -10,19 +10,24 @@ import 'features/home/pages/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Set preferred orientations
+
+  // Unlock orientation (remove restriction to portrait only)
+  // This allows users to read in landscape mode on tablets or larger phones.
+  // Unlock orientation to allow landscape mode
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
   ]);
-  
+
   // Initialize storage
   await StorageService.init();
-  
+
   // Initialize controllers
-  Get.put(AppController());
+  final appController = Get.put(AppController());
   Get.put(BibleController());
+  await appController.init();
 
   runApp(const MyApp());
 }
@@ -36,30 +41,34 @@ class MyApp extends StatelessWidget {
       builder: (appController) {
         return AdaptiveTheme(
           light: ThemeData(
-            useMaterial3: false,
+            useMaterial3: true,
             brightness: Brightness.light,
-            primaryColor: AppColors.themeColors[appController.colorThemeName.value],
+            primaryColor:
+                AppColors.themeColors[appController.colorThemeName.value],
             fontFamily: appController.globalFont.value,
             colorScheme: ColorScheme.fromSeed(
-              seedColor: AppColors.themeColors[appController.colorThemeName.value]!,
+              seedColor:
+                  AppColors.themeColors[appController.colorThemeName.value]!,
               brightness: Brightness.light,
             ),
           ),
           dark: ThemeData(
-            useMaterial3: false,
+            useMaterial3: true,
             brightness: Brightness.dark,
-            primaryColor: AppColors.themeColors[appController.colorThemeName.value],
+            primaryColor:
+                AppColors.themeColors[appController.colorThemeName.value],
             fontFamily: appController.globalFont.value,
             colorScheme: ColorScheme.fromSeed(
-              seedColor: AppColors.themeColors[appController.colorThemeName.value]!,
+              seedColor:
+                  AppColors.themeColors[appController.colorThemeName.value]!,
               brightness: Brightness.dark,
             ),
           ),
-          initial: appController.themeMode.value 
-              ? AdaptiveThemeMode.dark 
+          initial: appController.themeMode.value
+              ? AdaptiveThemeMode.dark
               : AdaptiveThemeMode.light,
           builder: (theme, darkTheme) => GetMaterialApp(
-            title: 'Simple Bible',
+            title: 'Offline Bible',
             debugShowCheckedModeBanner: false,
             theme: theme,
             darkTheme: darkTheme,

@@ -14,8 +14,6 @@ class BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appController = Get.find<AppController>();
-
     return GetBuilder<AppController>(
       builder: (controller) {
         return NavigationBarTheme(

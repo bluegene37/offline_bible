@@ -11,6 +11,20 @@ class DateUtils {
 
   static int generateUniqueId() {
     final now = DateTime.now();
-    return int.parse('${DateFormat('yyMMdd').format(now)}${DateFormat('HHmmssS').format(now)}');
+    return int.parse(
+        '${DateFormat('yyMMdd').format(now)}${DateFormat('HHmmssS').format(now)}');
+  }
+
+  static DateTime? parseDateTime(String? dateString) {
+    if (dateString == null) return null;
+    try {
+      return DateFormat.yMMMMEEEEd().add_jms().parse(dateString);
+    } catch (_) {
+      try {
+        return DateTime.parse(dateString);
+      } catch (_) {
+        return null;
+      }
+    }
   }
 }

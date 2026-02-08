@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/utils/text_utils.dart';
+import '../../../core/utils/date_utils.dart' as du;
 
 class NotesController extends GetxController {
   final TextEditingController searchController = TextEditingController();
@@ -25,6 +26,7 @@ class NotesController extends GetxController {
 
   void switchTab(int tab) {
     currentTab.value = tab;
+    update();
   }
 
   void loadNotes() {
@@ -39,11 +41,19 @@ class NotesController extends GetxController {
     notes.sort((a, b) {
       final String? timeA = a['stamp'] as String?;
       final String? timeB = b['stamp'] as String?;
-      if (timeA == null || timeB == null) return 0;
-      return timeB.compareTo(timeA);
+
+      final dtA = du.DateUtils.parseDateTime(timeA);
+      final dtB = du.DateUtils.parseDateTime(timeB);
+
+      if (dtA == null && dtB == null) return 0;
+      if (dtA == null) return 1; // Nulls last
+      if (dtB == null) return -1;
+
+      return dtB.compareTo(dtA);
     });
 
     filteredNotes.value = notes;
+    update();
   }
 
   void loadHighlights() {
@@ -58,14 +68,23 @@ class NotesController extends GetxController {
     highlights.sort((a, b) {
       final String? timeA = a['datetime'] as String?;
       final String? timeB = b['datetime'] as String?;
-      if (timeA == null || timeB == null) return 0;
-      return timeB.compareTo(timeA);
+
+      final dtA = du.DateUtils.parseDateTime(timeA);
+      final dtB = du.DateUtils.parseDateTime(timeB);
+
+      if (dtA == null && dtB == null) return 0;
+      if (dtA == null) return 1;
+      if (dtB == null) return -1;
+
+      return dtB.compareTo(dtA);
     });
+    update();
   }
 
   void filterNotes(String query) {
     if (query.trim().isEmpty) {
       filteredNotes.value = notes;
+      update();
       return;
     }
 
@@ -76,6 +95,7 @@ class NotesController extends GetxController {
           .toLowerCase();
       return noteText.contains(lowerQuery) || bookText.contains(lowerQuery);
     }).toList();
+    update();
   }
 
   void deleteNote(String noteId) {
@@ -93,7 +113,7 @@ class NotesController extends GetxController {
     final existingNote = StorageService.notesBox.get(noteId);
     if (existingNote != null) {
       existingNote['notes'] = newNotes;
-      existingNote['stamp'] = DateTime.now().toString();
+      existingNote['stamp'] = du.DateUtils.formatDateTime(DateTime.now());
       StorageService.notesBox.put(noteId, existingNote);
       loadNotes();
     }

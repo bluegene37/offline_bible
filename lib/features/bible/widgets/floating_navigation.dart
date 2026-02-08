@@ -9,56 +9,103 @@ class FloatingNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appController = Get.find<AppController>();
-    final bibleController = Get.find<BibleController>();
+    final AppController appController = Get.find();
+    final BibleController bibleController = Get.find();
 
-    return GetBuilder<AppController>(
-      builder: (controller) {
-        final canGoBack = controller.selectedChapter.value > 1;
-        final canGoForward = controller.selectedChapter.value < appController.lastChapter;
+    return Obx(() {
+      final int currentChapter = appController.selectedChapter.value;
+      final String currentBook = appController.bookSelected.value;
+      final int lastChapter = appController.lastChapter;
 
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            Positioned(
-              left: 30,
-              bottom: 20,
-              width: 40,
-              height: 40,
-              child: FloatingActionButton(
-                backgroundColor: AppColors.themeColors[controller.colorThemeName.value],
-                heroTag: 'back',
-                onPressed: canGoBack ? () => bibleController.navigateToPreviousChapter() : null,
-                child: Icon(
-                  Icons.navigate_before_rounded,
-                  size: 40,
-                  color: canGoBack 
-                      ? controller.textColorDynamic.value 
-                      : Colors.black12,
-                ),
-              ),
-            ),
-            Positioned(
-              right: 30,
-              bottom: 20,
-              width: 40,
-              height: 40,
-              child: FloatingActionButton(
-                backgroundColor: AppColors.themeColors[controller.colorThemeName.value],
-                heroTag: 'next',
-                onPressed: canGoForward ? () => bibleController.navigateToNextChapter() : null,
-                child: Icon(
-                  Icons.navigate_next_rounded,
-                  size: 40,
-                  color: canGoForward 
-                      ? controller.textColorDynamic.value 
-                      : Colors.black12,
-                ),
-              ),
+      final bool canGoBack = currentChapter > 1;
+      final bool canGoForward = currentChapter < lastChapter;
+
+      return Container(
+        height: 50,
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.6),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
             ),
           ],
-        );
-      },
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildNavButton(
+              icon: Icons.arrow_back_ios_new,
+              label: canGoBack
+                  ? '$currentBook ${currentChapter - 1}'
+                  : 'First Chapter',
+              onPressed:
+                  canGoBack ? bibleController.navigateToPreviousChapter : null,
+              isEnabled: canGoBack,
+            ),
+            const VerticalDivider(width: 1),
+            _buildNavButton(
+              icon: Icons.arrow_forward_ios,
+              label: canGoForward
+                  ? '$currentBook ${currentChapter + 1}'
+                  : 'Last Chapter',
+              onPressed:
+                  canGoForward ? bibleController.navigateToNextChapter : null,
+              isEnabled: canGoForward,
+              isNext: true,
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildNavButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback? onPressed,
+    required bool isEnabled,
+    bool isNext = false,
+  }) {
+    final AppController appController = Get.find();
+    final textColor = isEnabled
+        ? AppColors.themeColors[appController.colorThemeName.value]
+        : Colors.grey.withValues(alpha: 0.6);
+
+    return Expanded(
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: isNext
+            ? const BorderRadius.horizontal(right: Radius.circular(25))
+            : const BorderRadius.horizontal(left: Radius.circular(25)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (!isNext) Icon(icon, color: textColor, size: 18),
+              if (!isNext) const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: isNext ? TextAlign.end : TextAlign.start,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (isNext) const SizedBox(width: 8),
+              if (isNext) Icon(icon, color: textColor, size: 18),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
