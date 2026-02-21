@@ -70,7 +70,7 @@ class SelectionToolbar extends StatelessWidget {
             color: Colors.transparent,
             icon: Icons.format_color_reset_outlined,
             onTap: () => _applyHighlight(-1, controller, bibleController),
-            borderColor: Colors.white.withValues(alpha: 0.9),
+            borderColor: Theme.of(context).dividerColor,
           ),
           const SizedBox(width: 8),
 

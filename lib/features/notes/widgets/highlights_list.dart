@@ -37,9 +37,13 @@ class HighlightsList extends StatelessWidget {
 
   Widget _buildHighlightCard(Map highlight, String highlightKey,
       AppController appController, NotesController notesController) {
+    final highlightColor = AppColors.highlightColors[highlight['color'] ?? 0];
+
     return GetBuilder<AppController>(
       builder: (controller) {
         return Card(
+          // Apply the highlight color to the entire card for consistent contrast
+          color: highlightColor,
           child: ListTile(
             title: Text.rich(
               TextSpan(
@@ -55,10 +59,8 @@ class HighlightsList extends StatelessWidget {
                   const TextSpan(text: '\n'),
                   TextSpan(
                     text: highlight['text']?.toString() ?? '',
-                    style: TextStyle(
-                      color: controller.textColorDynamic.value == Colors.white
-                          ? Colors.black54
-                          : Colors.black,
+                    style: const TextStyle(
+                      color: Colors.black87,
                     ),
                   ),
                   const TextSpan(text: '\n'),
@@ -73,7 +75,6 @@ class HighlightsList extends StatelessWidget {
                 ],
               ),
             ),
-            tileColor: AppColors.highlightColors[highlight['color'] ?? 0],
             trailing: _buildHighlightPopupMenu(highlightKey, notesController),
             onTap: () => _navigateToHighlight(highlightKey, appController),
           ),

@@ -12,7 +12,7 @@ class NotesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appController = Get.find<AppController>();
-    final notesController = Get.put(NotesController());
+    final notesController = Get.find<NotesController>();
 
     return Scaffold(
       body: Column(
@@ -39,7 +39,8 @@ class NotesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTabHeader(AppController appController, NotesController notesController) {
+  Widget _buildTabHeader(
+      AppController appController, NotesController notesController) {
     return GetBuilder<AppController>(
       builder: (controller) {
         return Container(
@@ -56,8 +57,10 @@ class NotesPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: controller.textColorDynamic.value,
                       backgroundColor: notesCtrl.currentTab.value == 2
-                          ? AppColors.themeColors[controller.colorThemeName.value]
-                          : AppColors.themeColorShades[controller.colorThemeName.value],
+                          ? AppColors
+                              .themeColors[controller.colorThemeName.value]
+                          : AppColors.themeColorShades[
+                              controller.colorThemeName.value],
                     ),
                     onPressed: () => notesController.switchTab(2),
                     child: const Text('Notes'),
@@ -70,8 +73,10 @@ class NotesPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: controller.textColorDynamic.value,
                       backgroundColor: notesCtrl.currentTab.value == 1
-                          ? AppColors.themeColors[controller.colorThemeName.value]
-                          : AppColors.themeColorShades[controller.colorThemeName.value],
+                          ? AppColors
+                              .themeColors[controller.colorThemeName.value]
+                          : AppColors.themeColorShades[
+                              controller.colorThemeName.value],
                     ),
                     onPressed: () => notesController.switchTab(1),
                     child: const Text('Highlights'),

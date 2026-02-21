@@ -109,6 +109,14 @@ class BibleController extends GetxController {
       final results = await _bibleService.searchVerses(query, scope: scope);
       searchResults.value = results;
       _saveSearchHistory(query);
+
+      // Update bar title counter AFTER results are ready
+      final count = searchResults.length;
+      appController.barTitle.value =
+          count > 0 ? 'Search result: $count' : 'Search';
+
+      // Notify GetBuilder listeners that results changed
+      update();
     } catch (e) {
       Get.snackbar('Error', 'Search failed: $e');
     } finally {
@@ -194,6 +202,8 @@ class BibleController extends GetxController {
     StorageService.notesBox.put(noteId, noteData);
     appController.clearTextSelection();
     notesController.clear();
+    // Refresh verse tiles so the note icon appears immediately
+    appController.update();
   }
 
   void copyVerses(List<String> verseKeys) {

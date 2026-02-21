@@ -12,17 +12,17 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppController appController = Get.find<AppController>();
-
     return Scaffold(
-      body: Obx(() => SettingsList(
-            sections: [
-              _buildVersionSection(appController),
-              _buildFontSection(appController),
-              _buildThemeSection(),
-              _buildAppInfoSection(),
-            ],
-          )),
+      body: GetBuilder<AppController>(
+        builder: (controller) => SettingsList(
+          sections: [
+            _buildVersionSection(controller),
+            _buildFontSection(controller),
+            _buildThemeSection(),
+            _buildAppInfoSection(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -41,14 +41,14 @@ class SettingsPage extends StatelessWidget {
     return SettingsSection(
       tiles: [
         SettingsTile(
-          title: Obx(() => Text(
-              'Font Size: ${(controller.fontSize.value + 15).toStringAsFixed(2)}')),
-          value: Obx(() => Slider(
-                min: 0.0,
-                max: 15.0,
-                value: controller.fontSize.value,
-                onChanged: (value) => controller.updateFontSize(value),
-              )),
+          title: Text(
+              'Font Size: ${(controller.fontSize.value + 15).toStringAsFixed(2)}'),
+          value: Slider(
+            min: 0.0,
+            max: 15.0,
+            value: controller.fontSize.value,
+            onChanged: (value) => controller.updateFontSize(value),
+          ),
         ),
         CustomSettingsTile(
           child: Padding(
@@ -71,17 +71,24 @@ class SettingsPage extends StatelessWidget {
     return SettingsSection(
       title: const Text('Appearance'),
       tiles: [
-        SettingsTile.switchTile(
-          title: const Text('Keep Screen On'),
-          initialValue: Get.find<AppController>().keepScreenOn.value,
-          onToggle: (value) =>
-              Get.find<AppController>().toggleKeepScreenOn(value),
+        CustomSettingsTile(
+          child: GetBuilder<AppController>(
+            builder: (controller) => SwitchListTile(
+              title: const Text('Keep Screen On'),
+              value: controller.keepScreenOn.value,
+              onChanged: (value) => controller.toggleKeepScreenOn(value),
+            ),
+          ),
         ),
-        SettingsTile.switchTile(
-          title: const Text('Dark Mode'),
-          initialValue: Get.find<AppController>().themeMode.value,
-          onToggle: (value) =>
-              Get.find<AppController>().toggleThemeMode(value, Get.context!),
+        CustomSettingsTile(
+          child: GetBuilder<AppController>(
+            builder: (controller) => SwitchListTile(
+              title: const Text('Dark Mode'),
+              value: controller.themeMode.value,
+              onChanged: (value) =>
+                  controller.toggleThemeMode(value, Get.context!),
+            ),
+          ),
         ),
         CustomSettingsTile(
           child: Padding(

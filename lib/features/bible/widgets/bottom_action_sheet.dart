@@ -49,7 +49,7 @@ class BottomActionSheet extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: Colors.grey.shade400,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),

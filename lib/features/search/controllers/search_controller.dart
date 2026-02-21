@@ -42,7 +42,6 @@ class BibleSearchController extends GetxController {
     bibleController.searchVerses(query, scope: searchScope.value);
 
     _saveToHistory(query);
-    _updateSearchResults();
   }
 
   void clearSearch(BuildContext context) {
@@ -83,18 +82,6 @@ class BibleSearchController extends GetxController {
     _loadSearchHistory();
   }
 
-  void _updateSearchResults() {
-    final appController = Get.find<AppController>();
-    final bibleController = Get.find<BibleController>();
-
-    if (bibleController.searchResults.isNotEmpty) {
-      appController.barTitle.value =
-          'Search result: ${bibleController.searchResults.length}';
-    } else {
-      appController.barTitle.value = 'Search';
-    }
-  }
-
   void selectHistoryItem(String query) {
     searchQuery.value = query;
     textController.text = query;
@@ -104,7 +91,6 @@ class BibleSearchController extends GetxController {
     bibleController.searchVerses(query, scope: searchScope.value);
 
     _saveToHistory(query);
-    _updateSearchResults();
   }
 
   void deleteHistoryItem(String key) {

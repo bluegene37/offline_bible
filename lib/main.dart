@@ -6,6 +6,7 @@ import 'core/controllers/app_controller.dart';
 import 'core/services/storage_service.dart';
 import 'core/theme/app_colors.dart';
 import 'features/bible/controllers/bible_controller.dart';
+import 'features/notes/controllers/notes_controller.dart';
 import 'features/home/pages/home_page.dart';
 
 void main() async {
@@ -27,6 +28,7 @@ void main() async {
   // Initialize controllers
   final appController = Get.put(AppController());
   Get.put(BibleController());
+  Get.put(NotesController());
   await appController.init();
 
   runApp(const MyApp());

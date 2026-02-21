@@ -131,6 +131,7 @@ class AppController extends GetxController {
     } else {
       AdaptiveTheme.of(context).setLight();
     }
+    update();
   }
 
   void toggleKeepScreenOn(bool value) {
@@ -141,5 +142,6 @@ class AppController extends GetxController {
     } else {
       WakelockPlus.disable();
     }
+    update();
   }
 }
