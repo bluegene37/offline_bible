@@ -8,6 +8,7 @@ import '../../../core/services/storage_service.dart';
 import '../../../core/utils/date_utils.dart';
 import '../models/book_model.dart';
 import '../services/bible_service.dart';
+import '../../notes/controllers/notes_controller.dart';
 
 class BibleController extends GetxController {
   final AppController appController = Get.find<AppController>();
@@ -58,6 +59,9 @@ class BibleController extends GetxController {
     if (StorageService.highlightBox.containsKey(verseKey)) {
       StorageService.highlightBox.delete(verseKey);
       StorageService.textsBox.delete(verseKey);
+      if (Get.isRegistered<NotesController>()) {
+        Get.find<NotesController>().loadHighlights();
+      }
     }
   }
 
@@ -187,6 +191,9 @@ class BibleController extends GetxController {
     }
 
     appController.clearTextSelection();
+    if (Get.isRegistered<NotesController>()) {
+      Get.find<NotesController>().loadHighlights();
+    }
   }
 
   void saveNotes(List<String> verseKeys, String notes) {
@@ -204,6 +211,44 @@ class BibleController extends GetxController {
     notesController.clear();
     // Refresh verse tiles so the note icon appears immediately
     appController.update();
+    if (Get.isRegistered<NotesController>()) {
+      Get.find<NotesController>().loadNotes();
+    }
+  }
+
+  void toggleBookmarks(List<String> verseKeys) {
+    final timestamp = DateUtils.formatDateTime(DateTime.now());
+    int added = 0;
+    
+    for (final key in verseKeys) {
+      if (StorageService.bookmarksBox.containsKey(key)) {
+        StorageService.bookmarksBox.delete(key);
+      } else {
+        final verse = currentVerses
+            .firstWhereOrNull((v) => '${v.book}:${v.chapter}:${v.verse}' == key);
+        if (verse != null) {
+          final bookmarkData = {
+            'datetime': timestamp,
+            'text': verse.text,
+            'version': appController.bibleVersion,
+            'book': verse.book,
+            'chapter': verse.chapter,
+            'verse': verse.verse,
+          };
+          StorageService.bookmarksBox.put(key, bookmarkData);
+          added++;
+        }
+      }
+    }
+    
+    appController.clearTextSelection();
+    Get.snackbar(
+        'Bookmarks', added > 0 ? 'Added to bookmarks' : 'Removed from bookmarks',
+        snackPosition: SnackPosition.BOTTOM);
+    appController.update(); 
+    if (Get.isRegistered<NotesController>()) {
+      Get.find<NotesController>().loadBookmarks();
+    }
   }
 
   void copyVerses(List<String> verseKeys) {

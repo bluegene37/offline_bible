@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/theme/app_colors.dart';
 import '../controllers/bible_controller.dart';
 
 class ChapterPage extends StatelessWidget {
-  const ChapterPage({Key? key}) : super(key: key);
+  const ChapterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +48,9 @@ class ChapterPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isSelected
-                        ? AppColors
-                            .themeColorShades[controller.colorThemeName.value]
+                        ? (controller.themeMode.value
+                            ? Colors.grey.shade700
+                            : controller.activeThemeShade)
                         : null,
                   ),
                   child: Column(
@@ -61,7 +61,9 @@ class ChapterPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w300,
-                          color: isSelected ? Colors.black : null,
+                          color: isSelected
+                              ? (controller.themeMode.value ? Colors.white : Colors.black)
+                              : null,
                         ),
                       ),
                     ],

@@ -7,7 +7,7 @@ import '../../bible/controllers/bible_controller.dart';
 import '../controllers/notes_controller.dart';
 
 class HighlightsList extends StatelessWidget {
-  const HighlightsList({Key? key}) : super(key: key);
+  const HighlightsList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,28 @@ class HighlightsList extends StatelessWidget {
     return GetBuilder<NotesController>(
       builder: (controller) {
         if (controller.highlights.isEmpty) {
-          return const Center(child: Text('No highlights found'));
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.highlight_alt, size: 64, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                Text(
+                  'No highlights yet',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Highlight verses to reflect on them later.',
+                  style: TextStyle(color: Colors.grey.shade500),
+                )
+              ],
+            ),
+          );
         }
 
         return ListView.builder(

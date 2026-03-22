@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   // A curated, modern color palette
   static final Map<String, Color> themeColors = {
+    'Black': Colors.black,
     'Blue': Colors.blue,
     'Red': Colors.red,
     'Pink': Colors.pink,
@@ -24,6 +25,7 @@ class AppColors {
   };
 
   static final Map<String, Color> themeColorShades = {
+    'Black': Colors.grey.shade700,
     'Blue': Colors.blue.shade100,
     'Red': Colors.red.shade100,
     'Pink': Colors.pink.shade100,

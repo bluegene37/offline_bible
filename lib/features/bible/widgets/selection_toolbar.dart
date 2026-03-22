@@ -6,7 +6,7 @@ import '../controllers/bible_controller.dart';
 import '../../notes/widgets/note_editor_sheet.dart';
 
 class SelectionToolbar extends StatelessWidget {
-  const SelectionToolbar({Key? key}) : super(key: key);
+  const SelectionToolbar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +148,13 @@ class SelectionToolbar extends StatelessWidget {
           onTap: () {
             bibleController.shareVerses(controller.textUnderline.toList());
           },
+        ),
+        _buildActionButton(
+          context,
+          icon: Icons.bookmark_add_rounded,
+          label: 'Bookmark',
+          onTap: () =>
+              bibleController.toggleBookmarks(controller.textUnderline.toList()),
         ),
         Container(
           height: 24,

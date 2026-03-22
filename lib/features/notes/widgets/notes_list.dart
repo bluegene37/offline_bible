@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:outline_search_bar/outline_search_bar.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/text_utils.dart';
 import '../../../core/utils/ui_utils.dart';
+import '../../../core/widgets/outline_search_bar.dart';
 import '../controllers/notes_controller.dart';
 import 'note_editor_sheet.dart';
 
 class NotesList extends StatelessWidget {
-  const NotesList({Key? key}) : super(key: key);
+  const NotesList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +22,28 @@ class NotesList extends StatelessWidget {
           child: GetBuilder<NotesController>(
             builder: (controller) {
               if (controller.filteredNotes.isEmpty) {
-                return const Center(child: Text('No notes found'));
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.edit_note, size: 64, color: Colors.grey.shade400),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No notes found',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Add notes to verses or try a different search.',
+                        style: TextStyle(color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                );
               }
 
               return ListView.builder(
@@ -134,7 +154,7 @@ class NotesList extends StatelessWidget {
   }
 
   Color _getSearchBarColor(AppController controller) {
-    return AppColors.themeColors[controller.colorThemeName.value]!;
+    return controller.activeThemeColor ?? Colors.white;
   }
 
   void _clearSearch(NotesController notesController, BuildContext context) {

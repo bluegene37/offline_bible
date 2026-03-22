@@ -5,7 +5,7 @@ import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
 
 class ColorPicker extends StatelessWidget {
-  const ColorPicker({Key? key}) : super(key: key);
+  const ColorPicker({super.key});
 
   @override
   Widget build(BuildContext context) {

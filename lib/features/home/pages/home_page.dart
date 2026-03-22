@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../navigation/widgets/bottom_navigation.dart';
 import '../../bible/pages/bible_page.dart';
@@ -13,7 +12,7 @@ import '../../settings/pages/settings_page.dart';
 import '../../bible/widgets/floating_navigation.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,16 +25,15 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           centerTitle: true,
           elevation: 0,
-          backgroundColor:
-              AppColors.themeColors[appController.colorThemeName.value],
-          title: Text(
+          backgroundColor: appController.activeThemeColor,
+          title: Obx(() => Text(
             appController.barTitle.value,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w400,
               letterSpacing: 0.5,
             ),
-          ),
+          )),
         ),
         body: SafeArea(child: _getCurrentPage(currentIndex)),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

@@ -10,9 +10,9 @@ class BottomActionSheet extends StatelessWidget {
   final List<String> selectedVerses;
 
   const BottomActionSheet({
-    Key? key,
+    super.key,
     required this.selectedVerses,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +92,15 @@ class BottomActionSheet extends StatelessWidget {
             bibleController.shareVerses(selectedVerses);
           },
         ),
+        _buildActionButton(
+          context,
+          icon: Icons.bookmark_add_rounded,
+          label: 'Bookmark',
+          onTap: () {
+            bibleController.toggleBookmarks(selectedVerses);
+            Get.back();
+          },
+        ),
       ],
     );
   }
@@ -103,8 +112,8 @@ class BottomActionSheet extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     // Use the primary theme color for actions to make them pop
-    final primaryColor =
-        AppColors.themeColors[Get.find<AppController>().colorThemeName.value];
+    final controller = Get.find<AppController>();
+    final primaryColor = controller.activeThemeColor ?? Colors.white;
 
     return InkWell(
       onTap: onTap,
@@ -113,7 +122,7 @@ class BottomActionSheet extends StatelessWidget {
         width: 80,
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: primaryColor!.withValues(
+          color: primaryColor.withValues(
               alpha: 0.1), // Value 0.1 opacity for subtle background
           borderRadius: BorderRadius.circular(16),
         ),

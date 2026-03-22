@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:outline_search_bar/outline_search_bar.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/outline_search_bar.dart';
 import '../controllers/search_controller.dart';
 import '../widgets/search_results_list.dart';
 import '../widgets/search_history_list.dart';
 
 class SearchPage extends StatelessWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +74,7 @@ class SearchPage extends StatelessWidget {
       AppController appController) {
     return Obx(() {
       final isSelected = searchController.searchScope.value == label;
-      final themeColor =
-          AppColors.themeColors[appController.colorThemeName.value]!;
+      final themeColor = appController.activeThemeColor ?? Colors.white;
 
       return FilterChip(
         label: Text(label),
@@ -102,24 +100,18 @@ class SearchPage extends StatelessWidget {
   }
 
   Color _getClearButtonColor(AppController controller) {
-    return AppColors.themeColors[controller.colorThemeName.value]!;
+    return controller.activeThemeColor ?? Colors.white;
   }
 
   Color _getCursorColor(AppController controller) {
-    return controller.colorThemeName.value == 'Black'
-        ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorThemeName.value]!;
+    return controller.activeThemeColor ?? Colors.white;
   }
 
   Color _getSearchIconColor(AppController controller) {
-    return controller.colorThemeName.value == 'Black'
-        ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorThemeName.value]!;
+    return controller.activeThemeColor ?? Colors.white;
   }
 
   Color _getBorderColor(AppController controller) {
-    return controller.colorThemeName.value == 'Black'
-        ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorThemeName.value]!;
+    return controller.activeThemeColor ?? Colors.white;
   }
 }

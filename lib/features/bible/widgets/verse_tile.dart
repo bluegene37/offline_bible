@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Added this import
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/controllers/app_controller.dart';
@@ -15,12 +16,12 @@ class VerseTile extends StatelessWidget {
   final VoidCallback? onTap;
 
   const VerseTile({
-    Key? key,
+    super.key,
     required this.verse,
     required this.index,
     this.isLastVerse = false,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,14 +33,30 @@ class VerseTile extends StatelessWidget {
         final hasHighlight = StorageService.highlightBox.containsKey(verseKey);
         final hasNotes = _hasNotes(verseKey);
 
+        final hasBookmark = StorageService.bookmarksBox.containsKey(verseKey);
+
         return ListTile(
-          trailing:
-              hasNotes ? _buildNotesIcon(context, verseKey, controller) : null,
+          trailing: hasNotes || hasBookmark
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (hasBookmark)
+                      Icon(Icons.bookmark, color: controller.activeThemeColor, size: 20),
+                    if (hasNotes) _buildNotesIcon(context, verseKey, controller),
+                  ],
+                )
+              : null,
           title: _buildVerseText(
               context, controller, verseKey, isSelected, hasHighlight),
           subtitle: isLastVerse ? _buildCopyrightText() : null,
-          onTap: onTap,
-          onLongPress: onTap,
+          onTap: () {
+            HapticFeedback.selectionClick(); // Added haptic feedback
+            onTap?.call();
+          },
+          onLongPress: () {
+            HapticFeedback.selectionClick(); // Added haptic feedback
+            onTap?.call(); // Assuming long press should also trigger the same action
+          },
         );
       },
     );
@@ -106,7 +123,7 @@ class VerseTile extends StatelessWidget {
     return IconButton(
       icon: Icon(
         Icons.note,
-        color: AppColors.themeColors[controller.colorThemeName.value],
+        color: controller.activeThemeColor,
       ),
       onPressed: () => _onNoteIconTap(context, verseKey),
     );

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/theme/app_colors.dart';
 import '../controllers/bible_controller.dart';
 
 class FloatingNavigation extends StatelessWidget {
-  const FloatingNavigation({Key? key}) : super(key: key);
+  const FloatingNavigation({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +72,7 @@ class FloatingNavigation extends StatelessWidget {
   }) {
     final AppController appController = Get.find();
     final textColor = isEnabled
-        ? AppColors.themeColors[appController.colorThemeName.value]
+        ? (appController.activeThemeColor ?? (appController.themeMode.value ? Colors.white : Colors.black))
         : Colors.grey.withValues(alpha: 0.6);
 
     return Expanded(

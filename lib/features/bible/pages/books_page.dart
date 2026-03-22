@@ -3,12 +3,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/theme/app_colors.dart';
 import '../models/book_model.dart';
 import '../services/bible_service.dart';
 
 class BooksPage extends StatefulWidget {
-  const BooksPage({Key? key}) : super(key: key);
+  const BooksPage({super.key});
 
   @override
   State<BooksPage> createState() => _BooksPageState();
@@ -75,6 +74,7 @@ class _BooksPageState extends State<BooksPage> {
   Widget _buildBooksGrid() {
     return Column(
       children: [
+        const SizedBox(height: 8),
         _buildTestamentHeaders(),
         Expanded(
           child: Row(
@@ -103,27 +103,29 @@ class _BooksPageState extends State<BooksPage> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  color: AppColors
-                      .themeColorShades[appController.colorThemeName.value],
+                  color: appController.themeMode.value
+                      ? Colors.grey.shade800
+                      : appController.activeThemeShade,
                   child: Text(
                     'Old Testament',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.raleway(
                       fontSize: 17.0,
-                      color: Colors.black,
+                      color: appController.themeMode.value ? Colors.white : Colors.black,
                     ),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(8),
-                  color: AppColors
-                      .themeColorShades[appController.colorThemeName.value],
+                  color: appController.themeMode.value
+                      ? Colors.grey.shade800
+                      : appController.activeThemeShade,
                   child: Text(
                     'New Testament',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.raleway(
                       fontSize: 17.0,
-                      color: Colors.black,
+                      color: appController.themeMode.value ? Colors.white : Colors.black,
                     ),
                   ),
                 ),
@@ -151,8 +153,9 @@ class _BooksPageState extends State<BooksPage> {
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
                 color: isSelected
-                    ? AppColors
-                        .themeColorShades[appController.colorThemeName.value]
+                    ? (appController.themeMode.value
+                        ? Colors.grey.shade700
+                        : appController.activeThemeShade)
                     : null,
                 borderRadius: const BorderRadius.all(Radius.circular(30.0)),
               ),
@@ -164,7 +167,9 @@ class _BooksPageState extends State<BooksPage> {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w300,
-                      color: isSelected ? Colors.black : null,
+                      color: isSelected
+                          ? (appController.themeMode.value ? Colors.white : Colors.black)
+                          : null,
                     ),
                   ),
                   Text(
@@ -173,7 +178,9 @@ class _BooksPageState extends State<BooksPage> {
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
                       fontStyle: FontStyle.italic,
-                      color: isSelected ? Colors.black : null,
+                      color: isSelected
+                          ? (appController.themeMode.value ? Colors.white : Colors.black)
+                          : null,
                     ),
                   ),
                 ],
@@ -189,4 +196,5 @@ class _BooksPageState extends State<BooksPage> {
     appController.updateBookSelection(bookKey, 1);
     appController.navigateToPage(1); // Navigate to chapters page
   }
+
 }

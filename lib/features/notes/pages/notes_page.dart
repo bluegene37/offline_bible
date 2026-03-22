@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/theme/app_colors.dart';
 import '../controllers/notes_controller.dart';
 import '../widgets/notes_list.dart';
 import '../widgets/highlights_list.dart';
+import '../widgets/bookmarks_list.dart';
 
 class NotesPage extends StatelessWidget {
-  const NotesPage({Key? key}) : super(key: key);
+  const NotesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +23,13 @@ class NotesPage extends StatelessWidget {
               builder: (controller) {
                 switch (controller.currentTab.value) {
                   case 0:
-                    return const Center(child: CircularProgressIndicator());
+                    return const NotesList(); // Safe default instead of endless spinner
                   case 1:
                     return const HighlightsList();
                   case 2:
                     return const NotesList();
+                  case 3:
+                    return const BookmarksList();
                   default:
                     return const NotesList();
                 }
@@ -46,7 +48,7 @@ class NotesPage extends StatelessWidget {
         return Container(
           height: 50,
           decoration: BoxDecoration(
-            color: AppColors.themeColorShades[controller.colorThemeName.value],
+            color: controller.activeThemeShade,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -57,10 +59,8 @@ class NotesPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: controller.textColorDynamic.value,
                       backgroundColor: notesCtrl.currentTab.value == 2
-                          ? AppColors
-                              .themeColors[controller.colorThemeName.value]
-                          : AppColors.themeColorShades[
-                              controller.colorThemeName.value],
+                          ? controller.activeThemeColor
+                          : controller.activeThemeShade,
                     ),
                     onPressed: () => notesController.switchTab(2),
                     child: const Text('Notes'),
@@ -73,13 +73,25 @@ class NotesPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: controller.textColorDynamic.value,
                       backgroundColor: notesCtrl.currentTab.value == 1
-                          ? AppColors
-                              .themeColors[controller.colorThemeName.value]
-                          : AppColors.themeColorShades[
-                              controller.colorThemeName.value],
+                          ? controller.activeThemeColor
+                          : controller.activeThemeShade,
                     ),
                     onPressed: () => notesController.switchTab(1),
                     child: const Text('Highlights'),
+                  );
+                },
+              ),
+              GetBuilder<NotesController>(
+                builder: (notesCtrl) {
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: controller.textColorDynamic.value,
+                      backgroundColor: notesCtrl.currentTab.value == 3
+                          ? controller.activeThemeColor
+                          : controller.activeThemeShade,
+                    ),
+                    onPressed: () => notesController.switchTab(3),
+                    child: const Text('Bookmarks'),
                   );
                 },
               ),

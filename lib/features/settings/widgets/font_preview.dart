@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/controllers/app_controller.dart';
 
 class FontPreview extends StatelessWidget {
-  const FontPreview({Key? key}) : super(key: key);
+  const FontPreview({super.key});
 
   @override
   Widget build(BuildContext context) {

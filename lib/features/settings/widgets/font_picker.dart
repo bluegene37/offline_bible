@@ -4,10 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../core/theme/app_colors.dart';
 
 class FontPicker extends StatelessWidget {
-  const FontPicker({Key? key}) : super(key: key);
+  const FontPicker({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -81,8 +80,7 @@ class FontPicker extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: AppColors
-                          .themeColors[controller.colorThemeName.value],
+                      color: controller.activeThemeColor,
                     ),
                   ),
                 ),
@@ -102,8 +100,7 @@ class FontPicker extends StatelessWidget {
                               font,
                               fontSize: 18,
                               color: isSelected
-                                  ? AppColors.themeColors[
-                                      controller.colorThemeName.value]
+                                  ? controller.activeThemeColor
                                   : (controller.themeMode.value
                                       ? Colors.white
                                       : Colors.black87),
@@ -114,8 +111,7 @@ class FontPicker extends StatelessWidget {
                           ),
                           trailing: isSelected
                               ? Icon(Icons.check,
-                                  color: AppColors.themeColors[
-                                      controller.colorThemeName.value])
+                                  color: controller.activeThemeColor)
                               : null,
                           onTap: () {
                             controller.updateFont(font);

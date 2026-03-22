@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:substring_highlight/substring_highlight.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../bible/controllers/bible_controller.dart';
 import '../../bible/models/book_model.dart';
 
@@ -11,9 +10,9 @@ class SearchResultsList extends StatelessWidget {
   final String query;
 
   const SearchResultsList({
-    Key? key,
+    super.key,
     required this.query,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +54,7 @@ class SearchResultsList extends StatelessWidget {
                       term: query,
                       textStyle: TextStyle(
                         fontSize: 15,
-                        color: AppColors.textColors[appCtrl.textColorIdx.value],
+                        color: appCtrl.themeMode.value ? Colors.white : Colors.black87,
                         fontWeight: FontWeight.w400,
                         fontStyle: FontStyle.italic,
                       ),
@@ -71,7 +70,7 @@ class SearchResultsList extends StatelessWidget {
                       term: query,
                       textStyle: TextStyle(
                         fontSize: 17,
-                        color: AppColors.textColors[appCtrl.textColorIdx.value],
+                        color: appCtrl.themeMode.value ? Colors.white : Colors.black87,
                         fontWeight: FontWeight.w300,
                       ),
                       textStyleHighlight: TextStyle(
@@ -93,9 +92,7 @@ class SearchResultsList extends StatelessWidget {
   }
 
   Color _getHighlightColor(AppController controller) {
-    return controller.colorThemeName.value == 'Black'
-        ? AppColors.textColors[controller.textColorIdx.value]
-        : AppColors.themeColors[controller.colorThemeName.value]!;
+    return controller.activeThemeColor ?? Colors.white;
   }
 
   void _navigateToVerse(Book verse, AppController controller) {

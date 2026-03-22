@@ -35,37 +35,70 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
+
+  static ThemeData buildLightTheme(String colorThemeName, String fontFamily) {
+    final seedColor = AppColors.themeColors[colorThemeName]!;
+    final baseScheme = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: Brightness.light,
+    );
+    // Very subtle tint for backgrounds — almost white
+    final lightTint = HSLColor.fromColor(seedColor)
+        .withSaturation(0.08)
+        .withLightness(0.98)
+        .toColor();
+
+    // Override surface colors to remove Material 3's default bluish tint
+    final colorScheme = baseScheme.copyWith(
+      surface: lightTint,
+      surfaceContainerHighest: AppColors.themeColorShades[colorThemeName],
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      primaryColor: seedColor,
+      fontFamily: fontFamily,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: lightTint,
+      appBarTheme: AppBarTheme(
+        backgroundColor: seedColor,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: lightTint,
+      ),
+    );
+  }
+
+  /// Builds the dark ThemeData with neutral black/white colors.
+  static ThemeData buildDarkTheme(String fontFamily) {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      fontFamily: fontFamily,
+      colorScheme: ColorScheme.dark(
+        primary: Colors.white,
+        secondary: Colors.grey.shade400,
+        onPrimary: Colors.black,
+        surface: Colors.grey.shade900,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AppController>(
       builder: (appController) {
+        final lightTheme = buildLightTheme(
+          appController.colorThemeName.value,
+          appController.globalFont.value,
+        );
+        final darkTheme = buildDarkTheme(appController.globalFont.value);
+
         return AdaptiveTheme(
-          light: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.light,
-            primaryColor:
-                AppColors.themeColors[appController.colorThemeName.value],
-            fontFamily: appController.globalFont.value,
-            colorScheme: ColorScheme.fromSeed(
-              seedColor:
-                  AppColors.themeColors[appController.colorThemeName.value]!,
-              brightness: Brightness.light,
-            ),
-          ),
-          dark: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.dark,
-            primaryColor:
-                AppColors.themeColors[appController.colorThemeName.value],
-            fontFamily: appController.globalFont.value,
-            colorScheme: ColorScheme.fromSeed(
-              seedColor:
-                  AppColors.themeColors[appController.colorThemeName.value]!,
-              brightness: Brightness.dark,
-            ),
-          ),
+          light: lightTheme,
+          dark: darkTheme,
           initial: appController.themeMode.value
               ? AdaptiveThemeMode.dark
               : AdaptiveThemeMode.light,

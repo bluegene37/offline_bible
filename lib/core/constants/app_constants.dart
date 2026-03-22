@@ -5,7 +5,7 @@ class AppConstants {
   static const int defaultChapter = 1;
   static const double defaultFontSize = 2.0;
   static const String defaultFont = 'Raleway';
-  static const String defaultColorTheme = 'Blue';
+  static const String defaultColorTheme = 'Black';
   static const int defaultTextColorIndex = 1;
 
   // Database box names
@@ -14,6 +14,7 @@ class AppConstants {
   static const String historyBox = 'searchHistoryDB';
   static const String notesBox = 'notesBoxDB';
   static const String textsBox = 'textsBoxDB';
+  static const String bookmarksBox = 'bookmarksBoxDB';
 
   // Navigation indices
   static const int booksPageIndex = 0;

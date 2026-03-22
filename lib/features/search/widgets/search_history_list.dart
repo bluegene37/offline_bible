@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/search_controller.dart';
 
 class SearchHistoryList extends StatelessWidget {
-  const SearchHistoryList({Key? key}) : super(key: key);
+  const SearchHistoryList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,27 @@ class SearchHistoryList extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Obx(() => ListView.builder(
+              child: Obx(() {
+                if (controller.searchHistory.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.manage_search, size: 64, color: Colors.grey.shade400),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No search history',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     itemCount: controller.searchHistory.length,
                     itemBuilder: (context, index) {
@@ -54,7 +74,8 @@ class SearchHistoryList extends StatelessWidget {
                         ),
                       );
                     },
-                  )),
+                  );
+              }),
             ),
           ],
         );

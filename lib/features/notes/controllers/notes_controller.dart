@@ -9,6 +9,7 @@ class NotesController extends GetxController {
   final RxInt currentTab = 2.obs;
   final RxList notes = [].obs;
   final RxList highlights = [].obs;
+  final RxList bookmarks = [].obs;
   final RxList filteredNotes = [].obs;
 
   @override
@@ -16,6 +17,7 @@ class NotesController extends GetxController {
     super.onInit();
     loadNotes();
     loadHighlights();
+    loadBookmarks();
   }
 
   @override
@@ -81,6 +83,30 @@ class NotesController extends GetxController {
     update();
   }
 
+  void loadBookmarks() {
+    final Map<dynamic, dynamic> rawBookmarks = StorageService.bookmarksBox.toMap();
+    bookmarks.value = rawBookmarks.entries.map((entry) {
+      final bookmark = Map<String, dynamic>.from(entry.value as Map);
+      bookmark['id'] = entry.key.toString();
+      return bookmark;
+    }).toList();
+
+    bookmarks.sort((a, b) {
+      final String? timeA = a['datetime'] as String?;
+      final String? timeB = b['datetime'] as String?;
+
+      final dtA = du.DateUtils.parseDateTime(timeA);
+      final dtB = du.DateUtils.parseDateTime(timeB);
+
+      if (dtA == null && dtB == null) return 0;
+      if (dtA == null) return 1;
+      if (dtB == null) return -1;
+
+      return dtB.compareTo(dtA);
+    });
+    update();
+  }
+
   void filterNotes(String query) {
     if (query.trim().isEmpty) {
       filteredNotes.value = notes;
@@ -107,6 +133,11 @@ class NotesController extends GetxController {
     StorageService.highlightBox.delete(highlightKey);
     StorageService.textsBox.delete(highlightKey);
     loadHighlights();
+  }
+
+  void deleteBookmark(String key) {
+    StorageService.bookmarksBox.delete(key);
+    loadBookmarks();
   }
 
   void updateNote(String noteId, String newNotes) {

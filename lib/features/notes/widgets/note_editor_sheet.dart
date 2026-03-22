@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../bible/controllers/bible_controller.dart';
 import '../controllers/notes_controller.dart';
@@ -12,11 +11,11 @@ class NoteEditorSheet extends StatefulWidget {
   final String? initialText;
 
   const NoteEditorSheet({
-    Key? key,
+    super.key,
     required this.verseKeys,
     this.existingNoteId,
     this.initialText,
-  }) : super(key: key);
+  });
 
   @override
   State<NoteEditorSheet> createState() => _NoteEditorSheetState();
@@ -83,7 +82,7 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
           style: GoogleFonts.raleway(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppColors.themeColors[_appController.colorThemeName.value],
+            color: _appController.activeThemeColor,
           ),
         ),
         IconButton(
@@ -106,12 +105,12 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
       padding: const EdgeInsets.all(12),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.themeColorShades[_appController.colorThemeName.value]!
+        color: (_appController.activeThemeShade ?? Colors.grey.shade800)
             .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color:
-              AppColors.themeColorShades[_appController.colorThemeName.value]!,
+              _appController.activeThemeShade ?? Colors.grey.shade800,
         ),
       ),
       child: Text(
@@ -174,7 +173,7 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    AppColors.themeColors[_appController.colorThemeName.value],
+                    _appController.activeThemeColor,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
                 elevation: 0,

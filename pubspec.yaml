@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 2.0.0+6
 
 environment:
-  sdk: ">=2.16.1 <3.0.0"
+  sdk: ">=2.17.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -30,36 +30,21 @@ dependencies:
   flutter:
     sdk: flutter
 
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_native_splash: ^2.3.8
   get: ^4.6.5
-  outline_search_bar: ^2.3.0
-#  simple_text_field: ^3.0.0
   substring_highlight: ^1.0.33
   flutter_sticky_header: ^0.8.0
   scrollable_positioned_list: ^0.3.1
   adaptive_theme: ^3.0.0
   settings_ui: ^2.0.2
-#  flutter_settings_ui: ^3.0.1
-  flutter_font_picker: ^2.0.0
   google_fonts: ^6.3.3
-  carousel_slider: ^5.0.0
   hive_ce: ^2.19.1
   hive_ce_flutter: ^2.3.4
   intl: ^0.20.2
   flutter_launcher_icons: ^0.14.3
-#  flutter_login: ^4.0.0-beta.1
   font_awesome_flutter: ^10.0.0
   package_info_plus: ^9.0.0
-#  readmore: ^2.1.0
-  google_mobile_ads: ^7.0.0
-  rename: ^3.0.2
-  flutter_offline: ^6.0.0
-#  material_floating_search_bar_2: ^0.5.0
-  change_app_package_name: ^1.5.0
   share_plus: ^12.0.1
   wakelock_plus: ^1.4.0
 
@@ -108,36 +93,3 @@ flutter:
   assets:
     - assets/
     - google_fonts/
-  #   - images/a_dot_ham.jpeg
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware.
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
-
-
-#      plugins {
-#      id("com.android.application") version "8.2.0" // Or your AGP version
-#      kotlin("android") version "1.9.0" // Ensure this matches what's expected
-#      }
