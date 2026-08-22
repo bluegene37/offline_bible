@@ -3,7 +3,6 @@ plugins {
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 //    id 'org.jetbrains.kotlin.android' version '2.1.0'
-//    id "com.google.gms.google-services"
 }
 
 def localProperties = new Properties()
@@ -33,10 +32,6 @@ if (flutterVersionName == null) {
 //apply plugin: 'kotlin-android'
 //apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-// START: FlutterFire Configuration
-apply plugin: 'com.google.gms.google-services'
-// END: FlutterFire Configuration
-
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -45,17 +40,17 @@ if (keystorePropertiesFile.exists()) {
 
 android {
 //    compileSdkVersion flutter.compileSdkVersion
-    compileSdkVersion 36
+    compileSdkVersion 37
 //    ndkVersion "25.1.8937393"
-    ndkVersion "28.0.13004108"
+    ndkVersion "28.2.13676358"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '21'
     }
 
     sourceSets {
@@ -70,7 +65,7 @@ android {
 //        minSdkVersion flutter.minSdkVersion
         minSdkVersion 26
 //        targetSdkVersion flutter.targetSdkVersion
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

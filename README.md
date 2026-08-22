@@ -1,16 +1,53 @@
 # Offline Bible
 
-Offline SImple Bible.
+A fast, fully offline King James Version (KJV) Bible app built with Flutter.
+No internet connection required — the complete Bible text ships with the app.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- **Complete offline KJV Bible** — all 66 books, no network needed
+- **Reading experience** — adjustable font, font size, light/dark mode, and color themes
+- **Audio Bible** — listen to any chapter with text-to-speech, adjustable playback speed, and verse-by-verse highlighting
+- **Highlights, notes, and bookmarks** — long-press or tap verses to highlight in multiple colors, attach notes, or bookmark
+- **Search** — full-text search across the whole Bible or scoped to Old/New Testament, with search history
+- **Reading plans** — built-in plans (Proverbs, Psalms, Gospel of John, Epistles) with per-day progress tracking
+- **Verse of the Day** — a daily verse with copy/share
+- **Continue reading** — the app reopens to the chapter you were last reading
+- **Share and copy verses** — formatted with book, chapter, and version
 
-A few resources to get you started if this is your first Flutter project:
+## Getting started
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+```sh
+flutter pub get
+flutter run
+```
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Release builds
+
+- **Android**: requires `android/key.properties` with your release keystore
+  (`keyAlias`, `keyPassword`, `storeFile`, `storePassword`), then
+  `flutter build appbundle`.
+- **iOS/macOS**: open the workspace in Xcode with your signing team configured,
+  or use `flutter build ipa` / `flutter build macos`.
+
+## Project structure
+
+```
+lib/
+  core/          # app-wide controllers, services (storage, TTS, plans), theme, utils
+  features/
+    bible/       # books, chapters, verses, audio player, verse actions
+    search/      # full-text search and history
+    notes/       # notes, highlights, bookmarks
+    plans/       # reading plans
+    settings/    # appearance and app settings
+    home/        # home shell and continue-reading card
+    navigation/  # bottom navigation
+assets/          # KJV text (kjv.json), book titles, app images
+```
+
+## Scripture rights
+
+Rights in the Authorized (King James) Version in the United Kingdom are vested
+in the Crown. Published by permission of the Crown's patentee, Cambridge
+University Press.

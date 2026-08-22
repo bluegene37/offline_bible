@@ -1,10 +1,20 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/constants/app_constants.dart';
 
 class BottomNavigation extends StatelessWidget {
   final Function(int) onTabSelected;
+
+  static const List<int> _barPageIndices = [
+    AppConstants.booksPageIndex,
+    AppConstants.chaptersPageIndex,
+    AppConstants.biblePageIndex,
+    AppConstants.searchPageIndex,
+    AppConstants.settingsPageIndex,
+  ];
 
   const BottomNavigation({
     super.key,
@@ -15,97 +25,104 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<AppController>(
       builder: (controller) {
-        return NavigationBarTheme(
-          data: NavigationBarThemeData(
-            indicatorColor: controller.themeMode.value
-                ? Colors.grey.shade800
-                : controller.activeThemeShade,
-            labelTextStyle: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: controller.themeMode.value ? Colors.white : Colors.black,
-                );
-              }
-              return const TextStyle(fontSize: 14, fontWeight: FontWeight.w400);
-            }),
-            iconTheme: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return IconThemeData(
-                  color: controller.themeMode.value ? Colors.white : Colors.black,
-                );
-              }
-              return null;
-            }),
-          ),
-          child: NavigationBar(
-            height: 60,
-            selectedIndex: controller.globalIndex.value,
-            onDestinationSelected: (index) {
-              _handleNavigation(index, controller);
-            },
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.library_books_outlined),
-                selectedIcon: Icon(Icons.library_books),
-                label: 'Books',
+        final barPosition =
+            _barPageIndices.indexOf(controller.globalIndex.value);
+        final selectedIndex =
+            barPosition != -1 ? barPosition : _barPageIndices.length - 1;
+
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final barColor = isDark
+            ? Colors.black.withOpacity(0.7)
+            : Colors.white.withOpacity(0.85);
+
+        return ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              decoration: BoxDecoration(
+                color: barColor,
+                border: Border(
+                  top: BorderSide(
+                    color: isDark ? Colors.white12 : Colors.black12,
+                    width: 0.5,
+                  ),
+                ),
               ),
-              NavigationDestination(
-                icon: Icon(Icons.format_list_numbered),
-                label: 'Chapters',
+              child: NavigationBarTheme(
+                data: NavigationBarThemeData(
+                  backgroundColor: Colors.transparent,
+                  indicatorColor: Theme.of(context).primaryColor.withOpacity(isDark ? 0.3 : 0.2),
+                  indicatorShape: const StadiumBorder(),
+                  labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : Colors.black,
+                      );
+                    }
+                    return TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? Colors.white70 : Colors.black54);
+                  }),
+                  iconTheme: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return IconThemeData(
+                        color: isDark ? Colors.white : Theme.of(context).primaryColor,
+                      );
+                    }
+                    return IconThemeData(
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    );
+                  }),
+                ),
+                child: NavigationBar(
+                  height: 64,
+                  elevation: 0,
+                  selectedIndex: selectedIndex,
+                  onDestinationSelected: (index) {
+                    HapticFeedback.selectionClick();
+                    _handleNavigation(_barPageIndices[index], controller);
+                  },
+                  destinations: const [
+                    NavigationDestination(
+                      icon: Icon(Icons.library_books_outlined),
+                      selectedIcon: Icon(Icons.library_books),
+                      label: 'Books',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.grid_view_outlined),
+                      selectedIcon: Icon(Icons.grid_view_rounded),
+                      label: 'Chapters',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.menu_book_outlined),
+                      selectedIcon: Icon(Icons.menu_book),
+                      label: 'Bible',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.search_outlined),
+                      selectedIcon: Icon(Icons.search),
+                      label: 'Search',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.settings_outlined),
+                      selectedIcon: Icon(Icons.settings),
+                      label: 'Settings',
+                    ),
+                  ],
+                ),
               ),
-              NavigationDestination(
-                icon: Icon(Icons.menu_book_outlined),
-                selectedIcon: Icon(Icons.menu_book),
-                label: 'Bible',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.search_outlined),
-                selectedIcon: Icon(Icons.search),
-                label: 'Search',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.collections_bookmark_outlined),
-                selectedIcon: Icon(Icons.collections_bookmark),
-                label: 'Saved',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.settings_outlined),
-                selectedIcon: Icon(Icons.settings),
-                label: 'Settings',
-              ),
-            ],
+            ),
           ),
         );
       },
     );
   }
 
-  void _handleNavigation(int index, AppController controller) {
-    onTabSelected(index);
-    controller.navigateToPage(index);
-
-    switch (index) {
-      case AppConstants.booksPageIndex:
-        controller.barTitle.value = "Books (66)";
-        break;
-      case AppConstants.chaptersPageIndex:
-        controller.barTitle.value = "Chapters";
-        break;
-      case AppConstants.biblePageIndex:
-        controller.barTitle.value =
-            '${controller.bookSelected.value} ${controller.selectedChapter.value}';
-        break;
-      case AppConstants.searchPageIndex:
-        controller.barTitle.value = "Search";
-        break;
-      case AppConstants.notesPageIndex:
-        controller.barTitle.value = "Saved Items";
-        break;
-      case AppConstants.settingsPageIndex:
-        controller.barTitle.value = "Settings";
-        break;
-    }
+  void _handleNavigation(int pageIndex, AppController controller) {
+    onTabSelected(pageIndex);
+    controller.navigateToPage(pageIndex);
   }
 }

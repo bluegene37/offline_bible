@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../core/controllers/app_controller.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../home/widgets/continue_reading_card.dart';
 import '../models/book_model.dart';
 import '../services/bible_service.dart';
 
@@ -14,14 +14,12 @@ class BooksPage extends StatefulWidget {
 }
 
 class _BooksPageState extends State<BooksPage> {
-  final ItemScrollController _oldTestamentScrollController =
-      ItemScrollController();
-  final ItemScrollController _newTestamentScrollController =
-      ItemScrollController();
   final AppController appController = Get.find<AppController>();
 
   List<BookTitle> _oldTestamentBooks = [];
   List<BookTitle> _newTestamentBooks = [];
+
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -35,154 +33,150 @@ class _BooksPageState extends State<BooksPage> {
       _oldTestamentBooks = allBooks.where((b) => b.testament == 'old').toList();
       _newTestamentBooks = allBooks.where((b) => b.testament == 'new').toList();
     });
-    _scrollToSelectedBook();
-  }
-
-  void _scrollToSelectedBook() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final selectedBookKey = appController.bookSelected.value;
-
-      int oldTestamentIndex =
-          _oldTestamentBooks.indexWhere((b) => b.key == selectedBookKey);
-      if (oldTestamentIndex != -1 && _oldTestamentScrollController.isAttached) {
-        _oldTestamentScrollController.jumpTo(
-          index: oldTestamentIndex,
-          alignment: 0.5,
-        );
-      }
-
-      int newTestamentIndex =
-          _newTestamentBooks.indexWhere((b) => b.key == selectedBookKey);
-      if (newTestamentIndex != -1 && _newTestamentScrollController.isAttached) {
-        _newTestamentScrollController.jumpTo(
-          index: newTestamentIndex,
-          alignment: 0.5,
-        );
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: _oldTestamentBooks.isEmpty && _newTestamentBooks.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : _buildBooksGrid(),
-    );
-  }
-
-  Widget _buildBooksGrid() {
-    return Column(
-      children: [
-        const SizedBox(height: 8),
-        _buildTestamentHeaders(),
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(
-                  child: _buildTestamentList(
-                      _oldTestamentBooks, _oldTestamentScrollController)),
-              Expanded(
-                  child: _buildTestamentList(
-                      _newTestamentBooks, _newTestamentScrollController)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTestamentHeaders() {
-    return Obx(() => Card(
-          margin: EdgeInsets.zero,
-          child: SizedBox(
-            height: 35,
-            child: GridView.count(
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
+          : Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  color: appController.themeMode.value
-                      ? Colors.grey.shade800
-                      : appController.activeThemeShade,
-                  child: Text(
-                    'Old Testament',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.raleway(
-                      fontSize: 17.0,
-                      color: appController.themeMode.value ? Colors.white : Colors.black,
+                const ContinueReadingCard(),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search books...',
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: isDark ? Colors.grey[800] : Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: EdgeInsets.zero,
                     ),
+                    onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  color: appController.themeMode.value
-                      ? Colors.grey.shade800
-                      : appController.activeThemeShade,
-                  child: Text(
-                    'New Testament',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.raleway(
-                      fontSize: 17.0,
-                      color: appController.themeMode.value ? Colors.white : Colors.black,
-                    ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Old Testament',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          'New Testament',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Divider(height: 1),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildBookColumn(_oldTestamentBooks, true),
+                      ),
+                      const VerticalDivider(width: 1),
+                      Expanded(
+                        child: _buildBookColumn(_newTestamentBooks, false),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ));
+    );
   }
 
-  Widget _buildTestamentList(
-      List<BookTitle> books, ItemScrollController scrollController) {
-    return ScrollablePositionedList.builder(
-      itemScrollController: scrollController,
-      physics: const BouncingScrollPhysics(),
-      itemCount: books.length,
+  Widget _buildBookColumn(List<BookTitle> books, bool isOT) {
+    List<BookTitle> displayBooks = books;
+
+    if (_searchQuery.isNotEmpty) {
+      displayBooks = displayBooks
+          .where((b) => b.key.toLowerCase().contains(_searchQuery))
+          .toList();
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      itemCount: displayBooks.length,
       itemBuilder: (context, index) {
-        final book = books[index];
+        final book = displayBooks[index];
+        
         return Obx(() {
           final isSelected = appController.bookSelected.value == book.key;
+          
           return InkWell(
             onTap: () => _selectBook(book.key),
+            borderRadius: BorderRadius.circular(8),
             child: Container(
-              margin: const EdgeInsets.all(4.0),
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              margin: const EdgeInsets.only(bottom: 2.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
               decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                color: isSelected
-                    ? (appController.themeMode.value
-                        ? Colors.grey.shade700
-                        : appController.activeThemeShade)
-                    : null,
-                borderRadius: const BorderRadius.all(Radius.circular(30.0)),
+                color: isSelected 
+                    ? Theme.of(context).primaryColor.withOpacity(0.1) 
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
               ),
-              alignment: Alignment.center,
-              child: Column(
+              child: Row(
                 children: [
-                  Text(
-                    book.key,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w300,
-                      color: isSelected
-                          ? (appController.themeMode.value ? Colors.white : Colors.black)
-                          : null,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          book.key,
+                          style: TextStyle(
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                            color: isSelected ? Theme.of(context).primaryColor : null,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          book.val
+                              .replaceAll(' Chapters', 'C')
+                              .replaceAll(' Chapter', 'C')
+                              .replaceAll(' Verses', 'V')
+                              .replaceAll(' Verse', 'V'),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: isSelected 
+                                ? Theme.of(context).primaryColor.withOpacity(0.7)
+                                : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    book.val,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      fontStyle: FontStyle.italic,
-                      color: isSelected
-                          ? (appController.themeMode.value ? Colors.white : Colors.black)
-                          : null,
-                    ),
-                  ),
+                  if (isSelected)
+                    Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor),
                 ],
               ),
             ),
@@ -194,7 +188,6 @@ class _BooksPageState extends State<BooksPage> {
 
   void _selectBook(String bookKey) {
     appController.updateBookSelection(bookKey, 1);
-    appController.navigateToPage(1); // Navigate to chapters page
+    appController.navigateToPage(AppConstants.chaptersPageIndex);
   }
-
 }

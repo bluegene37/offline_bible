@@ -1,132 +1,122 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
+
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../models/book_model.dart';
+import 'bible_data.dart';
+import 'version_service.dart';
 
 class BibleService {
-  static bool _isInitialized = false;
+  static BibleData? _data;
+  static List<BookTitle> _bookTitles = [];
+  static String _loadedVersion = '';
+  static bool _initFailed = false;
+  static Completer<void>? _readyCompleter;
 
-  static bool get isInitialized => _isInitialized;
+  static bool get isInitialized => _data != null;
+  static bool get initFailed => _initFailed;
+  static String get loadedVersion => _loadedVersion;
 
-  // Initialize the service by loading data from assets
+  /// Completes when the current initialize/switch finishes (with an error if
+  /// loading failed), so callers can await instead of polling.
+  static Future<void> get ready =>
+      _readyCompleter?.future ?? Future.value();
+
+  // Initialize the service by loading data from assets or a downloaded file
   static Future<void> initialize(AppController controller) async {
-    if (_isInitialized) return;
+    if (_data != null && _loadedVersion == controller.bibleVersion.value) {
+      return;
+    }
+    await _load(controller.bibleVersion.value);
+  }
 
+  /// Loads [abbrev], falling back to the bundled KJV if its file is missing.
+  static Future<void> switchVersion(String abbrev) async {
+    if (!await VersionService.isAvailable(abbrev)) {
+      abbrev = 'kjv';
+    }
+    await _load(abbrev);
+  }
+
+  static Future<void> _load(String abbrev) async {
+    final completer = Completer<void>();
+    _readyCompleter = completer;
     try {
-      // Load and parse Bible data from assets
-      final bibleData = await rootBundle.loadString('assets/kjv.json');
-      final List<dynamic> bibleJson = json.decode(bibleData);
-      controller.cachedBibleData =
-          bibleJson.map((x) => Book.fromJson(x)).toList();
+      _initFailed = false;
 
-      // Load and parse book titles from assets
-      final bookTitlesData =
-          await rootBundle.loadString('assets/booktitle.json');
-      final List<dynamic> titlesJson = json.decode(bookTitlesData);
-      controller.cachedBookTitles =
-          titlesJson.map((x) => BookTitle.fromJson(x)).toList();
+      final String rawJson;
+      if (VersionService.byAbbrev(abbrev).bundled) {
+        rawJson = await rootBundle.loadString('assets/kjv.json');
+      } else {
+        rawJson = await (await VersionService.versionFile(abbrev))
+            .readAsString();
+      }
 
-      _isInitialized = true;
+      // Parse and index off the UI thread; the KJV JSON alone is ~6.5MB.
+      _data = await Isolate.run(
+          () => BibleData.fromFlatJson(json.decode(rawJson)));
+      _loadedVersion = abbrev;
+
+      if (_bookTitles.isEmpty) {
+        final bookTitlesData =
+            await rootBundle.loadString('assets/booktitle.json');
+        final List<dynamic> titlesJson = json.decode(bookTitlesData);
+        _bookTitles = titlesJson.map((x) => BookTitle.fromJson(x)).toList();
+      }
+
+      completer.complete();
     } catch (e) {
-      // print('Error loading Bible data: $e');
+      _initFailed = true;
+      completer.completeError(e);
+      rethrow;
     }
   }
 
   Future<List<Book>> getVerses(String bookTitle, int chapter) async {
-    final AppController controller = Get.find();
-    if (controller.cachedBibleData.isEmpty) {
-      // Retry initialization if empty (e.g. hot reload or race condition)
-      await initialize(controller);
-      if (controller.cachedBibleData.isEmpty) {
-        throw Exception('Bible data not loaded');
-      }
-    }
-
-    final verses = controller.cachedBibleData
-        .where((verse) => verse.book == bookTitle && verse.chapter == chapter)
-        .toList();
-
-    // Update last chapter count (optimization: calculate only if needed or store pre-calculated)
-    // For now, we filter again or we can optimization later.
-    // Optimization: filtering the whole bible for one book is okay but maybe we can optimize this too.
-    // Let's keep it simple for now but using the list.
-    final allChapters =
-        controller.cachedBibleData.where((x) => x.book == bookTitle);
-
-    // Efficiently find max chapter
-    int maxChapter = 1;
-    for (final b in allChapters) {
-      if (b.chapter > maxChapter) maxChapter = b.chapter;
-    }
-
-    // Update the controller with last chapter info
-    controller.lastChapter = maxChapter;
-
-    return verses;
+    final data = await _requireData();
+    Get.find<AppController>().lastChapter = data.chapterCount(bookTitle);
+    return data.chapterVerses(bookTitle, chapter);
   }
 
   Future<List<Book>> getChapters(String bookTitle) async {
-    final AppController controller = Get.find();
-    if (controller.cachedBibleData.isEmpty) {
-      await initialize(controller);
-    }
-
-    // This logic extracts first verse of each chapter to represent the chapter?
-    // Or just all verses?
-    // The original code:
-    // final allChapters = body.map<Book>((json) => Book.fromJson(json)).toList();
-    // final bookChapters = allChapters.where((x) => x.book == bookTitle).toList();
-    // final uniqueChapters = <int, Book>{}; ...
-    // Note: This seems to just get one Book object per chapter to list them.
-
-    final bookChapters =
-        controller.cachedBibleData.where((x) => x.book == bookTitle);
-
-    final uniqueChapters = <int, Book>{};
-    for (final chapter in bookChapters) {
-      if (!uniqueChapters.containsKey(chapter.chapter)) {
-        uniqueChapters[chapter.chapter] = chapter;
-      }
-    }
-
-    return uniqueChapters.values.toList()
+    final data = await _requireData();
+    final chapters = data.byBookChapter[bookTitle];
+    if (chapters == null) return [];
+    final firstVerses = chapters.values
+        .where((verses) => verses.isNotEmpty)
+        .map((verses) => verses.first)
+        .toList()
       ..sort((a, b) => a.chapter.compareTo(b.chapter));
+    return firstVerses;
   }
 
   Future<List<BookTitle>> getBookTitles(String testament) async {
-    final AppController controller = Get.find();
-    if (controller.cachedBookTitles.isEmpty) {
-      await initialize(controller);
-    }
-
+    await _requireData();
     if (testament == 'all') {
-      return controller.cachedBookTitles;
+      return _bookTitles;
     }
-
-    return controller.cachedBookTitles
-        .where((book) => book.testament == testament)
-        .toList();
+    return _bookTitles.where((book) => book.testament == testament).toList();
   }
 
   Future<List<Book>> searchVerses(String query, {String scope = 'All'}) async {
-    final AppController controller = Get.find();
-    if (controller.cachedBibleData.isEmpty || query.trim().isEmpty) {
-      return [];
-    }
+    if (query.trim().isEmpty) return [];
+    final data = await _requireData();
 
     final lowerQuery = query.toLowerCase().trim();
     Set<String>? allowedBooks;
 
     if (scope != 'All') {
       final testament = scope == 'Old Testament' ? 'old' : 'new';
-      allowedBooks = controller.cachedBookTitles
+      allowedBooks = _bookTitles
           .where((b) => b.testament == testament)
           .map((b) => b.key)
           .toSet();
     }
 
-    return controller.cachedBibleData.where((verse) {
+    return data.verses.where((verse) {
       if (allowedBooks != null && !allowedBooks.contains(verse.book)) {
         return false;
       }
@@ -135,5 +125,16 @@ class BibleService {
               verse.chapter == 1 &&
               verse.verse == 1);
     }).toList();
+  }
+
+  Future<BibleData> _requireData() async {
+    if (_data == null) {
+      await initialize(Get.find<AppController>());
+    }
+    final data = _data;
+    if (data == null) {
+      throw Exception('Bible data not loaded');
+    }
+    return data;
   }
 }

@@ -113,7 +113,7 @@ class BottomActionSheet extends StatelessWidget {
   }) {
     // Use the primary theme color for actions to make them pop
     final controller = Get.find<AppController>();
-    final primaryColor = controller.activeThemeColor ?? Colors.white;
+    final primaryColor = controller.activeThemeColor;
 
     return InkWell(
       onTap: onTap,

@@ -3,10 +3,14 @@ class AppConstants {
   static const String defaultBibleVersion = 'kjv';
   static const String defaultBook = 'Genesis';
   static const int defaultChapter = 1;
-  static const double defaultFontSize = 2.0;
+  static const double defaultFontSize = 17.0;
+  static const double minFontSize = 13.0;
+  static const double maxFontSize = 30.0;
+  static const double defaultLineHeight = 1.5;
+  static const double minLineHeight = 1.2;
+  static const double maxLineHeight = 2.0;
   static const String defaultFont = 'Raleway';
   static const String defaultColorTheme = 'Black';
-  static const int defaultTextColorIndex = 1;
 
   // Database box names
   static const String settingsBox = 'settingsDB';
@@ -15,71 +19,30 @@ class AppConstants {
   static const String notesBox = 'notesBoxDB';
   static const String textsBox = 'textsBoxDB';
   static const String bookmarksBox = 'bookmarksBoxDB';
+  static const String readingPlansBox = 'readingPlansDB';
+  static const String votdBox = 'votdDB';
 
   // Navigation indices
   static const int booksPageIndex = 0;
   static const int chaptersPageIndex = 1;
   static const int biblePageIndex = 2;
-  static const int searchPageIndex = 3;
-  static const int notesPageIndex = 4;
-  static const int settingsPageIndex = 5;
+  static const int plansPageIndex = 3;
+  static const int searchPageIndex = 4;
+  static const int notesPageIndex = 5;
+  static const int settingsPageIndex = 6;
 
-  // Font options
+  // Curated reading fonts. Every font here is bundled in google_fonts/ so
+  // the app never needs the network to render text — do not add fonts
+  // without also adding their .ttf files.
   static const List<String> fontOptions = [
-    'Roboto',
-    'Open Sans',
     'Lato',
-    'Montserrat',
     'Raleway',
     'Oswald',
     'Merriweather',
-    'Lora',
-    'Nunito',
-    'Playfair Display',
-    'Rubik',
-    'Ubuntu',
-    'Kanit',
-    'Lobster',
-    'Pacifico',
-    'Dancing Script',
-    'Indie Flower',
     'Quattrocento',
     'Slabo 27px',
     'Inconsolata',
-    'Source Code Pro',
-    'PT Serif',
-    'Josefin Sans',
-    'Abril Fatface',
-    'Anton',
-    'Bebas Neue',
-    'Bitter',
-    'Cabin',
-    'Comfortaa',
-    'Exo 2',
-    'Fjalla One',
-    'Francois One',
-    'Great Vibes',
-    'Hind',
-    'Inria Serif',
-    'Karla',
-    'Maven Pro',
-    'Mukta',
-    'Oxygen',
-    'Pathway Gothic One',
-    'Poiret One',
-    'Questrial',
-    'Righteous',
-    'Sacramento',
-    'Satisfy',
-    'Shadows Into Light',
-    'Teko',
-    'Varela Round',
-    'Yanone Kaffeesatz',
-    'Zilla Slab',
+    'Indie Flower',
+    'Lobster',
   ];
-
-  // Bible rights text
-  static const String bibleRights =
-      'Rights in the Authorized (King James) Version in the United Kingdom are vested in the Crown. '
-      'Published by permission of the Crown\'s patentee, Cambridge University Press';
 }

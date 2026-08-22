@@ -87,8 +87,8 @@ class NotesList extends StatelessWidget {
 
   Widget _buildNoteCard(Map note, String noteId, AppController appController,
       NotesController notesController) {
-    final verseText = TextUtils.formatMultipleVerses(
-        TextUtils.cleanNotesText(note['book']?.toString() ?? '').split(','));
+    final verseText = TextUtils.formatVerseKeysCompact(
+        NotesController.verseKeysOfNote(note));
 
     return GetBuilder<AppController>(
       builder: (controller) {
@@ -105,7 +105,7 @@ class NotesList extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: '$verseText - ${appController.bibleVersion}',
+                    text: '$verseText - ${appController.bibleVersion.value}',
                     style: TextStyle(
                       color: textColor,
                       fontSize: 13,
@@ -154,7 +154,7 @@ class NotesList extends StatelessWidget {
   }
 
   Color _getSearchBarColor(AppController controller) {
-    return controller.activeThemeColor ?? Colors.white;
+    return controller.activeThemeColor;
   }
 
   void _clearSearch(NotesController notesController, BuildContext context) {
@@ -181,10 +181,9 @@ class NotesList extends StatelessWidget {
 
   void _showEditDialog(
       String noteId, Map note, NotesController notesController) {
-    // Parse verses back from string if possible, or just pass noteId
     Get.bottomSheet(
       NoteEditorSheet(
-        verseKeys: [], // Logic to parse keys or just load by ID
+        verseKeys: NotesController.verseKeysOfNote(note),
         existingNoteId: noteId,
         initialText: note['notes']?.toString(),
       ),

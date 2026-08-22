@@ -11,15 +11,24 @@ class SearchHistoryList extends StatelessWidget {
       builder: (controller) {
         return Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(5.0),
-              child: Center(
-                child: Text(
-                  controller.searchHistory.isNotEmpty
-                      ? 'Search History:'
-                      : 'Search History: None',
-                  style: const TextStyle(fontSize: 18.0),
-                ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    controller.searchHistory.isNotEmpty
+                        ? 'Recent Searches'
+                        : 'No Search History',
+                    style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                  ),
+                  if (controller.searchHistory.isNotEmpty)
+                    TextButton.icon(
+                      onPressed: () => controller.clearAllHistory(),
+                      icon: const Icon(Icons.delete_sweep_rounded, size: 18),
+                      label: const Text('Clear All'),
+                    ),
+                ],
               ),
             ),
             Expanded(

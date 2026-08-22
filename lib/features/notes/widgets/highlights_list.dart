@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/ui_utils.dart';
 import '../../bible/controllers/bible_controller.dart';
@@ -131,7 +132,7 @@ class HighlightsList extends StatelessWidget {
       bibleController.pendingScrollVerseIndex = verse - 1;
       bibleController.loadChapter(bookTitle, chapter);
 
-      appController.navigateToPage(2); // Switch to Bible tab
+      appController.navigateToPage(AppConstants.biblePageIndex); // Switch to Bible tab
     }
   }
 

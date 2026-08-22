@@ -73,8 +73,7 @@ class BookmarksList extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: appController.activeThemeColor ?? 
-                                     (appController.themeMode.value ? Colors.white : Colors.black),
+                              color: appController.activeThemeColor,
                             ),
                           ),
                         ),

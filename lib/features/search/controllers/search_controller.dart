@@ -98,6 +98,11 @@ class BibleSearchController extends GetxController {
     _loadSearchHistory();
   }
 
+  void clearAllHistory() {
+    StorageService.historyBox.clear();
+    _loadSearchHistory();
+  }
+
   void setSearchScope(String scope) {
     searchScope.value = scope;
     if (searchQuery.isNotEmpty) {

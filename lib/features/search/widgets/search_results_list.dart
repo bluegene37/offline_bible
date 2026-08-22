@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:substring_highlight/substring_highlight.dart';
 import '../../../core/controllers/app_controller.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../bible/controllers/bible_controller.dart';
 import '../../bible/models/book_model.dart';
 
@@ -92,7 +93,7 @@ class SearchResultsList extends StatelessWidget {
   }
 
   Color _getHighlightColor(AppController controller) {
-    return controller.activeThemeColor ?? Colors.white;
+    return controller.activeThemeColor;
   }
 
   void _navigateToVerse(Book verse, AppController controller) {
@@ -101,7 +102,7 @@ class SearchResultsList extends StatelessWidget {
     final bibleController = Get.find<BibleController>();
     bibleController.loadChapters(verse.book);
 
-    controller.navigateToPage(2); // Navigate to Bible page
+    controller.navigateToPage(AppConstants.biblePageIndex); // Navigate to Bible page
 
     // Jump to specific verse
     Future.delayed(const Duration(milliseconds: 500), () {

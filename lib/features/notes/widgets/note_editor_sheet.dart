@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/controllers/app_controller.dart';
+import '../../../core/utils/text_utils.dart';
 import '../../bible/controllers/bible_controller.dart';
 import '../controllers/notes_controller.dart';
 
@@ -94,23 +95,20 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
   }
 
   Widget _buildVerseReference() {
-    // Format keys like "Genesis 1:1, 1:2"
-    String reference = widget.verseKeys.join(', ');
-    // Simple improvement: if keys are long, truncate or format better
-    if (reference.length > 50) {
-      reference = '${reference.substring(0, 47)}...';
-    }
+    // Compact reference like "Genesis 1:1-3"
+    String reference = TextUtils.formatVerseKeysCompact(widget.verseKeys);
+    if (reference.isEmpty) reference = widget.verseKeys.join(', ');
 
     return Container(
       padding: const EdgeInsets.all(12),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: (_appController.activeThemeShade ?? Colors.grey.shade800)
+        color: (_appController.activeThemeShade)
             .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color:
-              _appController.activeThemeShade ?? Colors.grey.shade800,
+              _appController.activeThemeShade,
         ),
       ),
       child: Text(

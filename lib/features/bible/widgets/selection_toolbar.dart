@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
@@ -11,7 +13,6 @@ class SelectionToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bibleController = Get.find<BibleController>();
-
     final appController = Get.find<AppController>();
 
     return Obx(() {
@@ -20,37 +21,41 @@ class SelectionToolbar extends StatelessWidget {
       final isDark = Theme.of(context).brightness == Brightness.dark;
 
       return Positioned(
-        bottom: 20,
-        left: 20,
-        right: 20,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 15,
-                spreadRadius: 2,
-                offset: const Offset(0, 5),
+        bottom: 24,
+        left: 16,
+        right: 16,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.black.withOpacity(0.7) : Colors.white.withOpacity(0.85),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: isDark ? Colors.white12 : Colors.black12,
+                  width: 0.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
               ),
-            ],
-            border: Border.all(
-              color: isDark
-                  ? Colors.white10
-                  : Colors.black.withValues(alpha: 0.05),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildColorRow(context, appController, bibleController),
+                  const SizedBox(height: 12),
+                  const Divider(height: 1),
+                  const SizedBox(height: 8),
+                  _buildActionsRow(context, appController, bibleController),
+                ],
+              ),
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildColorRow(context, appController, bibleController),
-              const SizedBox(height: 12),
-              const Divider(height: 1),
-              const SizedBox(height: 8),
-              _buildActionsRow(context, appController, bibleController),
-            ],
           ),
         ),
       );
@@ -131,21 +136,26 @@ class SelectionToolbar extends StatelessWidget {
           context,
           icon: Icons.copy_rounded,
           label: 'Copy',
-          onTap: () =>
-              bibleController.copyVerses(controller.textUnderline.toList()),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            bibleController.copyVerses(controller.textUnderline.toList());
+          },
         ),
         _buildActionButton(
           context,
           icon: Icons.edit_note_rounded,
           label: 'Note',
-          onTap: () =>
-              _openNoteEditor(context, controller.textUnderline.toList()),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            _openNoteEditor(context, controller.textUnderline.toList());
+          },
         ),
         _buildActionButton(
           context,
           icon: Icons.share_rounded,
           label: 'Share',
           onTap: () {
+            HapticFeedback.selectionClick();
             bibleController.shareVerses(controller.textUnderline.toList());
           },
         ),
@@ -153,8 +163,28 @@ class SelectionToolbar extends StatelessWidget {
           context,
           icon: Icons.bookmark_add_rounded,
           label: 'Bookmark',
-          onTap: () =>
-              bibleController.toggleBookmarks(controller.textUnderline.toList()),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            bibleController.toggleBookmarks(controller.textUnderline.toList());
+          },
+        ),
+        _buildActionButton(
+          context,
+          icon: Icons.record_voice_over_rounded,
+          label: 'Speak',
+          onTap: () {
+            HapticFeedback.selectionClick();
+            final keys = controller.textUnderline.toList();
+            if (keys.isNotEmpty) {
+              final firstKey = keys.first;
+              final index = bibleController.currentVerses.indexWhere(
+                  (v) => '${v.book}:${v.chapter}:${v.verse}' == firstKey);
+              if (index != -1) {
+                bibleController.startChapterAudio(startIndex: index);
+              }
+            }
+            controller.clearTextSelection();
+          },
         ),
         Container(
           height: 24,
@@ -166,7 +196,10 @@ class SelectionToolbar extends StatelessWidget {
           icon: Icons.close_rounded,
           label: 'Close',
           isDestructive: true,
-          onTap: () => controller.clearTextSelection(),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            controller.clearTextSelection();
+          },
         ),
       ],
     );
@@ -208,6 +241,7 @@ class SelectionToolbar extends StatelessWidget {
 
   void _applyHighlight(int colorIndex, AppController controller,
       BibleController bibleController) {
+    HapticFeedback.selectionClick();
     final selected = controller.textUnderline.toList();
     if (colorIndex == -1) {
       for (final key in selected) {

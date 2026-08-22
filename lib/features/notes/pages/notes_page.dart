@@ -43,59 +43,20 @@ class NotesPage extends StatelessWidget {
 
   Widget _buildTabHeader(
       AppController appController, NotesController notesController) {
-    return GetBuilder<AppController>(
-      builder: (controller) {
-        return Container(
-          height: 50,
-          decoration: BoxDecoration(
-            color: controller.activeThemeShade,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              GetBuilder<NotesController>(
-                builder: (notesCtrl) {
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: controller.textColorDynamic.value,
-                      backgroundColor: notesCtrl.currentTab.value == 2
-                          ? controller.activeThemeColor
-                          : controller.activeThemeShade,
-                    ),
-                    onPressed: () => notesController.switchTab(2),
-                    child: const Text('Notes'),
-                  );
-                },
-              ),
-              GetBuilder<NotesController>(
-                builder: (notesCtrl) {
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: controller.textColorDynamic.value,
-                      backgroundColor: notesCtrl.currentTab.value == 1
-                          ? controller.activeThemeColor
-                          : controller.activeThemeShade,
-                    ),
-                    onPressed: () => notesController.switchTab(1),
-                    child: const Text('Highlights'),
-                  );
-                },
-              ),
-              GetBuilder<NotesController>(
-                builder: (notesCtrl) {
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: controller.textColorDynamic.value,
-                      backgroundColor: notesCtrl.currentTab.value == 3
-                          ? controller.activeThemeColor
-                          : controller.activeThemeShade,
-                    ),
-                    onPressed: () => notesController.switchTab(3),
-                    child: const Text('Bookmarks'),
-                  );
-                },
-              ),
+    return GetBuilder<NotesController>(
+      builder: (notesCtrl) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: SegmentedButton<int>(
+            segments: const [
+              ButtonSegment(value: 2, label: Text('Notes')),
+              ButtonSegment(value: 1, label: Text('Highlights')),
+              ButtonSegment(value: 3, label: Text('Bookmarks')),
             ],
+            selected: {notesCtrl.currentTab.value},
+            onSelectionChanged: (Set<int> newSelection) {
+              notesController.switchTab(newSelection.first);
+            },
           ),
         );
       },

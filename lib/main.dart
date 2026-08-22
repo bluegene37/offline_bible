@@ -1,7 +1,7 @@
-import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'core/controllers/app_controller.dart';
 import 'core/services/storage_service.dart';
 import 'core/theme/app_colors.dart';
@@ -12,9 +12,11 @@ import 'features/home/pages/home_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Unlock orientation (remove restriction to portrait only)
-  // This allows users to read in landscape mode on tablets or larger phones.
-  // Unlock orientation to allow landscape mode
+  // All offered fonts ship inside the app; never fetch fonts over the network.
+  // GoogleFonts.config.allowRuntimeFetching = false;
+
+  // Allow both portrait and landscape so tablets and larger phones can
+  // read comfortably in either orientation.
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -38,21 +40,10 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   static ThemeData buildLightTheme(String colorThemeName, String fontFamily) {
-    final seedColor = AppColors.themeColors[colorThemeName]!;
+    final seedColor = AppColors.themeColors[colorThemeName] ?? AppColors.themeColors['Sapphire']!;
     final baseScheme = ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: Brightness.light,
-    );
-    // Very subtle tint for backgrounds — almost white
-    final lightTint = HSLColor.fromColor(seedColor)
-        .withSaturation(0.08)
-        .withLightness(0.98)
-        .toColor();
-
-    // Override surface colors to remove Material 3's default bluish tint
-    final colorScheme = baseScheme.copyWith(
-      surface: lightTint,
-      surfaceContainerHighest: AppColors.themeColorShades[colorThemeName],
     );
 
     return ThemeData(
@@ -60,30 +51,66 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.light,
       primaryColor: seedColor,
       fontFamily: fontFamily,
-      colorScheme: colorScheme,
-      scaffoldBackgroundColor: lightTint,
+      colorScheme: baseScheme.copyWith(
+        surface: AppColors.lightSurface,
+      ),
+      scaffoldBackgroundColor: AppColors.lightSurface,
       appBarTheme: AppBarTheme(
-        backgroundColor: seedColor,
+        backgroundColor: AppColors.lightSurface,
+        foregroundColor: Colors.black87,
+        elevation: 0,
+        scrolledUnderElevation: 0, // modern airy feel
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: lightTint,
+        backgroundColor: AppColors.lightSurface,
+        indicatorColor: seedColor.withOpacity(0.2),
       ),
     );
   }
 
-  /// Builds the dark ThemeData with neutral black/white colors.
-  static ThemeData buildDarkTheme(String fontFamily) {
+  static ThemeData buildDarkTheme(String colorThemeName, String fontFamily) {
+    final seedColor = AppColors.themeColors[colorThemeName] ?? AppColors.themeColors['Sapphire']!;
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: Brightness.dark,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
       fontFamily: fontFamily,
-      colorScheme: ColorScheme.dark(
-        primary: Colors.white,
-        secondary: Colors.grey.shade400,
-        onPrimary: Colors.black,
-        surface: Colors.grey.shade900,
+      colorScheme: colorScheme.copyWith(
+        surface: AppColors.darkSurface,
+      ),
+      scaffoldBackgroundColor: AppColors.darkSurface,
+      appBarTheme: AppBarTheme(
+        backgroundColor: AppColors.darkSurface,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
+  }
+
+  static ThemeMode _initialMode(String pref) {
+    switch (pref) {
+      case 'dark':
+        return ThemeMode.dark;
+      case 'light':
+        return ThemeMode.light;
+      default:
+        return ThemeMode.system;
+    }
   }
 
   @override
@@ -94,24 +121,21 @@ class MyApp extends StatelessWidget {
           appController.colorThemeName.value,
           appController.globalFont.value,
         );
-        final darkTheme = buildDarkTheme(appController.globalFont.value);
+        final darkTheme = buildDarkTheme(
+          appController.colorThemeName.value,
+          appController.globalFont.value,
+        );
 
-        return AdaptiveTheme(
-          light: lightTheme,
-          dark: darkTheme,
-          initial: appController.themeMode.value
-              ? AdaptiveThemeMode.dark
-              : AdaptiveThemeMode.light,
-          builder: (theme, darkTheme) => GetMaterialApp(
-            title: 'Offline Bible',
-            debugShowCheckedModeBanner: false,
-            theme: theme,
-            darkTheme: darkTheme,
-            home: const HomePage(),
-            getPages: [
-              GetPage(name: '/', page: () => const HomePage()),
-            ],
-          ),
+        return GetMaterialApp(
+          title: 'Offline Bible',
+          debugShowCheckedModeBanner: false,
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: _initialMode(appController.themePref.value),
+          home: const HomePage(),
+          getPages: [
+            GetPage(name: '/', page: () => const HomePage()),
+          ],
         );
       },
     );

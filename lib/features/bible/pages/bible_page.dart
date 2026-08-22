@@ -4,6 +4,7 @@ import '../../../core/controllers/app_controller.dart';
 import '../controllers/bible_controller.dart';
 import '../widgets/verse_list.dart';
 import '../widgets/selection_toolbar.dart';
+import '../widgets/audio_player_bar.dart';
 
 class BiblePage extends StatelessWidget {
   final String bookTitle;
@@ -20,9 +21,13 @@ class BiblePage extends StatelessWidget {
     final bibleController = Get.find<BibleController>();
     final appController = Get.find<AppController>();
 
-    // Load chapter data when page is built
+    // Load chapter data when page is built, but skip when this chapter is
+    // already loaded — a reload would reset scroll and stop chapter audio.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      bibleController.loadChapter(bookTitle, chapter);
+      if (!bibleController.isChapterLoaded(bookTitle, chapter) ||
+          bibleController.pendingScrollVerseIndex != null) {
+        bibleController.loadChapter(bookTitle, chapter);
+      }
     });
 
     return Scaffold(
@@ -44,7 +49,21 @@ class BiblePage extends StatelessWidget {
                 // The VerseList is always in the tree
                 if (controller.currentVerses.isEmpty &&
                     !controller.isLoading.value)
-                  const Center(child: Text('No verses found'))
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('No verses found'),
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              controller.loadChapter(bookTitle, chapter),
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  )
                 else
                   VerseList(
                     key: ValueKey(
@@ -57,6 +76,12 @@ class BiblePage extends StatelessWidget {
 
                 // Selection Toolbar
                 const SelectionToolbar(),
+
+                // Audio Player Bar
+                const Align(
+                  alignment: Alignment.bottomCenter,
+                  child: AudioPlayerBar(),
+                ),
               ],
             ),
           );

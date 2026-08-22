@@ -8,6 +8,8 @@ class StorageService {
   static late Box _notesBox;
   static late Box _textsBox;
   static late Box _bookmarksBox;
+  static late Box _readingPlansBox;
+  static late Box _votdBox;
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -17,6 +19,8 @@ class StorageService {
     _notesBox = await Hive.openBox(AppConstants.notesBox);
     _textsBox = await Hive.openBox(AppConstants.textsBox);
     _bookmarksBox = await Hive.openBox(AppConstants.bookmarksBox);
+    _readingPlansBox = await Hive.openBox(AppConstants.readingPlansBox);
+    _votdBox = await Hive.openBox(AppConstants.votdBox);
   }
 
   // Settings operations
@@ -34,6 +38,8 @@ class StorageService {
   static Box get notesBox => _notesBox;
   static Box get textsBox => _textsBox;
   static Box get bookmarksBox => _bookmarksBox;
+  static Box get readingPlansBox => _readingPlansBox;
+  static Box get votdBox => _votdBox;
 
   // Clear all data (for debugging)
   static Future<void> clearAll() async {
@@ -43,5 +49,7 @@ class StorageService {
     await _notesBox.clear();
     await _textsBox.clear();
     await _bookmarksBox.clear();
+    await _readingPlansBox.clear();
+    await _votdBox.clear();
   }
 }

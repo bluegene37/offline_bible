@@ -74,7 +74,7 @@ class SearchPage extends StatelessWidget {
       AppController appController) {
     return Obx(() {
       final isSelected = searchController.searchScope.value == label;
-      final themeColor = appController.activeThemeColor ?? Colors.white;
+      final themeColor = appController.activeThemeColor;
 
       return FilterChip(
         label: Text(label),
@@ -100,18 +100,18 @@ class SearchPage extends StatelessWidget {
   }
 
   Color _getClearButtonColor(AppController controller) {
-    return controller.activeThemeColor ?? Colors.white;
+    return controller.activeThemeColor;
   }
 
   Color _getCursorColor(AppController controller) {
-    return controller.activeThemeColor ?? Colors.white;
+    return controller.activeThemeColor;
   }
 
   Color _getSearchIconColor(AppController controller) {
-    return controller.activeThemeColor ?? Colors.white;
+    return controller.activeThemeColor;
   }
 
   Color _getBorderColor(AppController controller) {
-    return controller.activeThemeColor ?? Colors.white;
+    return controller.activeThemeColor;
   }
 }

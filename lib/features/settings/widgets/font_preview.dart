@@ -15,7 +15,8 @@ class FontPreview extends StatelessWidget {
         'In the beginning God created the heaven and the earth.',
         style: GoogleFonts.getFont(
           appController.globalFont.value,
-          fontSize: 15 + appController.fontSize.value,
+          fontSize: appController.fontSize.value,
+          height: appController.lineHeight.value,
         ),
       );
     });

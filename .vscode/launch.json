@@ -2,13 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "simple_bible",
+            "name": "offline_bible",
             "request": "launch",
             "type": "dart",
             "program": "lib/main.dart"
         },
         {
-            "name": "simple_bible (release)",
+            "name": "offline_bible (release)",
             "request": "launch",
             "type": "dart",
             "program": "lib/main.dart",

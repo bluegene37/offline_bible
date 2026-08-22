@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../core/services/tts_service.dart';
 import '../../../core/utils/date_utils.dart';
 import '../models/book_model.dart';
 import '../services/bible_service.dart';
@@ -13,6 +14,7 @@ import '../../notes/controllers/notes_controller.dart';
 class BibleController extends GetxController {
   final AppController appController = Get.find<AppController>();
   final BibleService _bibleService = BibleService();
+  final TtsService _ttsService = TtsService();
 
   ItemScrollController itemScrollController = ItemScrollController();
   ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
@@ -25,16 +27,26 @@ class BibleController extends GetxController {
   final RxDouble sheetHeight = 0.0.obs;
   final RxBool isLoading = false.obs;
 
+  // TTS Audio State
+  final RxBool isAudioPlaying = false.obs;
+  final RxBool isAudioPaused = false.obs;
+  final RxInt activeAudioVerseIndex = (-1).obs;
+  final RxDouble audioSpeechRate = 0.5.obs;
+
   int? pendingScrollVerseIndex;
 
   @override
   void onInit() {
     super.onInit();
     _setupScrollListener();
+    final savedRate = StorageService.getSetting('audioSpeechRate', 0.5);
+    audioSpeechRate.value = savedRate;
+    _ttsService.setRate(savedRate);
   }
 
   @override
   void onClose() {
+    stopAudio();
     notesController.dispose();
     super.onClose();
   }
@@ -55,6 +67,69 @@ class BibleController extends GetxController {
     });
   }
 
+  // Audio Methods
+  Future<void> toggleChapterAudio() async {
+    if (isAudioPlaying.value) {
+      await pauseAudio();
+    } else if (isAudioPaused.value) {
+      await resumeAudio();
+    } else {
+      await startChapterAudio();
+    }
+  }
+
+  Future<void> startChapterAudio({int startIndex = 0}) async {
+    if (currentVerses.isEmpty) return;
+    final versesTexts = currentVerses.map((v) => 'Verse ${v.verse}. ${v.text}').toList();
+
+    await _ttsService.speakVerses(
+      versesText: versesTexts,
+      startIndex: startIndex,
+      onVerseChanged: (index) {
+        activeAudioVerseIndex.value = index;
+        jumpToVerse(index);
+        update();
+      },
+      onStateChanged: (state) {
+        isAudioPlaying.value = state == TtsState.playing;
+        isAudioPaused.value = state == TtsState.paused;
+        if (state == TtsState.stopped) {
+          activeAudioVerseIndex.value = -1;
+        }
+        update();
+      },
+    );
+  }
+
+  Future<void> pauseAudio() async {
+    await _ttsService.pause();
+    isAudioPlaying.value = false;
+    isAudioPaused.value = true;
+    update();
+  }
+
+  Future<void> resumeAudio() async {
+    await _ttsService.resume();
+    isAudioPlaying.value = true;
+    isAudioPaused.value = false;
+    update();
+  }
+
+  Future<void> stopAudio() async {
+    await _ttsService.stop();
+    isAudioPlaying.value = false;
+    isAudioPaused.value = false;
+    activeAudioVerseIndex.value = -1;
+    update();
+  }
+
+  Future<void> setAudioRate(double rate) async {
+    audioSpeechRate.value = rate;
+    StorageService.setSetting('audioSpeechRate', rate);
+    await _ttsService.setRate(rate);
+    update();
+  }
+
   void deleteHighlight(String verseKey) {
     if (StorageService.highlightBox.containsKey(verseKey)) {
       StorageService.highlightBox.delete(verseKey);
@@ -65,10 +140,23 @@ class BibleController extends GetxController {
     }
   }
 
+  /// True when [book]/[chapter] is already the loaded chapter, so a rebuild
+  /// does not need to reload (which would reset scroll and stop audio).
+  bool isChapterLoaded(String book, int chapter) {
+    return currentVerses.isNotEmpty &&
+        appController.bookSelected.value == book &&
+        appController.selectedChapter.value == chapter &&
+        currentVerses.first.book == book &&
+        currentVerses.first.chapter == chapter;
+  }
+
   Future<void> loadChapter(String book, int chapter) async {
-    while (!BibleService.isInitialized) {
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
+    stopAudio();
+    // Wait for the Bible data to finish loading; getVerses retries and
+    // reports the error if initialization failed.
+    try {
+      await BibleService.ready;
+    } catch (_) {}
     try {
       isLoading.value = true;
       _resetScrollControllers();
@@ -112,7 +200,6 @@ class BibleController extends GetxController {
       isLoading.value = true;
       final results = await _bibleService.searchVerses(query, scope: scope);
       searchResults.value = results;
-      _saveSearchHistory(query);
 
       // Update bar title counter AFTER results are ready
       final count = searchResults.length;
@@ -126,18 +213,6 @@ class BibleController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  void _saveSearchHistory(String query) {
-    final timestamp = DateUtils.formatDateTime(DateTime.now());
-
-    StorageService.historyBox.toMap().forEach((key, value) {
-      if (value == query) {
-        StorageService.historyBox.delete(key);
-      }
-    });
-
-    StorageService.historyBox.put(timestamp, query);
   }
 
   void jumpToVerse(int verseIndex) {
@@ -183,7 +258,7 @@ class BibleController extends GetxController {
         final highlightData = {
           'datetime': timestamp,
           'text': verse.text,
-          'version': appController.bibleVersion,
+          'version': appController.bibleVersion.value,
           'color': colorIndex,
         };
         StorageService.textsBox.put(key, highlightData);
@@ -201,6 +276,10 @@ class BibleController extends GetxController {
     final noteId = DateUtils.generateUniqueId().toString();
 
     final noteData = {
+      // 'verses' is the canonical reference list; 'book' keeps the legacy
+      // stringified format so data written by newer builds stays readable
+      // if the app is downgraded.
+      'verses': verseKeys,
       'book': verseKeys.toString(),
       'stamp': timestamp,
       'notes': notes,
@@ -230,7 +309,7 @@ class BibleController extends GetxController {
           final bookmarkData = {
             'datetime': timestamp,
             'text': verse.text,
-            'version': appController.bibleVersion,
+            'version': appController.bibleVersion.value,
             'book': verse.book,
             'chapter': verse.chapter,
             'verse': verse.verse,
@@ -262,8 +341,7 @@ class BibleController extends GetxController {
   void shareVerses(List<String> verseKeys) {
     final text = _formatVerses(verseKeys);
     if (text == null) return;
-    // ignore: deprecated_member_use
-    Share.share(text);
+    SharePlus.instance.share(ShareParams(text: text));
     appController.clearTextSelection();
   }
 
@@ -289,7 +367,7 @@ class BibleController extends GetxController {
 
     if (firstVerse != null) {
       buffer.writeln(
-          '${firstVerse.book} ${firstVerse.chapter} (${appController.bibleVersion})\n');
+          '${firstVerse.book} ${firstVerse.chapter} (${appController.bibleVersion.value})\n');
       currentBook = firstVerse.book;
       currentChapter = firstVerse.chapter;
     }

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Added this import
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/services/storage_service.dart';
 
+import '../controllers/bible_controller.dart';
 import '../models/book_model.dart';
+import '../services/version_service.dart';
+import '../../notes/controllers/notes_controller.dart';
 import '../../notes/widgets/note_editor_sheet.dart';
 
 class VerseTile extends StatelessWidget {
@@ -32,14 +35,21 @@ class VerseTile extends StatelessWidget {
         final isSelected = controller.textUnderline.contains(verseKey);
         final hasHighlight = StorageService.highlightBox.containsKey(verseKey);
         final hasNotes = _hasNotes(verseKey);
-
         final hasBookmark = StorageService.bookmarksBox.containsKey(verseKey);
 
+        final bibleCtrl = Get.isRegistered<BibleController>() ? Get.find<BibleController>() : null;
+        final isAudioActive = bibleCtrl != null && bibleCtrl.activeAudioVerseIndex.value == index;
+
         return ListTile(
-          trailing: hasNotes || hasBookmark
+          tileColor: isAudioActive
+              ? (controller.activeThemeColor.withValues(alpha: 0.25))
+              : null,
+          trailing: hasNotes || hasBookmark || isAudioActive
               ? Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (isAudioActive)
+                      const Icon(Icons.volume_up_rounded, color: Colors.amber, size: 20),
                     if (hasBookmark)
                       Icon(Icons.bookmark, color: controller.activeThemeColor, size: 20),
                     if (hasNotes) _buildNotesIcon(context, verseKey, controller),
@@ -47,15 +57,15 @@ class VerseTile extends StatelessWidget {
                 )
               : null,
           title: _buildVerseText(
-              context, controller, verseKey, isSelected, hasHighlight),
+              context, controller, verseKey, isSelected, hasHighlight, isAudioActive),
           subtitle: isLastVerse ? _buildCopyrightText() : null,
           onTap: () {
-            HapticFeedback.selectionClick(); // Added haptic feedback
+            HapticFeedback.selectionClick();
             onTap?.call();
           },
           onLongPress: () {
-            HapticFeedback.selectionClick(); // Added haptic feedback
-            onTap?.call(); // Assuming long press should also trigger the same action
+            HapticFeedback.selectionClick();
+            onTap?.call();
           },
         );
       },
@@ -63,30 +73,38 @@ class VerseTile extends StatelessWidget {
   }
 
   Widget _buildVerseText(BuildContext context, AppController controller,
-      String verseKey, bool isSelected, bool hasHighlight) {
+      String verseKey, bool isSelected, bool hasHighlight, bool isAudioActive) {
     return Text.rich(
       TextSpan(
         children: [
-          TextSpan(
-            text: '${verse.verse}. ',
-            style: GoogleFonts.getFont(
-              controller.globalFont.value,
-              fontSize: 11 + controller.fontSize.value,
-              color:
-                  _getTextColor(context, hasHighlight).withValues(alpha: 0.7),
-              fontWeight: FontWeight.w300,
-              fontStyle: FontStyle.italic,
+          WidgetSpan(
+            alignment: PlaceholderAlignment.top,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 6.0, top: 2.0),
+              child: Text(
+                '${verse.verse}',
+                style: GoogleFonts.getFont(
+                  controller.globalFont.value,
+                  fontSize: controller.fontSize.value * 0.65,
+                  color: _getTextColor(context, hasHighlight).withOpacity(0.5),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
           TextSpan(
             text: verse.text,
             style: GoogleFonts.getFont(
               controller.globalFont.value,
-              fontSize: 15 + controller.fontSize.value,
+              fontSize: controller.fontSize.value,
+              height: controller.lineHeight.value,
               color: _getTextColor(context, hasHighlight),
+              fontWeight: isAudioActive ? FontWeight.w500 : FontWeight.normal,
               decoration: isSelected ? TextDecoration.underline : null,
               decorationStyle: isSelected ? TextDecorationStyle.dashed : null,
-              backgroundColor: _getBackgroundColor(verseKey, hasHighlight),
+              backgroundColor: isAudioActive
+                  ? (controller.activeThemeColor.withOpacity(0.15))
+                  : _getBackgroundColor(context, verseKey, hasHighlight),
             ),
           ),
         ],
@@ -95,27 +113,30 @@ class VerseTile extends StatelessWidget {
   }
 
   Color _getTextColor(BuildContext context, bool hasHighlight) {
-    if (hasHighlight) {
-      // Highlights are typically light colors, so use black text for contrast
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (hasHighlight && !isDark) {
+      // Light mode paints the full pastel marker, so text must be dark.
       return Colors.black;
     }
-
-    // For normal text, adapt to the background brightness
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
+    return isDark ? Colors.white : Colors.black;
   }
 
-  Color? _getBackgroundColor(String verseKey, bool hasHighlight) {
+  Color? _getBackgroundColor(BuildContext context, String verseKey,
+      bool hasHighlight) {
     if (!hasHighlight) return null;
 
     final colorIndex =
         StorageService.highlightBox.get(verseKey, defaultValue: 0);
-    // Ensure index is within bounds
-    if (colorIndex >= 0 && colorIndex < AppColors.highlightColors.length) {
-      return AppColors.highlightColors[colorIndex];
-    }
-    return AppColors.highlightColors[0];
+    final color = (colorIndex >= 0 &&
+            colorIndex < AppColors.highlightColors.length)
+        ? AppColors.highlightColors[colorIndex]
+        : AppColors.highlightColors[0];
+
+    // Dark mode dims the marker to a tint so white text stays readable
+    // and the page doesn't glow.
+    return Theme.of(context).brightness == Brightness.dark
+        ? color.withValues(alpha: 0.30)
+        : color;
   }
 
   Widget _buildNotesIcon(
@@ -130,40 +151,36 @@ class VerseTile extends StatelessWidget {
   }
 
   void _onNoteIconTap(BuildContext context, String verseKey) {
-    final notesBox = StorageService.notesBox;
-    // Find note containing this verseKey
-    final noteEntry = notesBox.toMap().entries.firstWhere(
-          (e) => e.value['book'].toString().contains(verseKey),
-          orElse: () => MapEntry('', {}),
-        );
+    final noteId = Get.find<NotesController>().noteIdForVerse(verseKey);
+    if (noteId == null) return;
+    final note = StorageService.notesBox.get(noteId);
+    if (note == null) return;
 
-    if (noteEntry.key.toString().isNotEmpty) {
-      Get.bottomSheet(
-        NoteEditorSheet(
-          verseKeys: [verseKey],
-          existingNoteId: noteEntry.key.toString(),
-          initialText: noteEntry.value['notes'],
-        ),
-        isScrollControlled: true,
-      );
-    }
+    Get.bottomSheet(
+      NoteEditorSheet(
+        verseKeys: [verseKey],
+        existingNoteId: noteId,
+        initialText: note['notes'],
+      ),
+      isScrollControlled: true,
+    );
   }
 
   Widget _buildCopyrightText() {
-    return const Padding(
-      padding: EdgeInsets.all(20),
+    final version =
+        VersionService.byAbbrev(Get.find<AppController>().bibleVersion.value);
+    return Padding(
+      padding: const EdgeInsets.all(20),
       child: Text(
-        'Rights in the Authorized (King James) Version in the United Kingdom are vested in the Crown. '
-        'Published by permission of the Crown\'s patentee, Cambridge University Press',
-        style: TextStyle(fontStyle: FontStyle.italic, fontSize: 11),
+        '${version.name} — ${version.copyright}',
+        style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 11),
         textAlign: TextAlign.center,
       ),
     );
   }
 
   bool _hasNotes(String verseKey) {
-    final notesValues = StorageService.notesBox.values.toList();
-    return notesValues
-        .any((note) => note['book'].toString().contains(verseKey));
+    return Get.isRegistered<NotesController>() &&
+        Get.find<NotesController>().hasNoteFor(verseKey);
   }
 }

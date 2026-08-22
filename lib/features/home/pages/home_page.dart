@@ -9,7 +9,10 @@ import '../../bible/pages/chapter_page.dart';
 import '../../search/pages/search_page.dart';
 import '../../notes/pages/notes_page.dart';
 import '../../settings/pages/settings_page.dart';
+import '../../plans/pages/reading_plans_page.dart';
 import '../../bible/widgets/floating_navigation.dart';
+import '../../bible/widgets/quick_picker_sheet.dart';
+import '../../bible/widgets/quick_display_sheet.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -22,19 +25,7 @@ class HomePage extends StatelessWidget {
       final int currentIndex = appController.globalIndex.value;
 
       return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          elevation: 0,
-          backgroundColor: appController.activeThemeColor,
-          title: Obx(() => Text(
-            appController.barTitle.value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0.5,
-            ),
-          )),
-        ),
+        appBar: _buildAppBar(appController, context, currentIndex),
         body: SafeArea(child: _getCurrentPage(currentIndex)),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: _shouldShowFloatingButton(appController)
@@ -45,6 +36,95 @@ class HomePage extends StatelessWidget {
         ),
       );
     });
+  }
+
+  PreferredSizeWidget _buildAppBar(AppController controller, BuildContext context, int currentIndex) {
+    if (currentIndex == AppConstants.biblePageIndex) {
+      return AppBar(
+        centerTitle: true,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              onTap: () {
+                QuickPickerSheet.show(context);
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Obx(() => Text(
+                      '${controller.bookSelected.value} ${controller.selectedChapter.value}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    )),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.keyboard_arrow_down, size: 18),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            InkWell(
+              onTap: () {
+                // Future version picker
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Obx(() => Text(
+                      controller.bibleVersion.value,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                    )),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.keyboard_arrow_down, size: 18),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.text_format),
+            onPressed: () {
+              QuickDisplaySheet.show(context);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              controller.navigateToPage(AppConstants.searchPageIndex);
+            },
+          ),
+        ],
+      );
+    }
+
+    return AppBar(
+      centerTitle: true,
+      elevation: 0,
+      title: Obx(() => Text(
+        controller.barTitle.value,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.5,
+        ),
+      )),
+    );
   }
 
   Widget _getCurrentPage(int index) {
@@ -59,6 +139,8 @@ class HomePage extends StatelessWidget {
           bookTitle: appController.bookSelected.value,
           chapter: appController.selectedChapter.value,
         );
+      case AppConstants.plansPageIndex:
+        return const ReadingPlansPage();
       case AppConstants.searchPageIndex:
         return const SearchPage();
       case AppConstants.notesPageIndex:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
+import '../../../core/constants/app_constants.dart';
 import '../controllers/bible_controller.dart';
 
 class ChapterPage extends StatelessWidget {
@@ -48,9 +49,7 @@ class ChapterPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isSelected
-                        ? (controller.themeMode.value
-                            ? Colors.grey.shade700
-                            : controller.activeThemeShade)
+                        ? (controller.activeThemeShade)
                         : null,
                   ),
                   child: Column(
@@ -84,6 +83,6 @@ class ChapterPage extends StatelessWidget {
       controller.bookSelected.value,
       chapterNumber,
     );
-    controller.navigateToPage(2); // Navigate to Bible page
+    controller.navigateToPage(AppConstants.biblePageIndex); // Navigate to Bible page
   }
 }

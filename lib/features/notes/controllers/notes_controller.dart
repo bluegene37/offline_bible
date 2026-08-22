@@ -12,6 +12,29 @@ class NotesController extends GetxController {
   final RxList bookmarks = [].obs;
   final RxList filteredNotes = [].obs;
 
+  /// verseKey -> noteId index rebuilt on every load, so verse tiles can
+  /// check for notes in O(1) instead of scanning the whole notes box.
+  final Map<String, String> _noteIdByVerse = {};
+
+  bool hasNoteFor(String verseKey) => _noteIdByVerse.containsKey(verseKey);
+
+  String? noteIdForVerse(String verseKey) => _noteIdByVerse[verseKey];
+
+  /// Reads a note's verse references, supporting both the current list
+  /// format ('verses') and the legacy stringified format ('book').
+  static List<String> verseKeysOfNote(Map note) {
+    final verses = note['verses'];
+    if (verses is List) {
+      return verses.map((v) => v.toString()).toList();
+    }
+    final legacy = note['book']?.toString() ?? '';
+    return TextUtils.cleanNotesText(legacy)
+        .split(',')
+        .map((k) => k.trim())
+        .where((k) => k.isNotEmpty)
+        .toList();
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -33,9 +56,13 @@ class NotesController extends GetxController {
 
   void loadNotes() {
     final Map<dynamic, dynamic> rawNotes = StorageService.notesBox.toMap();
+    _noteIdByVerse.clear();
     notes.value = rawNotes.entries.map((entry) {
       final note = Map<String, dynamic>.from(entry.value as Map);
       note['id'] = entry.key.toString();
+      for (final verseKey in verseKeysOfNote(note)) {
+        _noteIdByVerse[verseKey] = note['id'] as String;
+      }
       return note;
     }).toList();
 
