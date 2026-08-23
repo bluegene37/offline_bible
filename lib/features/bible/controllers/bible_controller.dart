@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../core/services/bible_audio_handler.dart';
 import '../../../core/services/tts_service.dart';
 import '../../../core/utils/date_utils.dart';
 import '../models/book_model.dart';
@@ -14,7 +15,7 @@ import '../../notes/controllers/notes_controller.dart';
 class BibleController extends GetxController {
   final AppController appController = Get.find<AppController>();
   final BibleService _bibleService = BibleService();
-  final TtsService _ttsService = TtsService();
+  final BibleAudioHandler _audio = Get.find<BibleAudioHandler>();
 
   ItemScrollController itemScrollController = ItemScrollController();
   ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
@@ -40,7 +41,21 @@ class BibleController extends GetxController {
     _setupScrollListener();
     final savedRate = StorageService.getSetting('audioSpeechRate', 0.5);
     audioSpeechRate.value = savedRate;
-    _ttsService.setRate(savedRate);
+    TtsService().setRate(savedRate);
+
+    // Playback can also be driven from the lock screen or a headset button,
+    // so the reader mirrors the handler rather than owning the state.
+    _audio.onVerseChanged = (index) {
+      activeAudioVerseIndex.value = index;
+      jumpToVerse(index);
+      update();
+    };
+    _audio.onStateChanged = (state) {
+      isAudioPlaying.value = state == TtsState.playing;
+      isAudioPaused.value = state == TtsState.paused;
+      if (state == TtsState.stopped) activeAudioVerseIndex.value = -1;
+      update();
+    };
   }
 
   @override
@@ -66,67 +81,56 @@ class BibleController extends GetxController {
     });
   }
 
-  // Audio Methods
+  // Audio. All of it goes through the media session so the lock screen,
+  // headset buttons and the in-app bar stay in agreement.
   Future<void> toggleChapterAudio() async {
     if (isAudioPlaying.value) {
-      await pauseAudio();
-    } else if (isAudioPaused.value) {
-      await resumeAudio();
+      await _audio.pause();
     } else {
-      await startChapterAudio();
+      await _audio.play();
     }
   }
 
   Future<void> startChapterAudio({int startIndex = 0}) async {
     if (currentVerses.isEmpty) return;
-    final versesTexts = currentVerses.map((v) => 'Verse ${v.verse}. ${v.text}').toList();
-
-    await _ttsService.speakVerses(
-      versesText: versesTexts,
-      startIndex: startIndex,
-      onVerseChanged: (index) {
-        activeAudioVerseIndex.value = index;
-        jumpToVerse(index);
-        update();
-      },
-      onStateChanged: (state) {
-        isAudioPlaying.value = state == TtsState.playing;
-        isAudioPaused.value = state == TtsState.paused;
-        if (state == TtsState.stopped) {
-          activeAudioVerseIndex.value = -1;
-        }
-        update();
-      },
-    );
+    _publishChapterToAudio();
+    await _audio.startFrom(startIndex);
   }
 
-  Future<void> pauseAudio() async {
-    await _ttsService.pause();
-    isAudioPlaying.value = false;
-    isAudioPaused.value = true;
-    update();
-  }
+  Future<void> pauseAudio() => _audio.pause();
 
-  Future<void> resumeAudio() async {
-    await _ttsService.resume();
-    isAudioPlaying.value = true;
-    isAudioPaused.value = false;
-    update();
-  }
+  Future<void> resumeAudio() => _audio.play();
 
   Future<void> stopAudio() async {
-    await _ttsService.stop();
+    await _audio.stop();
     isAudioPlaying.value = false;
     isAudioPaused.value = false;
     activeAudioVerseIndex.value = -1;
     update();
   }
 
+  Future<void> skipToNextVerse() => _audio.skipToNext();
+
+  Future<void> skipToPreviousVerse() => _audio.skipToPrevious();
+
   Future<void> setAudioRate(double rate) async {
     audioSpeechRate.value = rate;
     StorageService.setSetting('audioSpeechRate', rate);
-    await _ttsService.setRate(rate);
+    await TtsService().setRate(rate);
     update();
+  }
+
+  /// Hands the loaded chapter to the media session so the notification and
+  /// lock screen show the right reference before playback starts.
+  void _publishChapterToAudio() {
+    _audio.setChapter(
+      verses: currentVerses
+          .map((v) => 'Verse ${v.verse}. ${v.text}')
+          .toList(growable: false),
+      reference:
+          '${appController.bookSelected.value} ${appController.selectedChapter.value}',
+      version: appController.bibleVersion.value,
+    );
   }
 
   void deleteHighlight(String verseKey) {
@@ -162,6 +166,7 @@ class BibleController extends GetxController {
       final verses = await _bibleService.getVerses(book, chapter);
       currentVerses.value = verses;
       appController.updateBookSelection(book, chapter);
+      _publishChapterToAudio();
     } catch (e) {
       Get.snackbar('Error', 'Failed to load chapter: $e');
     } finally {

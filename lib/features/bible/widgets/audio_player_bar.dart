@@ -18,7 +18,7 @@ class AudioPlayerBar extends StatelessWidget {
       final activeVerseIdx = bibleController.activeAudioVerseIndex.value;
       final totalVerses = bibleController.currentVerses.length;
       final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-      final accentColor = Theme.of(context).primaryColor;
+      final accentColor = appController.activeThemeColor;
 
       if (!isPlaying && !isPaused && activeVerseIdx < 0) {
         return const SizedBox.shrink();
@@ -33,16 +33,18 @@ class AudioPlayerBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.black.withValues(alpha: 0.7) : Colors.white.withValues(alpha: 0.85),
+                color: isDarkMode
+                    ? const Color(0xFF222222).withValues(alpha: 0.95)
+                    : Colors.white.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: isDarkMode ? Colors.white12 : Colors.black12,
-                  width: 0.5,
+                  color: isDarkMode ? Colors.white24 : Colors.black12,
+                  width: 0.8,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
+                    color: Colors.black.withValues(alpha: isDarkMode ? 0.35 : 0.1),
+                    blurRadius: 12,
                     offset: const Offset(0, 4),
                   )
                 ],
@@ -90,7 +92,7 @@ class AudioPlayerBar extends StatelessWidget {
               ),
             ),
 
-            // Speed Selector
+            // Speed
             PopupMenuButton<double>(
               initialValue: bibleController.audioSpeechRate.value,
               tooltip: 'Playback Speed',
@@ -119,24 +121,47 @@ class AudioPlayerBar extends StatelessWidget {
               ),
             ),
 
-            // Play / Pause Button
+            // Previous verse
             IconButton(
+              tooltip: 'Previous verse',
+              visualDensity: VisualDensity.compact,
+              icon: Icon(Icons.skip_previous_rounded,
+                  size: 26, color: accentColor),
+              onPressed: activeVerseIdx > 0
+                  ? bibleController.skipToPreviousVerse
+                  : null,
+            ),
+
+            // Play / Pause
+            IconButton(
+              tooltip: isPlaying ? 'Pause' : 'Play',
+              visualDensity: VisualDensity.compact,
               icon: Icon(
-                isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_filled_rounded,
+                isPlaying
+                    ? Icons.pause_circle_filled_rounded
+                    : Icons.play_circle_filled_rounded,
                 size: 34,
                 color: accentColor,
               ),
-              onPressed: () {
-                bibleController.toggleChapterAudio();
-              },
+              onPressed: bibleController.toggleChapterAudio,
             ),
 
-            // Stop Button
+            // Next verse
             IconButton(
+              tooltip: 'Next verse',
+              visualDensity: VisualDensity.compact,
+              icon: Icon(Icons.skip_next_rounded, size: 26, color: accentColor),
+              onPressed: activeVerseIdx < totalVerses - 1
+                  ? bibleController.skipToNextVerse
+                  : null,
+            ),
+
+            // Stop
+            IconButton(
+              tooltip: 'Stop',
+              visualDensity: VisualDensity.compact,
               icon: const Icon(Icons.close_rounded, size: 22, color: Colors.grey),
-              onPressed: () {
-                bibleController.stopAudio();
-              },
+              onPressed: bibleController.stopAudio,
             ),
           ],
         ),

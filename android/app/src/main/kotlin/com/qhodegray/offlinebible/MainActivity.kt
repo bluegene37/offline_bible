@@ -1,6 +1,8 @@
 package com.qhodegray.offlinebible
 
-import io.flutter.embedding.android.FlutterActivity
+import com.ryanheise.audioservice.AudioServiceActivity
 
-class MainActivity: FlutterActivity() {
-}
+// AudioServiceActivity (rather than FlutterActivity) so media button events and
+// the playback foreground service are routed correctly while the app is in the
+// background or the screen is locked.
+class MainActivity : AudioServiceActivity()

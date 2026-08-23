@@ -31,16 +31,18 @@ class FloatingNavigation extends StatelessWidget {
             filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
             child: Container(
               decoration: BoxDecoration(
-                color: isDark ? Colors.black.withValues(alpha: 0.7) : Colors.white.withValues(alpha: 0.85),
+                color: isDark
+                    ? const Color(0xFF222222).withValues(alpha: 0.95)
+                    : Colors.white.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(26),
                 border: Border.all(
-                  color: isDark ? Colors.white12 : Colors.black12,
-                  width: 0.5,
+                  color: isDark ? Colors.white24 : Colors.black12,
+                  width: 0.8,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
+                    color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.1),
+                    blurRadius: 12,
                     offset: const Offset(0, 4),
                   )
                 ],
@@ -49,14 +51,18 @@ class FloatingNavigation extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildNavButton(
+                    context,
+                    appController,
                     icon: Icons.arrow_back_ios_new,
                     label: canGoBack
                         ? '$currentBook ${currentChapter - 1}'
                         : 'First Chapter',
-                    onPressed: canGoBack ? () {
-                      HapticFeedback.selectionClick();
-                      bibleController.navigateToPreviousChapter();
-                    } : null,
+                    onPressed: canGoBack
+                        ? () {
+                            HapticFeedback.selectionClick();
+                            bibleController.navigateToPreviousChapter();
+                          }
+                        : null,
                     isEnabled: canGoBack,
                   ),
                   Container(
@@ -71,7 +77,7 @@ class FloatingNavigation extends StatelessWidget {
                           bibleController.isAudioPlaying.value
                               ? Icons.pause_circle_filled_rounded
                               : Icons.volume_up_rounded,
-                          color: Theme.of(context).primaryColor,
+                          color: appController.activeThemeColor,
                           size: 26,
                         )),
                     onPressed: () {
@@ -85,14 +91,18 @@ class FloatingNavigation extends StatelessWidget {
                     color: isDark ? Colors.white24 : Colors.black12,
                   ),
                   _buildNavButton(
+                    context,
+                    appController,
                     icon: Icons.arrow_forward_ios,
                     label: canGoForward
                         ? '$currentBook ${currentChapter + 1}'
                         : 'Last Chapter',
-                    onPressed: canGoForward ? () {
-                      HapticFeedback.selectionClick();
-                      bibleController.navigateToNextChapter();
-                    } : null,
+                    onPressed: canGoForward
+                        ? () {
+                            HapticFeedback.selectionClick();
+                            bibleController.navigateToNextChapter();
+                          }
+                        : null,
                     isEnabled: canGoForward,
                     isNext: true,
                   ),
@@ -105,16 +115,19 @@ class FloatingNavigation extends StatelessWidget {
     });
   }
 
-  Widget _buildNavButton({
+  Widget _buildNavButton(
+    BuildContext context,
+    AppController appController, {
     required IconData icon,
     required String label,
     required VoidCallback? onPressed,
     required bool isEnabled,
     bool isNext = false,
   }) {
-    final isDark = Get.theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = appController.activeThemeColor;
     final textColor = isEnabled
-        ? (Get.theme.primaryColor)
+        ? primaryColor
         : (isDark ? Colors.white38 : Colors.black38);
 
     return Expanded(
@@ -124,7 +137,7 @@ class FloatingNavigation extends StatelessWidget {
             ? const BorderRadius.horizontal(right: Radius.circular(26))
             : const BorderRadius.horizontal(left: Radius.circular(26)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 14.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

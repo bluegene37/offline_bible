@@ -1,7 +1,10 @@
+import 'package:audio_service/audio_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'core/controllers/app_controller.dart';
+import 'core/services/bible_audio_handler.dart';
 import 'core/services/error_reporter.dart';
 import 'core/services/storage_service.dart';
 import 'core/theme/app_colors.dart';
@@ -24,8 +27,36 @@ void main() {
       DeviceOrientation.landscapeRight,
     ]);
 
+    LicenseRegistry.addLicense(() async* {
+      final text = await rootBundle.loadString('assets/fonts/OFL.txt');
+      yield LicenseEntryWithLineBreaks(const ['fonts'], text);
+      yield const LicenseEntryWithLineBreaks(
+        ['cross-reference data'],
+        'Cross-reference data is derived from the openbible.info '
+        'cross-references dataset (https://www.openbible.info/labs/cross-references/), '
+        'licensed under the Creative Commons Attribution licence (CC BY).',
+      );
+    });
+
     // Initialize storage
     await StorageService.init();
+
+    // Media session for chapter audio: gives Android a playback foreground
+    // service and both platforms lock-screen controls.
+    final audioHandler = await AudioService.init(
+      builder: BibleAudioHandler.new,
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'com.qhodegray.offlinebible.audio',
+        androidNotificationChannelName: 'Chapter audio',
+        // Must exist, or NotificationManager.notify throws and takes the
+        // process down. The plugin's default is mipmap/ic_launcher, which this
+        // app does not have — its launcher icon is mipmap/launcher_icon.
+        androidNotificationIcon: 'drawable/ic_stat_bible',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+      ),
+    );
+    Get.put<BibleAudioHandler>(audioHandler, permanent: true);
 
     // Initialize controllers
     final appController = Get.put(AppController());
@@ -87,6 +118,7 @@ class MyApp extends StatelessWidget {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      primaryColor: colorScheme.primary,
       fontFamily: fontFamily,
       colorScheme: colorScheme.copyWith(
         surface: AppColors.darkSurface,

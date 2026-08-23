@@ -42,6 +42,7 @@ dependencies:
   share_plus: ^13.3.0
   wakelock_plus: ^1.4.0
   flutter_tts: ^4.2.5
+  audio_service: ^0.18.19
   http: ^1.2.0
   crypto: ^3.0.6
   path_provider: ^2.1.4
@@ -91,6 +92,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/fonts/OFL.txt
 
   # Every reading font ships as an asset so text renders with no network at
   # all. Only the Regular weight is bundled; Flutter synthesizes bolder
@@ -149,50 +151,3 @@ flutter:
         - asset: assets/fonts/OpenDyslexic-Regular.otf
         - asset: assets/fonts/OpenDyslexic-Bold.otf
           weight: 700
-
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter.
-flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
-  uses-material-design: true
-
-  # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/
-
-  # Every reading font ships as an asset so text renders with no network at
-  # all. Only the Regular weight is bundled; Flutter synthesizes bolder
-  # weights, which keeps the download small and the app fully offline.
-  fonts:
-    - family: Lato
-      fonts:
-        - asset: assets/fonts/Lato-Regular.ttf
-    - family: Raleway
-      fonts:
-        - asset: assets/fonts/Raleway-Regular.ttf
-    - family: Oswald
-      fonts:
-        - asset: assets/fonts/Oswald-Regular.ttf
-    - family: Merriweather
-      fonts:
-        - asset: assets/fonts/Merriweather-Regular.ttf
-    - family: Quattrocento
-      fonts:
-        - asset: assets/fonts/Quattrocento-Regular.ttf
-    - family: Slabo 27px
-      fonts:
-        - asset: assets/fonts/Slabo27px-Regular.ttf
-    - family: Inconsolata
-      fonts:
-        - asset: assets/fonts/Inconsolata-Regular.ttf
-    - family: Indie Flower
-      fonts:
-        - asset: assets/fonts/IndieFlower-Regular.ttf
-    - family: Lobster
-      fonts:
-        - asset: assets/fonts/Lobster-Regular.ttf

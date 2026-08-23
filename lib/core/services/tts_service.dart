@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io' show Platform;
+
 import 'package:flutter_tts/flutter_tts.dart';
 
 enum TtsState { playing, stopped, paused }
@@ -27,6 +29,21 @@ class TtsService {
   Future<void> init() async {
     if (_flutterTts != null) return;
     _flutterTts = FlutterTts();
+
+    if (Platform.isIOS) {
+      // Without a shared session in the playback category, iOS silences TTS
+      // the moment the app leaves the foreground or the screen locks.
+      await _flutterTts!.setSharedInstance(true);
+      await _flutterTts!.setIosAudioCategory(
+        IosTextToSpeechAudioCategory.playback,
+        [
+          IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+          IosTextToSpeechAudioCategoryOptions.allowAirPlay,
+        ],
+        IosTextToSpeechAudioMode.spokenAudio,
+      );
+    }
 
     await _flutterTts!.setLanguage("en-US");
     await _flutterTts!.setSpeechRate(_speechRate);

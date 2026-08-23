@@ -78,6 +78,7 @@ class SearchPage extends StatelessWidget {
     return Obx(() {
       final isSelected = searchController.searchScope.value == label;
       final themeColor = appController.activeThemeColor;
+      final isDark = appController.themeMode.value;
 
       return FilterChip(
         label: Text(label),
@@ -89,13 +90,17 @@ class SearchPage extends StatelessWidget {
         selectedColor: themeColor.withValues(alpha: 0.2),
         checkmarkColor: themeColor,
         labelStyle: TextStyle(
-          color: isSelected ? themeColor : Colors.grey,
+          color: isSelected
+              ? themeColor
+              : (isDark ? Colors.white70 : Colors.black54),
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
-            color: isSelected ? themeColor : Colors.grey.withValues(alpha: 0.5),
+            color: isSelected
+                ? themeColor
+                : (isDark ? Colors.white24 : Colors.black26),
           ),
         ),
       );

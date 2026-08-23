@@ -42,6 +42,11 @@ class AppColors {
     'Cyan',
   ];
 
+  /// Words of Christ. Two tones, because a single red legible on paper turns
+  /// muddy on a dark ground and vice versa.
+  static const Color redLetterLight = Color(0xFFC62828);
+  static const Color redLetterDark = Color(0xFFEF9A9A);
+
   /// The reading surface. Deliberately independent of the accent colour: the
   /// page behind scripture should read as paper, not as a tinted UI panel.
   /// Warm off-white rather than the cool app surface, which is easier on the

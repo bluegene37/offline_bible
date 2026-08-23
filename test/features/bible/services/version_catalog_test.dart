@@ -36,6 +36,15 @@ void main() {
     test('byAbbrev falls back to the bundled version for unknown input', () {
       expect(VersionService.byAbbrev('does-not-exist').abbrev, 'kjv');
     });
+
+    test('every downloadable version is distinct from the bundled one', () {
+      // Red-letter ranges are character offsets into the bundled KJV wording.
+      // If another version were ever marked bundled they would be applied to
+      // text they were not derived from, colouring the wrong words.
+      final downloadable =
+          VersionService.catalog.where((v) => !v.bundled).map((v) => v.abbrev);
+      expect(downloadable, isNot(contains('kjv')));
+    });
   });
 
   group('normalizeGetBibleJson', () {

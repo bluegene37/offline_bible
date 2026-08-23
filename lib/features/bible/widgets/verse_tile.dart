@@ -7,6 +7,7 @@ import '../../../core/services/storage_service.dart';
 
 import '../controllers/bible_controller.dart';
 import '../models/book_model.dart';
+import '../services/red_letter_service.dart';
 import '../services/version_service.dart';
 import '../../notes/controllers/notes_controller.dart';
 import '../../notes/widgets/note_editor_sheet.dart';
@@ -105,9 +106,11 @@ class VerseTile extends StatelessWidget {
               ),
             ),
           ),
-          TextSpan(
-            text: verse.text,
-            style: TextStyle(
+          ..._buildBodySpans(
+            context,
+            controller,
+            hasHighlight: hasHighlight,
+            baseStyle: TextStyle(
               fontFamily: controller.globalFont.value,
               fontSize: controller.fontSize.value,
               height: controller.lineHeight.value,
@@ -123,6 +126,49 @@ class VerseTile extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Splits the verse so the words of Christ can be coloured. Returns a single
+  /// span when red letter is off or the verse has none — the common case.
+  List<InlineSpan> _buildBodySpans(
+    BuildContext context,
+    AppController controller, {
+    required TextStyle baseStyle,
+    required bool hasHighlight,
+  }) {
+    final text = verse.text;
+    if (!controller.showRedLetter) {
+      return [TextSpan(text: text, style: baseStyle)];
+    }
+    final ranges = RedLetterService.spansFor(verse.verseKey, text.length);
+    if (ranges.isEmpty) {
+      return [TextSpan(text: text, style: baseStyle)];
+    }
+
+    // In light mode, and on a pastel highlight, the darker red holds contrast;
+    // on a dark ground it goes muddy, so use the lighter tone there.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final redStyle = baseStyle.copyWith(
+      color: (isDark && !hasHighlight)
+          ? AppColors.redLetterDark
+          : AppColors.redLetterLight,
+    );
+
+    final out = <InlineSpan>[];
+    var cursor = 0;
+    for (final range in ranges) {
+      final start = range[0], end = range[1];
+      if (start < cursor) continue; // defensive: ignore overlaps
+      if (start > cursor) {
+        out.add(TextSpan(text: text.substring(cursor, start), style: baseStyle));
+      }
+      out.add(TextSpan(text: text.substring(start, end), style: redStyle));
+      cursor = end;
+    }
+    if (cursor < text.length) {
+      out.add(TextSpan(text: text.substring(cursor), style: baseStyle));
+    }
+    return out;
   }
 
   Color _getTextColor(BuildContext context, bool hasHighlight) {

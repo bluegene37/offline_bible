@@ -244,6 +244,19 @@ class SettingsPage extends StatelessWidget {
             ],
           ),
         ),
+        // Preview sits above the sliders: below them it scrolled out of view
+        // exactly when you were dragging to see its effect.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Text Preview:'),
+              const SizedBox(height: 10),
+              FontPreview(),
+            ],
+          ),
+        ),
         ListTile(
           title: Text('Font Size: ${controller.fontSize.value.round()}'),
           subtitle: Slider(
@@ -266,17 +279,6 @@ class SettingsPage extends StatelessWidget {
             value: controller.lineHeight.value,
             activeColor: controller.activeThemeColor,
             onChanged: (value) => controller.updateLineHeight(value),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Text Preview:'),
-              const SizedBox(height: 10),
-              FontPreview(),
-            ],
           ),
         ),
       ],
@@ -338,12 +340,29 @@ class SettingsPage extends StatelessWidget {
 
   Widget _buildGeneralSection(AppController controller) {
     return GetBuilder<AppController>(
-      builder: (controller) => SwitchListTile(
-        title: const Text('Keep Screen On'),
-        value: controller.keepScreenOn.value,
-        activeThumbColor: controller.activeThemeColor,
-        onChanged: (value) => controller.toggleKeepScreenOn(value),
-      ),
+      builder: (controller) {
+        final isKjv =
+            controller.bibleVersion.value == AppConstants.defaultBibleVersion;
+        return Column(
+          children: [
+            SwitchListTile(
+              title: const Text('Words of Christ in red'),
+              subtitle: Text(isKjv
+                  ? 'Colours the words of Jesus while reading'
+                  : 'Available in the King James Version only'),
+              value: controller.redLetterEnabled.value && isKjv,
+              activeThumbColor: controller.activeThemeColor,
+              onChanged: isKjv ? controller.toggleRedLetter : null,
+            ),
+            SwitchListTile(
+              title: const Text('Keep Screen On'),
+              value: controller.keepScreenOn.value,
+              activeThumbColor: controller.activeThemeColor,
+              onChanged: (value) => controller.toggleKeepScreenOn(value),
+            ),
+          ],
+        );
+      },
     );
   }
 

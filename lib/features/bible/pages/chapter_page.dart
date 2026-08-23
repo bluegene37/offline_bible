@@ -69,13 +69,12 @@ class _ChapterPageState extends State<ChapterPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .primaryColor
+                  color: appController.activeThemeColor
                       .withValues(alpha: isDark ? 0.15 : 0.08),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color:
-                        Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                        appController.activeThemeColor.withValues(alpha: 0.2),
                     width: 1,
                   ),
                 ),
@@ -84,15 +83,14 @@ class _ChapterPageState extends State<ChapterPage> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .primaryColor
+                        color: appController.activeThemeColor
                             .withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.menu_book_rounded,
                         size: 20,
-                        color: Theme.of(context).primaryColor,
+                        color: appController.activeThemeColor,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -149,10 +147,14 @@ class _ChapterPageState extends State<ChapterPage> {
   Widget _buildChapterGrid(List<Book> chapters, AppController appController) {
     return GetBuilder<AppController>(
       builder: (controller) {
+        final fontSize = controller.fontSize.value;
         return GridView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 6,
+          // Max-extent rather than a fixed column count: at 30pt a six-across
+          // grid clips three-digit chapter numbers, so let the columns reflow.
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: fontSize * 2.4 + 15,
+            childAspectRatio: 1,
           ),
           itemCount: chapters.length,
           itemBuilder: (context, index) {
@@ -176,8 +178,9 @@ class _ChapterPageState extends State<ChapterPage> {
                     children: [
                       Text(
                         chapter.chapter.toString(),
+                        maxLines: 1,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: fontSize,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.w300,
                           color: isSelected
                               ? (controller.themeMode.value

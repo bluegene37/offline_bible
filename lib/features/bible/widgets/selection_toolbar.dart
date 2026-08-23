@@ -6,6 +6,7 @@ import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../controllers/bible_controller.dart';
 import '../../notes/widgets/note_editor_sheet.dart';
+import 'cross_reference_sheet.dart';
 
 class SelectionToolbar extends StatelessWidget {
   const SelectionToolbar({super.key});
@@ -31,16 +32,18 @@ class SelectionToolbar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isDark ? Colors.black.withValues(alpha: 0.7) : Colors.white.withValues(alpha: 0.85),
+                color: isDark
+                    ? const Color(0xFF222222).withValues(alpha: 0.95)
+                    : Colors.white.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: isDark ? Colors.white12 : Colors.black12,
-                  width: 0.5,
+                  color: isDark ? Colors.white24 : Colors.black12,
+                  width: 0.8,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
+                    color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.1),
+                    blurRadius: 12,
                     offset: const Offset(0, 4),
                   )
                 ],
@@ -137,9 +140,25 @@ class SelectionToolbar extends StatelessWidget {
 
   Widget _buildActionsRow(BuildContext context, AppController controller,
       BibleController bibleController) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
+    // Scrollable: seven actions do not fit across a narrow phone, and clipping
+    // one silently is worse than letting the row scroll.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+        _buildActionButton(
+          context,
+          icon: Icons.hub_outlined,
+          label: 'Refs',
+          onTap: () {
+            HapticFeedback.selectionClick();
+            final keys = controller.textUnderline.toList();
+            if (keys.isEmpty) return;
+            // Cross-references are per verse; use the first of a selection.
+            CrossReferenceSheet.show(context, keys.first);
+          },
+        ),
         _buildActionButton(
           context,
           icon: Icons.copy_rounded,
@@ -209,7 +228,8 @@ class SelectionToolbar extends StatelessWidget {
             controller.clearTextSelection();
           },
         ),
-      ],
+        ],
+      ),
     );
   }
 

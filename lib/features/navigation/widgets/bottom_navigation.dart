@@ -32,8 +32,8 @@ class BottomNavigation extends StatelessWidget {
 
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final barColor = isDark
-            ? Colors.black.withValues(alpha: 0.7)
-            : Colors.white.withValues(alpha: 0.85);
+            ? const Color(0xFF1E1E1E).withValues(alpha: 0.92)
+            : Colors.white.withValues(alpha: 0.92);
 
         return ClipRRect(
           child: BackdropFilter(
@@ -43,7 +43,7 @@ class BottomNavigation extends StatelessWidget {
                 color: barColor,
                 border: Border(
                   top: BorderSide(
-                    color: isDark ? Colors.white12 : Colors.black12,
+                    color: isDark ? Colors.white24 : Colors.black12,
                     width: 0.5,
                   ),
                 ),
@@ -51,7 +51,7 @@ class BottomNavigation extends StatelessWidget {
               child: NavigationBarTheme(
                 data: NavigationBarThemeData(
                   backgroundColor: Colors.transparent,
-                  indicatorColor: Theme.of(context).primaryColor.withValues(alpha: isDark ? 0.3 : 0.2),
+                  indicatorColor: controller.activeThemeColor.withValues(alpha: isDark ? 0.35 : 0.2),
                   indicatorShape: const StadiumBorder(),
                   labelTextStyle: WidgetStateProperty.resolveWith((states) {
                     if (states.contains(WidgetState.selected)) {
@@ -64,16 +64,16 @@ class BottomNavigation extends StatelessWidget {
                     return TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? Colors.white70 : Colors.black54);
+                        color: isDark ? Colors.white60 : Colors.black54);
                   }),
                   iconTheme: WidgetStateProperty.resolveWith((states) {
                     if (states.contains(WidgetState.selected)) {
                       return IconThemeData(
-                        color: isDark ? Colors.white : Theme.of(context).primaryColor,
+                        color: isDark ? Colors.white : controller.activeThemeColor,
                       );
                     }
                     return IconThemeData(
-                      color: isDark ? Colors.white70 : Colors.black54,
+                      color: isDark ? Colors.white60 : Colors.black54,
                     );
                   }),
                 ),

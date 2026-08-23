@@ -19,7 +19,11 @@ class FontPicker extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(
+              color: appController.themeMode.value
+                  ? Colors.white24
+                  : Colors.grey.shade300,
+            ),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(

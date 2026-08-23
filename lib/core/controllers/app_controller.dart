@@ -5,7 +5,11 @@ import '../constants/app_constants.dart';
 import '../services/error_reporter.dart';
 import '../services/storage_service.dart';
 import '../theme/app_colors.dart';
+import 'dart:async';
+
 import '../../features/bible/services/bible_service.dart';
+import '../../features/bible/services/cross_reference_service.dart';
+import '../../features/bible/services/red_letter_service.dart';
 import '../../features/bible/services/version_service.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -32,6 +36,10 @@ class AppController extends GetxController {
   final RxList<String> textUnderline = <String>[].obs;
   final Rx<Color> textColorDynamic = Colors.black.obs;
   final RxBool keepScreenOn = false.obs;
+
+  /// Words of Christ in red. Only meaningful for the bundled KJV, whose
+  /// wording the ranges were derived against.
+  final RxBool redLetterEnabled = true.obs;
   final RxString bibleVersion = AppConstants.defaultBibleVersion.obs;
   final RxBool isSwitchingVersion = false.obs;
 
@@ -81,6 +89,15 @@ class AppController extends GetxController {
     await bibleController.loadChapter(bookSelected.value, selectedChapter.value);
 
     if (keepScreenOn.value) WakelockPlus.enable();
+
+    // Warm the cross-reference index off the critical path so the first tap on
+    // "Refs" does not pay a 3.5MB parse.
+    unawaited(CrossReferenceService.ensureLoaded().catchError((Object e, StackTrace s) {
+      ErrorReporter.recordHandled(e, s, context: 'cross-reference index');
+    }));
+    unawaited(RedLetterService.load().catchError((Object e, StackTrace s) {
+      ErrorReporter.recordHandled(e, s, context: 'red-letter ranges');
+    }));
   }
 
   /// Loads the selected translation, falling back to the bundled KJV if the
@@ -174,6 +191,7 @@ class AppController extends GetxController {
     lineHeight.value =
         StorageService.getSetting('lineHeight', AppConstants.defaultLineHeight);
     keepScreenOn.value = StorageService.getSetting('keepScreenOn', false);
+    redLetterEnabled.value = StorageService.getSetting('redLetter', true);
   }
 
   String _loadThemePref() {
@@ -373,6 +391,18 @@ class AppController extends GetxController {
     _updateTextColor();
     update();
   }
+
+  void toggleRedLetter(bool value) {
+    redLetterEnabled.value = value;
+    StorageService.setSetting('redLetter', value);
+    update();
+  }
+
+  /// True when words of Christ should be coloured: the user wants them and the
+  /// active translation is the one the ranges were built for.
+  bool get showRedLetter =>
+      redLetterEnabled.value &&
+      bibleVersion.value == AppConstants.defaultBibleVersion;
 
   void toggleKeepScreenOn(bool value) {
     keepScreenOn.value = value;
