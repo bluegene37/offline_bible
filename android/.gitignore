@@ -11,3 +11,7 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# NDK/CMake build cache. Generated, and it bakes in absolute paths — a stale
+# copy kept pointing at the project's previous location on disk.
+/app/.cxx

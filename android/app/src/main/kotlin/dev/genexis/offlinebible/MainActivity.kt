@@ -1,4 +1,4 @@
-package com.qhodegray.offlinebible
+package dev.genexis.offlinebible
 
 import com.ryanheise.audioservice.AudioServiceActivity
 
