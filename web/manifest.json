@@ -5,7 +5,7 @@
     "display": "standalone",
     "background_color": "#000000",
     "theme_color": "#000000",
-    "description": "A new Flutter project.",
+    "description": "A fast, elegant, and fully offline Bible app with audio playback, reading plans, customizable themes, and study tools.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

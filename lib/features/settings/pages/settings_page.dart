@@ -389,7 +389,7 @@ class SettingsPage extends StatelessWidget {
       final packageInfo = await PackageInfo.fromPlatform();
       return '${packageInfo.version}+${packageInfo.buildNumber}';
     } catch (e) {
-      return '2.0.0+6';
+      return '1.0.0+1';
     }
   }
 }
