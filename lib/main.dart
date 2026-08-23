@@ -46,7 +46,7 @@ void main() {
     final audioHandler = await AudioService.init(
       builder: BibleAudioHandler.new,
       config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.qhodegray.offlinebible.audio',
+        androidNotificationChannelId: 'dev.genexis.offlinebible.audio',
         androidNotificationChannelName: 'Chapter audio',
         // Must exist, or NotificationManager.notify throws and takes the
         // process down. The plugin's default is mipmap/ic_launcher, which this
