@@ -245,7 +245,9 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
         // Preview sits above the sliders: below them it scrolled out of view
-        // exactly when you were dragging to see its effect.
+        // exactly when you were dragging to see its effect. Its box is a fixed
+        // height so growing the text cannot push the slider out from under
+        // your finger either — it scrolls inside instead.
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: Column(
@@ -253,7 +255,11 @@ class SettingsPage extends StatelessWidget {
             children: [
               const Text('Text Preview:'),
               const SizedBox(height: 10),
-              FontPreview(),
+              SizedBox(
+                height: 130,
+                width: double.infinity,
+                child: SingleChildScrollView(child: FontPreview()),
+              ),
             ],
           ),
         ),

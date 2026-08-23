@@ -132,6 +132,10 @@ class _BooksPageState extends State<BooksPage> {
         
         return Obx(() {
           final isSelected = appController.bookSelected.value == book.key;
+          // The book name follows the reading font size; the chapter/verse
+          // count deliberately does not, so the counts stay a quiet caption
+          // however large the titles get.
+          final nameSize = appController.fontSize.value;
           
           return InkWell(
             onTap: () => _selectBook(book.key),
@@ -153,10 +157,18 @@ class _BooksPageState extends State<BooksPage> {
                       children: [
                         Text(
                           book.key,
+                          // Wraps rather than ellipsises: at larger sizes a
+                          // name like "2 Thessalonians" cannot fit one line in
+                          // a two-column layout, and a truncated book name is
+                          // worse than a two-line one.
+                          softWrap: true,
                           style: TextStyle(
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            color: isSelected ? Theme.of(context).primaryColor : null,
-                            fontSize: 14,
+                            fontWeight:
+                                isSelected ? FontWeight.bold : FontWeight.w500,
+                            color:
+                                isSelected ? Theme.of(context).primaryColor : null,
+                            fontSize: nameSize,
+                            height: 1.25,
                           ),
                         ),
                         const SizedBox(height: 2),
