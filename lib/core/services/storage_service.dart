@@ -1,4 +1,4 @@
-import 'package:hive_ce_flutter/adapters.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import '../constants/app_constants.dart';
 
 class StorageService {
