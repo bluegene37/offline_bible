@@ -47,19 +47,52 @@ dependencies:
   crypto: ^3.0.6
   path_provider: ^2.1.4
 
+# Icon sources live in branding/, not assets/, because they are only read at
+# build time by the two generators below. Anything under assets/ is bundled
+# into the shipped app, and these never need to be.
+# Regenerate them from the vector geometry with ./branding/src/build.sh
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  adaptive_icon_background: "#000000"
-  image_path: "assets/app_logo.png"
+  image_path: "branding/app_logo.png"
   min_sdk_android: 21
+  remove_alpha_ios: true
+
+  # Adaptive icons are 108dp with only the inner 72dp guaranteed visible, and
+  # Pixel masks to a circle. The foreground is pre-inset to survive that crop —
+  # previously image_path was reused full-bleed, so the mark was being clipped.
+  adaptive_icon_foreground: "branding/app_logo_foreground.png"
+  adaptive_icon_background: "branding/app_logo_background.png"
+  adaptive_icon_foreground_inset: 0
+  # Android 13+ themed icons: silhouette only, recoloured by the system.
+  adaptive_icon_monochrome: "branding/app_logo_monochrome.png"
+
+  # iOS 18 light/dark/tinted appearances.
+  image_path_ios_dark_transparent: "branding/app_logo_transparent.png"
+  image_path_ios_tinted_grayscale: "branding/app_logo_transparent.png"
+  desaturate_tinted_to_grayscale_ios: true
+
+  # macOS and web were still shipping the stock Flutter icon.
+  macos:
+    generate: true
+    image_path: "branding/app_logo_macos.png"
+
+  web:
+    generate: true
+    image_path: "branding/app_logo.png"
+    background_color: "#000000"
+    theme_color: "#000000"
 
 flutter_native_splash:
   color: "#000000"
-  image: assets/app_logo.png
+  # Transparent mark rather than the full black tile, so nothing shows a seam
+  # against the splash colour.
+  image: branding/app_logo_splash.png
 
   android_12:
-    image: assets/app_logo.png
+    # Android 12+ masks the splash icon to a circle showing only the inner
+    # two thirds, so this one is pre-inset like the adaptive foreground.
+    image: branding/app_logo_splash_android12.png
     icon_background_color: "#000000"
 
   web: false

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import '../../../core/controllers/app_controller.dart';
-import '../../../core/theme/app_colors.dart';
+import '../controllers/app_controller.dart';
+import '../theme/app_colors.dart';
 
 class ColorPicker extends StatelessWidget {
   const ColorPicker({super.key});
@@ -32,17 +32,28 @@ class ColorPicker extends StatelessWidget {
           final themeName = themeKeys[index];
           final color = AppColors.themeColors[themeName]!;
 
+          // Contrast is judged against the swatch itself, not the active accent.
+          // The two differ: the swatch shows the raw seed, while the accent is
+          // the tonal primary derived from it, so the pale seeds (Sunset Amber,
+          // Ocean Cyan…) were drawing a white tick on a near-white circle.
+          final tick =
+              ThemeData.estimateBrightnessForColor(color) == Brightness.light
+                  ? Colors.black
+                  : Colors.white;
+
           return Obx(() {
             final isSelected = appController.colorThemeName.value == themeName;
-            return InkWell(
-              onTap: () => _selectColor(themeName, appController, context),
-              child: CircleAvatar(
-                radius: 25,
-                backgroundColor: color,
-                child: isSelected
-                    ? Icon(Icons.check,
-                        color: appController.textColorDynamic.value)
-                    : null,
+            return Semantics(
+              label: themeName,
+              button: true,
+              selected: isSelected,
+              child: InkWell(
+                onTap: () => _selectColor(themeName, appController, context),
+                child: CircleAvatar(
+                  radius: 25,
+                  backgroundColor: color,
+                  child: isSelected ? Icon(Icons.check, color: tick) : null,
+                ),
               ),
             );
           });

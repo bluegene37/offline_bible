@@ -8,7 +8,7 @@ import '../../../core/controllers/app_controller.dart';
 import '../../bible/services/bible_service.dart';
 import '../../bible/services/version_service.dart';
 import '../widgets/font_picker.dart';
-import '../widgets/color_picker.dart';
+import '../../../core/widgets/color_picker.dart';
 import '../widgets/font_preview.dart';
 import '../widgets/version_manager_sheet.dart';
 
