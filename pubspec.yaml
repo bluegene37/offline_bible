@@ -35,7 +35,6 @@ dependencies:
   get: ^4.6.5
   substring_highlight: ^1.0.33
   scrollable_positioned_list: ^0.3.1
-  google_fonts: ^8.2.1
   hive_ce: ^2.19.1
   hive_ce_flutter: ^2.3.4
   intl: ^0.20.2
@@ -44,6 +43,7 @@ dependencies:
   wakelock_plus: ^1.4.0
   flutter_tts: ^4.2.5
   http: ^1.2.0
+  crypto: ^3.0.6
   path_provider: ^2.1.4
 
 flutter_launcher_icons:
@@ -91,4 +91,108 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
-    - google_fonts/
+
+  # Every reading font ships as an asset so text renders with no network at
+  # all. Only the Regular weight is bundled; Flutter synthesizes bolder
+  # weights, which keeps the download small and the app fully offline.
+  # Reading faces, bundled so text renders with no network at all. Each family
+  # ships a real 700 weight rather than relying on Flutter's synthetic bold,
+  # which smears at small sizes on long passages.
+  fonts:
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato-Regular.ttf
+        - asset: assets/fonts/Lato-Bold.ttf
+          weight: 700
+    - family: Raleway
+      fonts:
+        - asset: assets/fonts/Raleway-Regular.ttf
+        - asset: assets/fonts/Raleway-Bold.ttf
+          weight: 700
+    - family: Open Sans
+      fonts:
+        - asset: assets/fonts/OpenSans-Regular.ttf
+        - asset: assets/fonts/OpenSans-Bold.ttf
+          weight: 700
+    - family: Atkinson Hyperlegible
+      fonts:
+        - asset: assets/fonts/AtkinsonHyperlegible-Regular.ttf
+        - asset: assets/fonts/AtkinsonHyperlegible-Bold.ttf
+          weight: 700
+    - family: Merriweather
+      fonts:
+        - asset: assets/fonts/Merriweather-Regular.ttf
+        - asset: assets/fonts/Merriweather-Bold.ttf
+          weight: 700
+    - family: Quattrocento
+      fonts:
+        - asset: assets/fonts/Quattrocento-Regular.ttf
+        - asset: assets/fonts/Quattrocento-Bold.ttf
+          weight: 700
+    - family: EB Garamond
+      fonts:
+        - asset: assets/fonts/EBGaramond-Regular.ttf
+        - asset: assets/fonts/EBGaramond-Bold.ttf
+          weight: 700
+    - family: Literata
+      fonts:
+        - asset: assets/fonts/Literata-Regular.ttf
+        - asset: assets/fonts/Literata-Bold.ttf
+          weight: 700
+    - family: Lora
+      fonts:
+        - asset: assets/fonts/Lora-Regular.ttf
+        - asset: assets/fonts/Lora-Bold.ttf
+          weight: 700
+    - family: OpenDyslexic
+      fonts:
+        - asset: assets/fonts/OpenDyslexic-Regular.otf
+        - asset: assets/fonts/OpenDyslexic-Bold.otf
+          weight: 700
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/
+
+  # Every reading font ships as an asset so text renders with no network at
+  # all. Only the Regular weight is bundled; Flutter synthesizes bolder
+  # weights, which keeps the download small and the app fully offline.
+  fonts:
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato-Regular.ttf
+    - family: Raleway
+      fonts:
+        - asset: assets/fonts/Raleway-Regular.ttf
+    - family: Oswald
+      fonts:
+        - asset: assets/fonts/Oswald-Regular.ttf
+    - family: Merriweather
+      fonts:
+        - asset: assets/fonts/Merriweather-Regular.ttf
+    - family: Quattrocento
+      fonts:
+        - asset: assets/fonts/Quattrocento-Regular.ttf
+    - family: Slabo 27px
+      fonts:
+        - asset: assets/fonts/Slabo27px-Regular.ttf
+    - family: Inconsolata
+      fonts:
+        - asset: assets/fonts/Inconsolata-Regular.ttf
+    - family: Indie Flower
+      fonts:
+        - asset: assets/fonts/IndieFlower-Regular.ttf
+    - family: Lobster
+      fonts:
+        - asset: assets/fonts/Lobster-Regular.ttf

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/constants/app_constants.dart';
@@ -29,8 +28,8 @@ class FontPicker extends StatelessWidget {
               Expanded(
                 child: Text(
                   currentFont,
-                  style: GoogleFonts.getFont(
-                    currentFont,
+                  style: TextStyle(
+                    fontFamily: currentFont,
                     fontSize: 18,
                     color: appController.themeMode.value
                         ? Colors.white
@@ -49,12 +48,15 @@ class FontPicker extends StatelessWidget {
 
   void _showFontSelectionSheet(BuildContext context, AppController controller) {
     final ItemScrollController itemScrollController = ItemScrollController();
+    // indexOf returns -1 for a font that is no longer bundled; jumping to a
+    // negative index would throw. Aligning to the top rather than the middle
+    // also avoids the blank gap that centring left above the first few items.
     final initialIndex =
         AppConstants.fontOptions.indexOf(controller.globalFont.value);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (itemScrollController.isAttached) {
-        itemScrollController.jumpTo(index: initialIndex, alignment: 0.5);
+      if (initialIndex > 0 && itemScrollController.isAttached) {
+        itemScrollController.jumpTo(index: initialIndex);
       }
     });
 
@@ -96,8 +98,8 @@ class FontPicker extends StatelessWidget {
                         return ListTile(
                           title: Text(
                             font,
-                            style: GoogleFonts.getFont(
-                              font,
+                            style: TextStyle(
+                              fontFamily: font,
                               fontSize: 18,
                               color: isSelected
                                   ? controller.activeThemeColor

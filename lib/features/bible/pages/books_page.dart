@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/constants/app_constants.dart';
@@ -140,7 +141,7 @@ class _BooksPageState extends State<BooksPage> {
               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
               decoration: BoxDecoration(
                 color: isSelected 
-                    ? Theme.of(context).primaryColor.withOpacity(0.1) 
+                    ? Theme.of(context).primaryColor.withValues(alpha: 0.1) 
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -160,16 +161,17 @@ class _BooksPageState extends State<BooksPage> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          book.val
-                              .replaceAll(' Chapters', 'C')
-                              .replaceAll(' Chapter', 'C')
-                              .replaceAll(' Verses', 'V')
-                              .replaceAll(' Verse', 'V'),
+                          _formatBookSummary(book.val),
                           style: TextStyle(
-                            fontSize: 10,
-                            color: isSelected 
-                                ? Theme.of(context).primaryColor.withOpacity(0.7)
-                                : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
+                            fontSize: 11.5,
+                            height: 1.3,
+                            color: isSelected
+                                ? Theme.of(context).primaryColor.withValues(alpha: 0.75)
+                                : Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.color
+                                    ?.withValues(alpha: 0.75),
                           ),
                         ),
                       ],
@@ -184,6 +186,20 @@ class _BooksPageState extends State<BooksPage> {
         });
       },
     );
+  }
+
+  /// The bundled data spells the counts out already ("50 Chapters, 1,533
+  /// Verses") but is inconsistent about thousands separators — some entries
+  /// read "1288 Verses". Normalise so the column reads evenly.
+  static String _formatBookSummary(String raw) {
+    final normalized = raw.replaceAllMapped(RegExp(r'\d[\d,]*'), (match) {
+      final digits = match[0]!.replaceAll(',', '');
+      final number = int.tryParse(digits);
+      if (number == null) return match[0]!;
+      return NumberFormat.decimalPattern().format(number);
+    });
+    // One entry ships as "13  Chapters" with a doubled space.
+    return normalized.replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
   void _selectBook(String bookKey) {

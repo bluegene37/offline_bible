@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:substring_highlight/substring_highlight.dart';
 import '../../../core/controllers/app_controller.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../bible/controllers/bible_controller.dart';
 import '../../bible/models/book_model.dart';
 
@@ -97,16 +96,8 @@ class SearchResultsList extends StatelessWidget {
   }
 
   void _navigateToVerse(Book verse, AppController controller) {
-    controller.updateBookSelection(verse.book, verse.chapter);
-
-    final bibleController = Get.find<BibleController>();
-    bibleController.loadChapters(verse.book);
-
-    controller.navigateToPage(AppConstants.biblePageIndex); // Navigate to Bible page
-
-    // Jump to specific verse
-    Future.delayed(const Duration(milliseconds: 500), () {
-      bibleController.jumpToVerse(verse.verse - 1);
-    });
+    // navigateToVerse queues the scroll against the chapter load itself. The
+    // old fixed 500ms delay raced it and silently did nothing on slow devices.
+    controller.navigateToVerse(verse.book, verse.chapter, verse.verse);
   }
 }

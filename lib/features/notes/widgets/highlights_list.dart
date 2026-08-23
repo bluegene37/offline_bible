@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/date_utils.dart' as du;
 import '../../../core/utils/ui_utils.dart';
 import '../../bible/controllers/bible_controller.dart';
 import '../controllers/notes_controller.dart';
@@ -57,9 +58,17 @@ class HighlightsList extends StatelessWidget {
     );
   }
 
-  Widget _buildHighlightCard(Map highlight, String highlightKey,
+  Widget _buildHighlightCard(Map<String, dynamic> highlight, String highlightKey,
       AppController appController, NotesController notesController) {
-    final highlightColor = AppColors.highlightColors[highlight['color'] ?? 0];
+    // A stored index can outlive the palette it was written against, so clamp
+    // rather than index blindly — an out-of-range value used to take down the
+    // whole list, not just one card.
+    final rawColorIndex = highlight['color'];
+    final colorIndex = rawColorIndex is int ? rawColorIndex : 0;
+    final highlightColor = (colorIndex >= 0 &&
+            colorIndex < AppColors.highlightColors.length)
+        ? AppColors.highlightColors[colorIndex]
+        : AppColors.highlightColors[0];
 
     return GetBuilder<AppController>(
       builder: (controller) {
@@ -87,7 +96,8 @@ class HighlightsList extends StatelessWidget {
                   ),
                   const TextSpan(text: '\n'),
                   TextSpan(
-                    text: highlight['datetime']?.toString() ?? '',
+                    text: du.DateUtils.formatForDisplay(
+                        highlight['datetime']?.toString()),
                     style: const TextStyle(
                       color: Colors.black54,
                       fontSize: 13,

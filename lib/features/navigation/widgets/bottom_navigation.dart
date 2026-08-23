@@ -32,8 +32,8 @@ class BottomNavigation extends StatelessWidget {
 
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final barColor = isDark
-            ? Colors.black.withOpacity(0.7)
-            : Colors.white.withOpacity(0.85);
+            ? Colors.black.withValues(alpha: 0.7)
+            : Colors.white.withValues(alpha: 0.85);
 
         return ClipRRect(
           child: BackdropFilter(
@@ -51,7 +51,7 @@ class BottomNavigation extends StatelessWidget {
               child: NavigationBarTheme(
                 data: NavigationBarThemeData(
                   backgroundColor: Colors.transparent,
-                  indicatorColor: Theme.of(context).primaryColor.withOpacity(isDark ? 0.3 : 0.2),
+                  indicatorColor: Theme.of(context).primaryColor.withValues(alpha: isDark ? 0.3 : 0.2),
                   indicatorShape: const StadiumBorder(),
                   labelTextStyle: WidgetStateProperty.resolveWith((states) {
                     if (states.contains(WidgetState.selected)) {
@@ -122,7 +122,8 @@ class BottomNavigation extends StatelessWidget {
   }
 
   void _handleNavigation(int pageIndex, AppController controller) {
+    // onTabSelected already routes to navigateToPage; calling it again here
+    // cleared the verse selection and rewrote the title a second time.
     onTabSelected(pageIndex);
-    controller.navigateToPage(pageIndex);
   }
 }

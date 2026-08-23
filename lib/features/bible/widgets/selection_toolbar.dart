@@ -31,7 +31,7 @@ class SelectionToolbar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isDark ? Colors.black.withOpacity(0.7) : Colors.white.withOpacity(0.85),
+                color: isDark ? Colors.black.withValues(alpha: 0.7) : Colors.white.withValues(alpha: 0.85),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: isDark ? Colors.white12 : Colors.black12,
@@ -39,7 +39,7 @@ class SelectionToolbar extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -65,7 +65,7 @@ class SelectionToolbar extends StatelessWidget {
   Widget _buildColorRow(BuildContext context, AppController controller,
       BibleController bibleController) {
     return SizedBox(
-      height: 40,
+      height: 48,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
@@ -73,6 +73,7 @@ class SelectionToolbar extends StatelessWidget {
           _buildColorCircle(
             context,
             color: Colors.transparent,
+            label: 'Remove highlight',
             icon: Icons.format_color_reset_outlined,
             onTap: () => _applyHighlight(-1, controller, bibleController),
             borderColor: Theme.of(context).dividerColor,
@@ -87,6 +88,8 @@ class SelectionToolbar extends StatelessWidget {
               child: _buildColorCircle(
                 context,
                 color: color,
+                // Colour alone carries no meaning for a screen reader.
+                label: '${AppColors.highlightColorNames[index]} highlight',
                 onTap: () =>
                     _applyHighlight(index, controller, bibleController),
               ),
@@ -100,29 +103,34 @@ class SelectionToolbar extends StatelessWidget {
   Widget _buildColorCircle(
     BuildContext context, {
     required Color color,
+    required String label,
     VoidCallback? onTap,
     IconData? icon,
     Color? borderColor,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: borderColor ?? Colors.black12,
-            width: 1,
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: borderColor ?? Colors.black12,
+              width: 1,
+            ),
           ),
+          child: icon != null
+              ? Icon(icon,
+                  size: 20,
+                  color:
+                      Theme.of(context).iconTheme.color?.withValues(alpha: 0.7))
+              : null,
         ),
-        child: icon != null
-            ? Icon(icon,
-                size: 20,
-                color:
-                    Theme.of(context).iconTheme.color?.withValues(alpha: 0.7))
-            : null,
       ),
     );
   }

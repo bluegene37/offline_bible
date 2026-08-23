@@ -24,7 +24,6 @@ class BibleController extends GetxController {
   final RxList<Book> searchResults = <Book>[].obs;
   final RxList<Book> chapterList = <Book>[].obs;
   final RxDouble bottomPadding = 0.0.obs;
-  final RxDouble sheetHeight = 0.0.obs;
   final RxBool isLoading = false.obs;
 
   // TTS Audio State
@@ -246,7 +245,7 @@ class BibleController extends GetxController {
   }
 
   void saveHighlight(List<String> verseKeys, int colorIndex) {
-    final timestamp = DateUtils.formatDateTime(DateTime.now());
+    final timestamp = DateUtils.timestampNow();
 
     for (final key in verseKeys) {
       StorageService.highlightBox.put(key, colorIndex);
@@ -272,8 +271,8 @@ class BibleController extends GetxController {
   }
 
   void saveNotes(List<String> verseKeys, String notes) {
-    final timestamp = DateUtils.formatDateTime(DateTime.now());
-    final noteId = DateUtils.generateUniqueId().toString();
+    final timestamp = DateUtils.timestampNow();
+    final noteId = DateUtils.generateUniqueId();
 
     final noteData = {
       // 'verses' is the canonical reference list; 'book' keeps the legacy
@@ -296,7 +295,7 @@ class BibleController extends GetxController {
   }
 
   void toggleBookmarks(List<String> verseKeys) {
-    final timestamp = DateUtils.formatDateTime(DateTime.now());
+    final timestamp = DateUtils.timestampNow();
     int added = 0;
     
     for (final key in verseKeys) {

@@ -29,6 +29,26 @@ class AppColors {
     const Color(0xFFA5F3FC), // Cyan
   ];
 
+  /// Spoken names for [highlightColors], so the swatches are distinguishable
+  /// to a screen reader instead of being eight identical unlabeled buttons.
+  static const List<String> highlightColorNames = [
+    'Yellow',
+    'Mint',
+    'Sky',
+    'Peach',
+    'Lavender',
+    'Rose',
+    'Jade',
+    'Cyan',
+  ];
+
+  /// The reading surface. Deliberately independent of the accent colour: the
+  /// page behind scripture should read as paper, not as a tinted UI panel.
+  /// Warm off-white rather than the cool app surface, which is easier on the
+  /// eye over long sessions.
+  static const Color paperLight = Color(0xFFFBF9F4);
+  static const Color paperDark = Color(0xFF121212);
+
   // Colors used for surface backgrounds
   static const Color lightSurface = Color(0xFFF9FAFB);
   static const Color darkSurface = Color(0xFF121212);

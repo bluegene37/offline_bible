@@ -142,6 +142,9 @@ class ReadingPlanService {
   ];
 
   static ReadingPlan? getPlanById(String id) {
-    return availablePlans.firstWhere((p) => p.id == id, orElse: () => availablePlans.first);
+    for (final plan in availablePlans) {
+      if (plan.id == id) return plan;
+    }
+    return null;
   }
 }

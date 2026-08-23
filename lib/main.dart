@@ -1,39 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'core/controllers/app_controller.dart';
+import 'core/services/error_reporter.dart';
 import 'core/services/storage_service.dart';
 import 'core/theme/app_colors.dart';
 import 'features/bible/controllers/bible_controller.dart';
 import 'features/notes/controllers/notes_controller.dart';
 import 'features/home/pages/home_page.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
+  // Everything below runs inside a guarded zone, so a failure during startup
+  // is reported instead of vanishing into a blank screen.
+  ErrorReporter.install(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // All offered fonts ship inside the app; never fetch fonts over the network.
-  // GoogleFonts.config.allowRuntimeFetching = false;
+    // Allow both portrait and landscape so tablets and larger phones can
+    // read comfortably in either orientation.
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
 
-  // Allow both portrait and landscape so tablets and larger phones can
-  // read comfortably in either orientation.
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
+    // Initialize storage
+    await StorageService.init();
 
-  // Initialize storage
-  await StorageService.init();
+    // Initialize controllers
+    final appController = Get.put(AppController());
+    Get.put(BibleController());
+    Get.put(NotesController());
+    await appController.init();
 
-  // Initialize controllers
-  final appController = Get.put(AppController());
-  Get.put(BibleController());
-  Get.put(NotesController());
-  await appController.init();
-
-  runApp(const MyApp());
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -49,7 +50,10 @@ class MyApp extends StatelessWidget {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      primaryColor: seedColor,
+      // The tonal primary, not the raw seed: seeds like Sunset Amber sit at
+      // 1.6:1 against the light surface. Material derives this tone precisely
+      // so it stays legible on the scheme's own background.
+      primaryColor: baseScheme.primary,
       fontFamily: fontFamily,
       colorScheme: baseScheme.copyWith(
         surface: AppColors.lightSurface,
@@ -68,7 +72,7 @@ class MyApp extends StatelessWidget {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.lightSurface,
-        indicatorColor: seedColor.withOpacity(0.2),
+        indicatorColor: seedColor.withValues(alpha: 0.2),
       ),
     );
   }

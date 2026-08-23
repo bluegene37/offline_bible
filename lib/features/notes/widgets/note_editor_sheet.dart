@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/utils/text_utils.dart';
 import '../../bible/controllers/bible_controller.dart';
@@ -80,7 +79,8 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
       children: [
         Text(
           widget.existingNoteId != null ? 'Edit Note' : 'New Note',
-          style: GoogleFonts.raleway(
+          style: TextStyle(
+            fontFamily: 'Raleway',
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: _appController.activeThemeColor,

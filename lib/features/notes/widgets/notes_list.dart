@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/utils/text_utils.dart';
+import '../../../core/utils/date_utils.dart' as du;
 import '../../../core/utils/ui_utils.dart';
 import '../../../core/widgets/outline_search_bar.dart';
 import '../controllers/notes_controller.dart';
@@ -69,7 +70,6 @@ class NotesList extends StatelessWidget {
     return GetBuilder<AppController>(
       builder: (controller) {
         return OutlineSearchBar(
-          focusNode: FocusNode(),
           clearButtonColor: _getSearchBarColor(controller),
           cursorColor: _getSearchBarColor(controller),
           searchButtonIconColor: _getSearchBarColor(controller),
@@ -85,7 +85,7 @@ class NotesList extends StatelessWidget {
     );
   }
 
-  Widget _buildNoteCard(Map note, String noteId, AppController appController,
+  Widget _buildNoteCard(Map<String, dynamic> note, String noteId, AppController appController,
       NotesController notesController) {
     final verseText = TextUtils.formatVerseKeysCompact(
         NotesController.verseKeysOfNote(note));
@@ -121,7 +121,8 @@ class NotesList extends StatelessWidget {
                   ),
                   const TextSpan(text: '\n\n'),
                   TextSpan(
-                    text: note['stamp']?.toString() ?? '',
+                    text: du.DateUtils.formatForDisplay(
+                        note['stamp']?.toString()),
                     style: TextStyle(
                       color: textColor,
                       fontSize: 13,
@@ -139,7 +140,7 @@ class NotesList extends StatelessWidget {
     );
   }
 
-  Widget _buildPopupMenu(String noteId, Map note,
+  Widget _buildPopupMenu(String noteId, Map<String, dynamic> note,
       NotesController notesController, bool isDarkMode) {
     return PopupMenuButton<String>(
       icon:
@@ -164,7 +165,7 @@ class NotesList extends StatelessWidget {
   }
 
   void _handleMenuAction(
-      String action, String noteId, Map note, NotesController notesController) {
+      String action, String noteId, Map<String, dynamic> note, NotesController notesController) {
     switch (action) {
       case 'edit':
         _showEditDialog(noteId, note, notesController);
@@ -180,7 +181,7 @@ class NotesList extends StatelessWidget {
   }
 
   void _showEditDialog(
-      String noteId, Map note, NotesController notesController) {
+      String noteId, Map<String, dynamic> note, NotesController notesController) {
     Get.bottomSheet(
       NoteEditorSheet(
         verseKeys: NotesController.verseKeysOfNote(note),

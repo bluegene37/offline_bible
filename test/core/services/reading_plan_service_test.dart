@@ -14,15 +14,17 @@ void main() {
       }
     });
 
-    test('getPlanById returns correct plan or default', () {
+    test('getPlanById returns the matching plan', () {
       final proverbs = ReadingPlanService.getPlanById('proverbs_31');
       expect(proverbs, isNotNull);
       expect(proverbs!.id, equals('proverbs_31'));
       expect(proverbs.totalDays, equals(31));
+    });
 
-      final unknown = ReadingPlanService.getPlanById('non_existent_id');
-      expect(unknown, isNotNull);
-      expect(unknown!.id, equals(ReadingPlanService.availablePlans.first.id));
+    test('getPlanById returns null for an unknown id', () {
+      // It used to fall back to availablePlans.first, which silently handed
+      // callers a different plan than the one they asked for.
+      expect(ReadingPlanService.getPlanById('non_existent_id'), isNull);
     });
   });
 }

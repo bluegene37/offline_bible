@@ -1,3 +1,16 @@
+/// Coerces a JSON value that *should* be a string. Downloaded translations
+/// come from a third-party API, so a wrong type must degrade rather than throw
+/// halfway through parsing 31,000 verses.
+String _asString(Object? value) => value?.toString() ?? '';
+
+/// Coerces a JSON value that *should* be an int, tolerating numeric strings.
+int _asInt(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value) ?? 0;
+  return 0;
+}
+
 class Book {
   final String id;
   final String book;
@@ -15,11 +28,11 @@ class Book {
 
   factory Book.fromJson(Map<String, dynamic> json) {
     return Book(
-      id: json['book_id'] ?? '',
-      book: json['book_name'] ?? '',
-      chapter: json['chapter'] ?? 0,
-      verse: json['verse'] ?? 0,
-      text: json['text'] ?? '',
+      id: _asString(json['book_id']),
+      book: _asString(json['book_name']),
+      chapter: _asInt(json['chapter']),
+      verse: _asInt(json['verse']),
+      text: _asString(json['text']),
     );
   }
 
@@ -67,9 +80,9 @@ class BookTitle {
 
   factory BookTitle.fromJson(Map<String, dynamic> json) {
     return BookTitle(
-      testament: json['testament'] ?? '',
-      key: json['key'] ?? '',
-      val: json['val'] ?? '',
+      testament: _asString(json['testament']),
+      key: _asString(json['key']),
+      val: _asString(json['val']),
     );
   }
 

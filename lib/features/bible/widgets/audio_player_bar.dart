@@ -33,7 +33,7 @@ class AudioPlayerBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.black.withOpacity(0.7) : Colors.white.withOpacity(0.85),
+                color: isDarkMode ? Colors.black.withValues(alpha: 0.7) : Colors.white.withValues(alpha: 0.85),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: isDarkMode ? Colors.white12 : Colors.black12,
@@ -41,7 +41,7 @@ class AudioPlayerBar extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )

@@ -13,6 +13,7 @@ import '../../plans/pages/reading_plans_page.dart';
 import '../../bible/widgets/floating_navigation.dart';
 import '../../bible/widgets/quick_picker_sheet.dart';
 import '../../bible/widgets/quick_display_sheet.dart';
+import '../../settings/widgets/version_manager_sheet.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -53,7 +54,7 @@ class HomePage extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -72,20 +73,23 @@ class HomePage extends StatelessWidget {
             const SizedBox(width: 8),
             InkWell(
               onTap: () {
-                // Future version picker
+                Get.bottomSheet(
+                  const VersionManagerSheet(),
+                  isScrollControlled: true,
+                );
               },
               borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Obx(() => Text(
-                      controller.bibleVersion.value,
+                      controller.bibleVersion.value.toUpperCase(),
                       style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                     )),
                     const SizedBox(width: 4),
@@ -117,7 +121,9 @@ class HomePage extends StatelessWidget {
       centerTitle: true,
       elevation: 0,
       title: Obx(() => Text(
-        controller.barTitle.value,
+        currentIndex == AppConstants.chaptersPageIndex
+            ? controller.bookSelected.value
+            : controller.barTitle.value,
         style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,

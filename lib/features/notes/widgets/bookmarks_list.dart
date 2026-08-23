@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/notes_controller.dart';
 import '../../../core/controllers/app_controller.dart';
+import '../../../core/utils/date_utils.dart' as du;
 import '../../../core/utils/ui_utils.dart'; // For showConfirmationDialog
 
 class BookmarksList extends StatelessWidget {
@@ -43,12 +44,16 @@ class BookmarksList extends StatelessWidget {
         itemCount: notesController.bookmarks.length,
         itemBuilder: (context, index) {
           final bookmark = notesController.bookmarks[index];
-          final String key = bookmark['id'];
-          final String text = bookmark['text'] ?? '';
-          final String date = bookmark['datetime'] ?? '';
-          final String book = bookmark['book'] ?? '';
-          final int chapter = bookmark['chapter'] ?? 0;
-          final int verse = bookmark['verse'] ?? 0;
+          final String key = bookmark['id']?.toString() ?? '';
+          final String text = bookmark['text']?.toString() ?? '';
+          final String date =
+              du.DateUtils.formatForDisplay(bookmark['datetime']?.toString());
+          final String book = bookmark['book']?.toString() ?? '';
+          final int chapter = bookmark['chapter'] is int
+              ? bookmark['chapter'] as int
+              : 0;
+          final int verse =
+              bookmark['verse'] is int ? bookmark['verse'] as int : 0;
           final String reference = '$book $chapter:$verse';
 
           return Card(

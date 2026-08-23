@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
+import '../../../core/theme/app_colors.dart';
 import '../controllers/bible_controller.dart';
 import '../widgets/verse_list.dart';
 import '../widgets/selection_toolbar.dart';
@@ -30,7 +31,12 @@ class BiblePage extends StatelessWidget {
       }
     });
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      // Paper, not the themed app surface — see AppColors.paperLight.
+      backgroundColor:
+          isDark ? AppColors.paperDark : AppColors.paperLight,
       body: GetBuilder<BibleController>(
         builder: (controller) {
           return GestureDetector(
@@ -49,21 +55,7 @@ class BiblePage extends StatelessWidget {
                 // The VerseList is always in the tree
                 if (controller.currentVerses.isEmpty &&
                     !controller.isLoading.value)
-                  Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('No verses found'),
-                        const SizedBox(height: 12),
-                        OutlinedButton.icon(
-                          onPressed: () =>
-                              controller.loadChapter(bookTitle, chapter),
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  )
+                  _buildEmptyState(context, controller, appController)
                 else
                   VerseList(
                     key: ValueKey(
@@ -88,5 +80,44 @@ class BiblePage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  /// Shown when the reader has nothing to display. A failed load is a
+  /// different problem from an empty chapter, and needs to say so — the
+  /// startup path has no overlay to put a snackbar in.
+  Widget _buildEmptyState(BuildContext context, BibleController controller,
+      AppController appController) {
+    return Obx(() {
+      final error = appController.loadError.value;
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                error == null ? Icons.menu_book_outlined : Icons.error_outline,
+                size: 48,
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                error ?? 'No verses found for $bookTitle $chapter.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 15, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              OutlinedButton.icon(
+                onPressed: () => error == null
+                    ? controller.loadChapter(bookTitle, chapter)
+                    : appController.retryLoad(),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }

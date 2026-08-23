@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/controllers/app_controller.dart';
 
 class FontPreview extends StatelessWidget {
@@ -13,8 +12,8 @@ class FontPreview extends StatelessWidget {
     return Obx(() {
       return Text(
         'In the beginning God created the heaven and the earth.',
-        style: GoogleFonts.getFont(
-          appController.globalFont.value,
+        style: TextStyle(
+          fontFamily: appController.globalFont.value,
           fontSize: appController.fontSize.value,
           height: appController.lineHeight.value,
         ),

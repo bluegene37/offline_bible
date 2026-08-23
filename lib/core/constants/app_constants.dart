@@ -20,7 +20,6 @@ class AppConstants {
   static const String textsBox = 'textsBoxDB';
   static const String bookmarksBox = 'bookmarksBoxDB';
   static const String readingPlansBox = 'readingPlansDB';
-  static const String votdBox = 'votdDB';
 
   // Navigation indices
   static const int booksPageIndex = 0;
@@ -31,18 +30,24 @@ class AppConstants {
   static const int notesPageIndex = 5;
   static const int settingsPageIndex = 6;
 
-  // Curated reading fonts. Every font here is bundled in google_fonts/ so
-  // the app never needs the network to render text — do not add fonts
-  // without also adding their .ttf files.
+  // Curated reading fonts. Every name here must match a `family:` declared in
+  // pubspec.yaml and backed by a .ttf in assets/fonts/, so the app never needs
+  // the network to render text. Adding a name without its font file makes the
+  // option silently fall back to the platform default.
   static const List<String> fontOptions = [
+    // Serif faces first: they carry long passages better than sans.
+    'Literata',
+    'Merriweather',
+    'EB Garamond',
+    'Lora',
+    'Quattrocento',
     'Lato',
     'Raleway',
-    'Oswald',
-    'Merriweather',
-    'Quattrocento',
-    'Slabo 27px',
-    'Inconsolata',
-    'Indie Flower',
-    'Lobster',
+    'Open Sans',
+    // Accessibility faces. Atkinson Hyperlegible was designed by the Braille
+    // Institute for low vision; OpenDyslexic weights letter bottoms to reduce
+    // letter-swapping. Both belong in a reading app, not as novelties.
+    'Atkinson Hyperlegible',
+    'OpenDyslexic',
   ];
 }

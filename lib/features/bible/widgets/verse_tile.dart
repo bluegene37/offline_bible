@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/services/storage_service.dart';
@@ -33,9 +32,12 @@ class VerseTile extends StatelessWidget {
     return GetBuilder<AppController>(
       builder: (controller) {
         final isSelected = controller.textUnderline.contains(verseKey);
-        final hasHighlight = StorageService.highlightBox.containsKey(verseKey);
-        final hasNotes = _hasNotes(verseKey);
-        final hasBookmark = StorageService.bookmarksBox.containsKey(verseKey);
+        final notesCtrl = Get.isRegistered<NotesController>()
+            ? Get.find<NotesController>()
+            : null;
+        final highlightIndex = notesCtrl?.highlightColorFor(verseKey);
+        final hasNotes = notesCtrl?.hasNoteFor(verseKey) ?? false;
+        final hasBookmark = notesCtrl?.hasBookmarkFor(verseKey) ?? false;
 
         final bibleCtrl = Get.isRegistered<BibleController>() ? Get.find<BibleController>() : null;
         final isAudioActive = bibleCtrl != null && bibleCtrl.activeAudioVerseIndex.value == index;
@@ -49,15 +51,25 @@ class VerseTile extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (isAudioActive)
-                      const Icon(Icons.volume_up_rounded, color: Colors.amber, size: 20),
+                      Semantics(
+                        label: 'Now reading',
+                        excludeSemantics: true,
+                        child: const Icon(Icons.volume_up_rounded,
+                            color: Colors.amber, size: 20),
+                      ),
                     if (hasBookmark)
-                      Icon(Icons.bookmark, color: controller.activeThemeColor, size: 20),
+                      Semantics(
+                        label: 'Bookmarked',
+                        excludeSemantics: true,
+                        child: Icon(Icons.bookmark,
+                            color: controller.activeThemeColor, size: 20),
+                      ),
                     if (hasNotes) _buildNotesIcon(context, verseKey, controller),
                   ],
                 )
               : null,
-          title: _buildVerseText(
-              context, controller, verseKey, isSelected, hasHighlight, isAudioActive),
+          title: _buildVerseText(context, controller, highlightIndex, isSelected,
+              isAudioActive),
           subtitle: isLastVerse ? _buildCopyrightText() : null,
           onTap: () {
             HapticFeedback.selectionClick();
@@ -73,7 +85,8 @@ class VerseTile extends StatelessWidget {
   }
 
   Widget _buildVerseText(BuildContext context, AppController controller,
-      String verseKey, bool isSelected, bool hasHighlight, bool isAudioActive) {
+      int? highlightIndex, bool isSelected, bool isAudioActive) {
+    final hasHighlight = highlightIndex != null;
     return Text.rich(
       TextSpan(
         children: [
@@ -83,10 +96,10 @@ class VerseTile extends StatelessWidget {
               padding: const EdgeInsets.only(right: 6.0, top: 2.0),
               child: Text(
                 '${verse.verse}',
-                style: GoogleFonts.getFont(
-                  controller.globalFont.value,
+                style: TextStyle(
+                  fontFamily: controller.globalFont.value,
                   fontSize: controller.fontSize.value * 0.65,
-                  color: _getTextColor(context, hasHighlight).withOpacity(0.5),
+                  color: _getTextColor(context, hasHighlight).withValues(alpha: 0.5),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -94,8 +107,8 @@ class VerseTile extends StatelessWidget {
           ),
           TextSpan(
             text: verse.text,
-            style: GoogleFonts.getFont(
-              controller.globalFont.value,
+            style: TextStyle(
+              fontFamily: controller.globalFont.value,
               fontSize: controller.fontSize.value,
               height: controller.lineHeight.value,
               color: _getTextColor(context, hasHighlight),
@@ -103,8 +116,8 @@ class VerseTile extends StatelessWidget {
               decoration: isSelected ? TextDecoration.underline : null,
               decorationStyle: isSelected ? TextDecorationStyle.dashed : null,
               backgroundColor: isAudioActive
-                  ? (controller.activeThemeColor.withOpacity(0.15))
-                  : _getBackgroundColor(context, verseKey, hasHighlight),
+                  ? (controller.activeThemeColor.withValues(alpha: 0.15))
+                  : _getBackgroundColor(context, highlightIndex),
             ),
           ),
         ],
@@ -121,16 +134,10 @@ class VerseTile extends StatelessWidget {
     return isDark ? Colors.white : Colors.black;
   }
 
-  Color? _getBackgroundColor(BuildContext context, String verseKey,
-      bool hasHighlight) {
-    if (!hasHighlight) return null;
+  Color? _getBackgroundColor(BuildContext context, int? highlightIndex) {
+    if (highlightIndex == null) return null;
 
-    final colorIndex =
-        StorageService.highlightBox.get(verseKey, defaultValue: 0);
-    final color = (colorIndex >= 0 &&
-            colorIndex < AppColors.highlightColors.length)
-        ? AppColors.highlightColors[colorIndex]
-        : AppColors.highlightColors[0];
+    final color = AppColors.highlightColors[highlightIndex];
 
     // Dark mode dims the marker to a tint so white text stays readable
     // and the page doesn't glow.
@@ -146,6 +153,7 @@ class VerseTile extends StatelessWidget {
         Icons.note,
         color: controller.activeThemeColor,
       ),
+      tooltip: 'Open note',
       onPressed: () => _onNoteIconTap(context, verseKey),
     );
   }
@@ -160,7 +168,7 @@ class VerseTile extends StatelessWidget {
       NoteEditorSheet(
         verseKeys: [verseKey],
         existingNoteId: noteId,
-        initialText: note['notes'],
+        initialText: note['notes']?.toString(),
       ),
       isScrollControlled: true,
     );
@@ -177,10 +185,5 @@ class VerseTile extends StatelessWidget {
         textAlign: TextAlign.center,
       ),
     );
-  }
-
-  bool _hasNotes(String verseKey) {
-    return Get.isRegistered<NotesController>() &&
-        Get.find<NotesController>().hasNoteFor(verseKey);
   }
 }

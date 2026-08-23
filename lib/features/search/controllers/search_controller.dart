@@ -10,7 +10,8 @@ class BibleSearchController extends GetxController {
   final TextEditingController textController = TextEditingController();
   final RxString searchQuery = ''.obs;
   final RxBool hideHistory = false.obs;
-  final RxList searchHistory = [].obs;
+  final RxList<Map<String, dynamic>> searchHistory =
+      <Map<String, dynamic>>[].obs;
   final RxString searchScope = 'All'.obs;
 
   @override
@@ -25,11 +26,18 @@ class BibleSearchController extends GetxController {
     super.onClose();
   }
 
+  /// Most recent searches only. Unbounded history was both a slow read and a
+  /// list nobody scrolls to the bottom of.
+  static const int _maxHistoryEntries = 50;
+
   void _loadSearchHistory() {
     final historyMap = StorageService.historyBox.toMap();
-    searchHistory.value = historyMap.entries.map((entry) {
-      return {'id': entry.key, 'query': entry.value};
-    }).toList();
+    // Keys are monotonic, so insertion order is chronological — newest first.
+    searchHistory.value = historyMap.entries
+        .map((entry) => {'id': entry.key, 'query': entry.value})
+        .toList()
+        .reversed
+        .toList();
   }
 
   void performSearch(String query) {
@@ -64,21 +72,30 @@ class BibleSearchController extends GetxController {
   }
 
   void _saveToHistory(String query) {
-    final timestamp = DateUtils.formatDateTime(DateTime.now());
+    final box = StorageService.historyBox;
 
-    // Remove existing entry if it exists
-    String? keyToDelete;
-    StorageService.historyBox.toMap().forEach((key, value) {
-      if (value == query) {
-        keyToDelete = key;
-      }
-    });
-
-    if (keyToDelete != null) {
-      StorageService.historyBox.delete(keyToDelete);
+    // Drop any earlier entry for the same query so it re-enters as newest.
+    final duplicateKeys = box
+        .toMap()
+        .entries
+        .where((entry) => entry.value == query)
+        .map((entry) => entry.key)
+        .toList();
+    for (final key in duplicateKeys) {
+      box.delete(key);
     }
 
-    StorageService.historyBox.put(timestamp, query);
+    // A unique key, not a timestamp: two searches within the same second used
+    // to collide and overwrite one another.
+    box.put(DateUtils.generateUniqueId(), query);
+
+    if (box.length > _maxHistoryEntries) {
+      final excess = box.keys.take(box.length - _maxHistoryEntries).toList();
+      for (final key in excess) {
+        box.delete(key);
+      }
+    }
+
     _loadSearchHistory();
   }
 

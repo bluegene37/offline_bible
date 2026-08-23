@@ -1,28 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/text_utils.dart';
 import '../../../core/utils/date_utils.dart' as du;
 
 class NotesController extends GetxController {
   final TextEditingController searchController = TextEditingController();
   final RxInt currentTab = 2.obs;
-  final RxList notes = [].obs;
-  final RxList highlights = [].obs;
-  final RxList bookmarks = [].obs;
-  final RxList filteredNotes = [].obs;
+  final RxList<Map<String, dynamic>> notes = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> highlights = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> bookmarks = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> filteredNotes =
+      <Map<String, dynamic>>[].obs;
 
   /// verseKey -> noteId index rebuilt on every load, so verse tiles can
   /// check for notes in O(1) instead of scanning the whole notes box.
   final Map<String, String> _noteIdByVerse = {};
 
+  /// verseKey -> highlight colour index, and the set of bookmarked verses.
+  /// Verse tiles rebuild on every AppController update — a slider drag, a
+  /// theme switch — and reading Hive per verse per rebuild made that cost
+  /// scale with the length of the chapter.
+  final Map<String, int> _highlightColorByVerse = {};
+  final Set<String> _bookmarkedVerses = {};
+
   bool hasNoteFor(String verseKey) => _noteIdByVerse.containsKey(verseKey);
 
   String? noteIdForVerse(String verseKey) => _noteIdByVerse[verseKey];
 
+  bool hasHighlightFor(String verseKey) =>
+      _highlightColorByVerse.containsKey(verseKey);
+
+  /// Highlight colour index for [verseKey], already clamped to the palette.
+  int? highlightColorFor(String verseKey) {
+    final index = _highlightColorByVerse[verseKey];
+    if (index == null) return null;
+    return (index >= 0 && index < AppColors.highlightColors.length) ? index : 0;
+  }
+
+  bool hasBookmarkFor(String verseKey) => _bookmarkedVerses.contains(verseKey);
+
   /// Reads a note's verse references, supporting both the current list
   /// format ('verses') and the legacy stringified format ('book').
-  static List<String> verseKeysOfNote(Map note) {
+  static List<String> verseKeysOfNote(Map<String, dynamic> note) {
     final verses = note['verses'];
     if (verses is List) {
       return verses.map((v) => v.toString()).toList();
@@ -86,6 +107,17 @@ class NotesController extends GetxController {
   }
 
   void loadHighlights() {
+    _highlightColorByVerse
+      ..clear()
+      ..addEntries(
+        StorageService.highlightBox.toMap().entries.map(
+              (e) => MapEntry(
+                e.key.toString(),
+                e.value is int ? e.value as int : 0,
+              ),
+            ),
+      );
+
     final Map<dynamic, dynamic> rawHighlights = StorageService.textsBox.toMap();
     highlights.value = rawHighlights.entries.map((entry) {
       final highlight = Map<String, dynamic>.from(entry.value as Map);
@@ -111,6 +143,10 @@ class NotesController extends GetxController {
   }
 
   void loadBookmarks() {
+    _bookmarkedVerses
+      ..clear()
+      ..addAll(StorageService.bookmarksBox.keys.map((k) => k.toString()));
+
     final Map<dynamic, dynamic> rawBookmarks = StorageService.bookmarksBox.toMap();
     bookmarks.value = rawBookmarks.entries.map((entry) {
       final bookmark = Map<String, dynamic>.from(entry.value as Map);
@@ -171,7 +207,7 @@ class NotesController extends GetxController {
     final existingNote = StorageService.notesBox.get(noteId);
     if (existingNote != null) {
       existingNote['notes'] = newNotes;
-      existingNote['stamp'] = du.DateUtils.formatDateTime(DateTime.now());
+      existingNote['stamp'] = du.DateUtils.timestampNow();
       StorageService.notesBox.put(noteId, existingNote);
       loadNotes();
     }

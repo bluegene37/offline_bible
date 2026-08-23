@@ -3,35 +3,154 @@ import 'package:get/get.dart';
 import '../../../core/controllers/app_controller.dart';
 import '../../../core/constants/app_constants.dart';
 import '../controllers/bible_controller.dart';
+import '../models/book_model.dart';
 
-class ChapterPage extends StatelessWidget {
+class ChapterPage extends StatefulWidget {
   const ChapterPage({super.key});
+
+  @override
+  State<ChapterPage> createState() => _ChapterPageState();
+}
+
+class _ChapterPageState extends State<ChapterPage> {
+  @override
+  void initState() {
+    super.initState();
+    _ensureChaptersLoaded();
+  }
+
+  void _ensureChaptersLoaded() {
+    final appController = Get.find<AppController>();
+    final bibleController = Get.find<BibleController>();
+    if (bibleController.chapterList.isEmpty ||
+        bibleController.chapterList.firstOrNull?.book !=
+            appController.bookSelected.value) {
+      bibleController.loadChapters(appController.bookSelected.value);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final appController = Get.find<AppController>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      body: GetBuilder<BibleController>(
-        builder: (controller) {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Obx(() {
+        final bibleController = Get.find<BibleController>();
+        final bookName = appController.bookSelected.value;
 
-          if (controller.chapterList.isEmpty) {
-            return const Center(child: Text('No chapters found'));
-          }
+        if (bibleController.isLoading.value &&
+            bibleController.chapterList.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          return _buildChapterGrid(controller.chapterList, appController);
-        },
-      ),
+        final chapters = bibleController.chapterList;
+        if (chapters.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('No chapters found'),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => bibleController.loadChapters(bookName),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .primaryColor
+                      .withValues(alpha: isDark ? 0.15 : 0.08),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color:
+                        Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .primaryColor
+                            .withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.menu_book_rounded,
+                        size: 20,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            bookName,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${chapters.length} ${chapters.length == 1 ? "Chapter" : "Chapters"} • Select a chapter',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white60 : Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        appController
+                            .navigateToPage(AppConstants.booksPageIndex);
+                      },
+                      icon: const Icon(Icons.swap_horiz, size: 18),
+                      label: const Text('Change Book',
+                          style: TextStyle(fontSize: 12)),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: _buildChapterGrid(chapters, appController),
+            ),
+          ],
+        );
+      }),
     );
   }
 
-  Widget _buildChapterGrid(List chapters, AppController appController) {
+  Widget _buildChapterGrid(List<Book> chapters, AppController appController) {
     return GetBuilder<AppController>(
       builder: (controller) {
         return GridView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 6,
           ),
@@ -59,9 +178,11 @@ class ChapterPage extends StatelessWidget {
                         chapter.chapter.toString(),
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w300,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w300,
                           color: isSelected
-                              ? (controller.themeMode.value ? Colors.white : Colors.black)
+                              ? (controller.themeMode.value
+                                  ? Colors.white
+                                  : Colors.black)
                               : null,
                         ),
                       ),

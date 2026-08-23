@@ -116,7 +116,7 @@ class _QuickPickerSheetState extends State<QuickPickerSheet> {
                 decoration: BoxDecoration(
                   color: isCurrentSelection 
                       ? Theme.of(context).primaryColor 
-                      : Theme.of(context).primaryColor.withOpacity(0.1),
+                      : Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,

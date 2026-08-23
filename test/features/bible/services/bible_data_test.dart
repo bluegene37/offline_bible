@@ -84,7 +84,8 @@ void main() {
       });
 
       final data = BibleData.fromFlatJson(
-          jsonDecode(VersionService.normalizeGetBibleJson(raw)));
+          jsonDecode(VersionService.normalizeGetBibleJson(raw))
+              as List<dynamic>);
       expect(data.chapterVerses('Genesis', 1).single.text, 'In the beginning');
     });
   });

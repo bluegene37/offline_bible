@@ -17,6 +17,9 @@ class _VersionManagerSheetState extends State<VersionManagerSheet> {
   final AppController _appController = Get.find<AppController>();
   Set<String> _downloaded = {};
   final Set<String> _downloading = {};
+  /// abbrev -> 0.0-1.0, or -1 when the server sent no content length.
+  final Map<String, double> _progress = {};
+  Map<String, int> _sizes = {};
   bool _loading = true;
 
   @override
@@ -27,11 +30,22 @@ class _VersionManagerSheetState extends State<VersionManagerSheet> {
 
   Future<void> _refreshDownloaded() async {
     final abbrevs = await VersionService.downloadedAbbrevs();
+    final sizes = <String, int>{};
+    for (final abbrev in abbrevs) {
+      sizes[abbrev] = await VersionService.sizeOnDisk(abbrev);
+    }
     if (!mounted) return;
     setState(() {
       _downloaded = abbrevs.toSet();
+      _sizes = sizes;
       _loading = false;
     });
+  }
+
+  static String _formatSize(int bytes) {
+    if (bytes <= 0) return '';
+    final mb = bytes / (1024 * 1024);
+    return '${mb.toStringAsFixed(1)} MB';
   }
 
   @override
@@ -109,11 +123,7 @@ class _VersionManagerSheetState extends State<VersionManagerSheet> {
         ),
         title: Text(version.name),
         subtitle: Text(
-          version.bundled
-              ? '${version.abbrev.toUpperCase()} • Included'
-              : isAvailable
-                  ? '${version.abbrev.toUpperCase()} • Downloaded'
-                  : '${version.abbrev.toUpperCase()} • Tap to download',
+          _subtitleFor(version, isAvailable, isDownloading),
           style: const TextStyle(fontSize: 12),
         ),
         trailing: _buildTrailing(version, isAvailable, isDownloading, isActive),
@@ -126,13 +136,38 @@ class _VersionManagerSheetState extends State<VersionManagerSheet> {
     });
   }
 
+  String _subtitleFor(
+      BibleVersion version, bool isAvailable, bool isDownloading) {
+    final code = version.abbrev.toUpperCase();
+    if (isDownloading) {
+      final value = _progress[version.abbrev] ?? -1;
+      return value >= 0
+          ? '$code • Downloading ${(value * 100).round()}%'
+          : '$code • Downloading…';
+    }
+    if (version.bundled) return '$code • Included';
+    if (isAvailable) {
+      final size = _formatSize(_sizes[version.abbrev] ?? 0);
+      return size.isEmpty
+          ? '$code • Downloaded'
+          : '$code • Downloaded ($size)';
+    }
+    return '$code • Tap to download (about 9 MB)';
+  }
+
   Widget? _buildTrailing(BibleVersion version, bool isAvailable,
       bool isDownloading, bool isActive) {
     if (isDownloading) {
-      return const SizedBox(
+      final value = _progress[version.abbrev] ?? -1;
+      return SizedBox(
         width: 22,
         height: 22,
-        child: CircularProgressIndicator(strokeWidth: 2.5),
+        // Determinate once the server reports a size, so an 9MB download over
+        // a slow connection reads as progress rather than as a hang.
+        child: CircularProgressIndicator(
+          strokeWidth: 2.5,
+          value: value >= 0 ? value : null,
+        ),
       );
     }
     if (!isAvailable) {
@@ -155,17 +190,40 @@ class _VersionManagerSheetState extends State<VersionManagerSheet> {
   }
 
   Future<void> _downloadVersion(String abbrev) async {
-    setState(() => _downloading.add(abbrev));
+    setState(() {
+      _downloading.add(abbrev);
+      _progress[abbrev] = -1;
+    });
     try {
-      await VersionService.download(abbrev);
+      await VersionService.download(
+        abbrev,
+        onProgress: (value) {
+          if (!mounted) return;
+          // Only repaint on whole-percent changes; the stream fires per chunk.
+          final previous = _progress[abbrev] ?? -1;
+          if (value < 0 || (value - previous).abs() >= 0.01 || value >= 1.0) {
+            setState(() => _progress[abbrev] = value);
+          }
+        },
+      );
       await _refreshDownloaded();
       Get.snackbar('Downloaded',
           '${VersionService.byAbbrev(abbrev).name} is ready to use offline');
     } catch (e) {
-      Get.snackbar('Download failed',
-          'Check your internet connection and try again.');
+      final failedIntegrity = e.toString().contains('integrity');
+      Get.snackbar(
+        'Download failed',
+        failedIntegrity
+            ? 'The file arrived damaged and was discarded. Please try again.'
+            : 'Check your internet connection and try again.',
+      );
     } finally {
-      if (mounted) setState(() => _downloading.remove(abbrev));
+      if (mounted) {
+        setState(() {
+          _downloading.remove(abbrev);
+          _progress.remove(abbrev);
+        });
+      }
     }
   }
 

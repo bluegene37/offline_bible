@@ -11,7 +11,11 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final searchController = Get.put(BibleSearchController());
+    // Registered once. Calling Get.put here would build (and leak) a fresh
+    // controller on every rebuild, since GetX keeps the first registration.
+    final searchController = Get.isRegistered<BibleSearchController>()
+        ? Get.find<BibleSearchController>()
+        : Get.put(BibleSearchController());
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -37,7 +41,6 @@ class SearchPage extends StatelessWidget {
   Widget _buildSearchBar(AppController appController,
       BibleSearchController searchController, BuildContext context) {
     return Obx(() => OutlineSearchBar(
-          focusNode: FocusNode(),
           clearButtonColor: _getClearButtonColor(appController),
           cursorColor: _getCursorColor(appController),
           searchButtonIconColor: _getSearchIconColor(appController),

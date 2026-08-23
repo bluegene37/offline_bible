@@ -43,6 +43,10 @@ class BibleService {
 
   static Future<void> _load(String abbrev) async {
     final completer = Completer<void>();
+    // Nothing may be awaiting `ready` at the moment this fails, and a
+    // completer future carrying an unobserved error escalates to an unhandled
+    // zone error on top of the exception the caller already gets.
+    completer.future.catchError((Object _) {});
     _readyCompleter = completer;
     try {
       _initFailed = false;
@@ -57,14 +61,16 @@ class BibleService {
 
       // Parse and index off the UI thread; the KJV JSON alone is ~6.5MB.
       _data = await Isolate.run(
-          () => BibleData.fromFlatJson(json.decode(rawJson)));
+          () => BibleData.fromFlatJson(json.decode(rawJson) as List<dynamic>));
       _loadedVersion = abbrev;
 
       if (_bookTitles.isEmpty) {
         final bookTitlesData =
             await rootBundle.loadString('assets/booktitle.json');
-        final List<dynamic> titlesJson = json.decode(bookTitlesData);
-        _bookTitles = titlesJson.map((x) => BookTitle.fromJson(x)).toList();
+        final titlesJson = json.decode(bookTitlesData) as List<dynamic>;
+        _bookTitles = titlesJson
+            .map((x) => BookTitle.fromJson(x as Map<String, dynamic>))
+            .toList();
       }
 
       completer.complete();
@@ -75,10 +81,32 @@ class BibleService {
     }
   }
 
+  /// One verse from the loaded translation, or null if the data is not ready
+  /// or that reference does not exist in this translation. Synchronous because
+  /// the lookup is an index hit, not I/O.
+  static Book? verseOrNull(String bookTitle, int chapter, int verse) {
+    final data = _data;
+    if (data == null) return null;
+    for (final candidate in data.chapterVerses(bookTitle, chapter)) {
+      if (candidate.verse == verse) return candidate;
+    }
+    return null;
+  }
+
   Future<List<Book>> getVerses(String bookTitle, int chapter) async {
     final data = await _requireData();
     Get.find<AppController>().lastChapter = data.chapterCount(bookTitle);
     return data.chapterVerses(bookTitle, chapter);
+  }
+
+  /// A single verse from the active translation, or null if the reference
+  /// does not exist in it (verse numbering differs slightly between versions).
+  Future<Book?> getVerse(String bookTitle, int chapter, int verse) async {
+    final data = await _requireData();
+    for (final candidate in data.chapterVerses(bookTitle, chapter)) {
+      if (candidate.verse == verse) return candidate;
+    }
+    return null;
   }
 
   Future<List<Book>> getChapters(String bookTitle) async {
@@ -101,13 +129,21 @@ class BibleService {
     return _bookTitles.where((book) => book.testament == testament).toList();
   }
 
+  /// Verses scanned between yields. Sized so each slice stays well inside a
+  /// frame budget on a low-end device, letting the loading spinner animate
+  /// instead of freezing for the length of the scan.
+  static const int _searchChunkSize = 4000;
+
   Future<List<Book>> searchVerses(String query, {String scope = 'All'}) async {
-    if (query.trim().isEmpty) return [];
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
     final data = await _requireData();
 
-    final lowerQuery = query.toLowerCase().trim();
-    Set<String>? allowedBooks;
+    // A case-insensitive RegExp matches as fast as pre-lowercasing every verse
+    // but without retaining a second ~8MB copy of the whole Bible.
+    final matcher = RegExp(RegExp.escape(trimmed), caseSensitive: false);
 
+    Set<String>? allowedBooks;
     if (scope != 'All') {
       final testament = scope == 'Old Testament' ? 'old' : 'new';
       allowedBooks = _bookTitles
@@ -116,15 +152,27 @@ class BibleService {
           .toSet();
     }
 
-    return data.verses.where((verse) {
-      if (allowedBooks != null && !allowedBooks.contains(verse.book)) {
-        return false;
+    final verses = data.verses;
+    final results = <Book>[];
+    for (var start = 0; start < verses.length; start += _searchChunkSize) {
+      final end = (start + _searchChunkSize).clamp(0, verses.length);
+      for (var i = start; i < end; i++) {
+        final verse = verses[i];
+        if (allowedBooks != null && !allowedBooks.contains(verse.book)) {
+          continue;
+        }
+        // Matching the book name only on its first verse gives searches like
+        // "Romans" a single jump-to-book result instead of every verse in it.
+        if (matcher.hasMatch(verse.text) ||
+            (verse.chapter == 1 &&
+                verse.verse == 1 &&
+                matcher.hasMatch(verse.book))) {
+          results.add(verse);
+        }
       }
-      return verse.text.toLowerCase().contains(lowerQuery) ||
-          (verse.book.toLowerCase().contains(lowerQuery) &&
-              verse.chapter == 1 &&
-              verse.verse == 1);
-    }).toList();
+      if (end < verses.length) await Future<void>.delayed(Duration.zero);
+    }
+    return results;
   }
 
   Future<BibleData> _requireData() async {

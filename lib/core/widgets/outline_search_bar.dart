@@ -37,13 +37,24 @@ class OutlineSearchBar extends StatefulWidget {
 class _OutlineSearchBarState extends State<OutlineSearchBar> {
   late TextEditingController _controller;
 
+  /// Only set when this widget created the controller itself. A caller-owned
+  /// controller outlives this widget and must not be disposed here.
+  TextEditingController? _ownedController;
+
   @override
   void initState() {
     super.initState();
-    _controller = widget.textEditingController ?? TextEditingController();
+    _controller = widget.textEditingController ??
+        (_ownedController = TextEditingController());
     if (widget.initText != null && widget.initText!.isNotEmpty) {
       _controller.text = widget.initText!;
     }
+  }
+
+  @override
+  void dispose() {
+    _ownedController?.dispose();
+    super.dispose();
   }
 
   @override
