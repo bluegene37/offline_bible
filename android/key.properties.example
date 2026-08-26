@@ -1,0 +1,22 @@
+# Copy to android/key.properties (gitignored) and fill in your values.
+# Without this file, release builds fall back to DEBUG signing and cannot
+# be uploaded to Google Play.
+#
+# Create the keystore once with:
+#
+#   keytool -genkey -v \
+#     -keystore ~/keystores/offline_bible_upload.jks \
+#     -alias upload \
+#     -keyalg RSA -keysize 2048 -validity 10000 \
+#     -dname "CN=genexis.dev, O=genexis.dev"
+#
+# BACK UP THE KEYSTORE AND THESE PASSWORDS SOMEWHERE DURABLE (password
+# manager + offline copy). If the keystore is lost you permanently lose
+# the ability to update the app on Google Play under this signing key.
+
+# storeFile may be absolute, or relative to android/app/ (a keystore placed
+# at android/app/upload-keystore.jks is gitignored via **/*.jks).
+storeFile=/absolute/path/to/offline_bible_upload.jks
+storePassword=CHANGE_ME
+keyAlias=upload
+keyPassword=CHANGE_ME

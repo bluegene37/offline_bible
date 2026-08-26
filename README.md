@@ -24,11 +24,19 @@ flutter run
 
 ### Release builds
 
-- **Android**: requires `android/key.properties` with your release keystore
-  (`keyAlias`, `keyPassword`, `storeFile`, `storePassword`), then
-  `flutter build appbundle`.
-- **iOS/macOS**: open the workspace in Xcode with your signing team configured,
-  or use `flutter build ipa` / `flutter build macos`.
+Release targets are **Android** and **iOS** — see [RELEASING.md](RELEASING.md)
+for versioning rules, signing setup, and the tag-push release flow.
+
+```sh
+# Android (needs android/key.properties — see android/key.properties.example)
+flutter build appbundle --release --obfuscate --split-debug-info=build/symbols/android
+
+# iOS (needs your Apple team selected in Xcode automatic signing)
+flutter build ipa --release --obfuscate --split-debug-info=build/symbols/ios
+```
+
+Pushing a `v*` tag builds both platforms in CI and attaches the artifacts to
+a GitHub Release.
 
 ## Project structure
 
