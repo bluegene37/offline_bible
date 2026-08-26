@@ -51,7 +51,8 @@ class BottomNavigation extends StatelessWidget {
               child: NavigationBarTheme(
                 data: NavigationBarThemeData(
                   backgroundColor: Colors.transparent,
-                  indicatorColor: controller.activeThemeColor.withValues(alpha: isDark ? 0.35 : 0.2),
+                  indicatorColor: controller.activeThemeColor
+                      .withValues(alpha: isDark ? 0.35 : 0.2),
                   indicatorShape: const StadiumBorder(),
                   labelTextStyle: WidgetStateProperty.resolveWith((states) {
                     if (states.contains(WidgetState.selected)) {
@@ -69,7 +70,8 @@ class BottomNavigation extends StatelessWidget {
                   iconTheme: WidgetStateProperty.resolveWith((states) {
                     if (states.contains(WidgetState.selected)) {
                       return IconThemeData(
-                        color: isDark ? Colors.white : controller.activeThemeColor,
+                        color:
+                            isDark ? Colors.white : controller.activeThemeColor,
                       );
                     }
                     return IconThemeData(

@@ -6,10 +6,34 @@ import 'dart:convert';
 void main() {
   group('BibleData.fromFlatJson', () {
     final json = [
-      {'book_id': 'Gen', 'book_name': 'Genesis', 'chapter': 1, 'verse': 1, 'text': 'v1'},
-      {'book_id': 'Gen', 'book_name': 'Genesis', 'chapter': 1, 'verse': 2, 'text': 'v2'},
-      {'book_id': 'Gen', 'book_name': 'Genesis', 'chapter': 2, 'verse': 1, 'text': 'v3'},
-      {'book_id': 'Exo', 'book_name': 'Exodus', 'chapter': 1, 'verse': 1, 'text': 'v4'},
+      {
+        'book_id': 'Gen',
+        'book_name': 'Genesis',
+        'chapter': 1,
+        'verse': 1,
+        'text': 'v1'
+      },
+      {
+        'book_id': 'Gen',
+        'book_name': 'Genesis',
+        'chapter': 1,
+        'verse': 2,
+        'text': 'v2'
+      },
+      {
+        'book_id': 'Gen',
+        'book_name': 'Genesis',
+        'chapter': 2,
+        'verse': 1,
+        'text': 'v3'
+      },
+      {
+        'book_id': 'Exo',
+        'book_name': 'Exodus',
+        'chapter': 1,
+        'verse': 1,
+        'text': 'v4'
+      },
     ];
 
     test('indexes verses by book and chapter', () {

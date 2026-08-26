@@ -60,10 +60,7 @@ class Book {
 
   @override
   int get hashCode {
-    return id.hashCode ^
-        book.hashCode ^
-        chapter.hashCode ^
-        verse.hashCode;
+    return id.hashCode ^ book.hashCode ^ chapter.hashCode ^ verse.hashCode;
   }
 }
 

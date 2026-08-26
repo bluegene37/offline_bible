@@ -78,7 +78,8 @@ class AppController extends GetxController {
     // Restore last reading position before loading, so the first chapter
     // shown is the one the user was reading.
     final savedBook = StorageService.getSetting<String?>('lastReadBook', null);
-    final savedChapter = StorageService.getSetting<int?>('lastReadChapter', null);
+    final savedChapter =
+        StorageService.getSetting<int?>('lastReadChapter', null);
     if (savedBook != null && savedChapter != null) {
       bookSelected.value = savedBook;
       selectedChapter.value = savedChapter;
@@ -86,13 +87,15 @@ class AppController extends GetxController {
     }
 
     final bibleController = Get.find<BibleController>();
-    await bibleController.loadChapter(bookSelected.value, selectedChapter.value);
+    await bibleController.loadChapter(
+        bookSelected.value, selectedChapter.value);
 
     if (keepScreenOn.value) WakelockPlus.enable();
 
     // Warm the cross-reference index off the critical path so the first tap on
     // "Refs" does not pay a 3.5MB parse.
-    unawaited(CrossReferenceService.ensureLoaded().catchError((Object e, StackTrace s) {
+    unawaited(CrossReferenceService.ensureLoaded()
+        .catchError((Object e, StackTrace s) {
       ErrorReporter.recordHandled(e, s, context: 'cross-reference index');
     }));
     unawaited(RedLetterService.load().catchError((Object e, StackTrace s) {
@@ -119,7 +122,8 @@ class AppController extends GetxController {
       await BibleService.initialize(this);
       return;
     } catch (e, stack) {
-      ErrorReporter.recordHandled(e, stack, context: 'load ${bibleVersion.value}');
+      ErrorReporter.recordHandled(e, stack,
+          context: 'load ${bibleVersion.value}');
     }
 
     if (bibleVersion.value != AppConstants.defaultBibleVersion) {
@@ -163,8 +167,7 @@ class AppController extends GetxController {
     themeMode.value = _isEffectiveDark(themePref.value);
     bibleVersion.value = StorageService.getSetting(
         'bibleVersions', AppConstants.defaultBibleVersion);
-    if (!VersionService.catalog
-        .any((v) => v.abbrev == bibleVersion.value)) {
+    if (!VersionService.catalog.any((v) => v.abbrev == bibleVersion.value)) {
       // A version that has been withdrawn from the catalog (the mislabelled
       // French "Darby" shipped as English) would otherwise keep loading from
       // disk and rendering empty books. Drop it and fall back to KJV.
@@ -209,8 +212,8 @@ class AppController extends GetxController {
     // Migrate from the old 0-15 offset scale (rendered as 15 + offset px).
     final oldOffset = StorageService.getSetting<double?>('fontSize', null);
     if (oldOffset != null) {
-      return (15 + oldOffset).clamp(
-          AppConstants.minFontSize, AppConstants.maxFontSize);
+      return (15 + oldOffset)
+          .clamp(AppConstants.minFontSize, AppConstants.maxFontSize);
     }
     return AppConstants.defaultFontSize;
   }
@@ -222,8 +225,7 @@ class AppController extends GetxController {
       case 'light':
         return false;
       default:
-        return WidgetsBinding
-                .instance.platformDispatcher.platformBrightness ==
+        return WidgetsBinding.instance.platformDispatcher.platformBrightness ==
             Brightness.dark;
     }
   }
@@ -240,7 +242,8 @@ class AppController extends GetxController {
   }
 
   void _deriveAccentColors() {
-    final seed = AppColors.themeColors[colorThemeName.value] ?? AppColors.themeColors['Sapphire']!;
+    final seed = AppColors.themeColors[colorThemeName.value] ??
+        AppColors.themeColors['Sapphire']!;
     final lightScheme =
         ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.light);
     final darkScheme =

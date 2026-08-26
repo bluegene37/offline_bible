@@ -40,8 +40,11 @@ class VerseTile extends StatelessWidget {
         final hasNotes = notesCtrl?.hasNoteFor(verseKey) ?? false;
         final hasBookmark = notesCtrl?.hasBookmarkFor(verseKey) ?? false;
 
-        final bibleCtrl = Get.isRegistered<BibleController>() ? Get.find<BibleController>() : null;
-        final isAudioActive = bibleCtrl != null && bibleCtrl.activeAudioVerseIndex.value == index;
+        final bibleCtrl = Get.isRegistered<BibleController>()
+            ? Get.find<BibleController>()
+            : null;
+        final isAudioActive =
+            bibleCtrl != null && bibleCtrl.activeAudioVerseIndex.value == index;
 
         return ListTile(
           tileColor: isAudioActive
@@ -65,12 +68,13 @@ class VerseTile extends StatelessWidget {
                         child: Icon(Icons.bookmark,
                             color: controller.activeThemeColor, size: 20),
                       ),
-                    if (hasNotes) _buildNotesIcon(context, verseKey, controller),
+                    if (hasNotes)
+                      _buildNotesIcon(context, verseKey, controller),
                   ],
                 )
               : null,
-          title: _buildVerseText(context, controller, highlightIndex, isSelected,
-              isAudioActive),
+          title: _buildVerseText(
+              context, controller, highlightIndex, isSelected, isAudioActive),
           subtitle: isLastVerse ? _buildCopyrightText() : null,
           onTap: () {
             HapticFeedback.selectionClick();
@@ -100,7 +104,8 @@ class VerseTile extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: controller.globalFont.value,
                   fontSize: controller.fontSize.value * 0.65,
-                  color: _getTextColor(context, hasHighlight).withValues(alpha: 0.5),
+                  color: _getTextColor(context, hasHighlight)
+                      .withValues(alpha: 0.5),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -160,7 +165,8 @@ class VerseTile extends StatelessWidget {
       final start = range[0], end = range[1];
       if (start < cursor) continue; // defensive: ignore overlaps
       if (start > cursor) {
-        out.add(TextSpan(text: text.substring(cursor, start), style: baseStyle));
+        out.add(
+            TextSpan(text: text.substring(cursor, start), style: baseStyle));
       }
       out.add(TextSpan(text: text.substring(start, end), style: redStyle));
       cursor = end;

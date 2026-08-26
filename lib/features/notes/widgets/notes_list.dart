@@ -27,7 +27,8 @@ class NotesList extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.edit_note, size: 64, color: Colors.grey.shade400),
+                      Icon(Icons.edit_note,
+                          size: 64, color: Colors.grey.shade400),
                       const SizedBox(height: 16),
                       Text(
                         'No notes found',
@@ -85,10 +86,10 @@ class NotesList extends StatelessWidget {
     );
   }
 
-  Widget _buildNoteCard(Map<String, dynamic> note, String noteId, AppController appController,
-      NotesController notesController) {
-    final verseText = TextUtils.formatVerseKeysCompact(
-        NotesController.verseKeysOfNote(note));
+  Widget _buildNoteCard(Map<String, dynamic> note, String noteId,
+      AppController appController, NotesController notesController) {
+    final verseText =
+        TextUtils.formatVerseKeysCompact(NotesController.verseKeysOfNote(note));
 
     return GetBuilder<AppController>(
       builder: (controller) {
@@ -164,8 +165,8 @@ class NotesList extends StatelessWidget {
     FocusScope.of(context).unfocus();
   }
 
-  void _handleMenuAction(
-      String action, String noteId, Map<String, dynamic> note, NotesController notesController) {
+  void _handleMenuAction(String action, String noteId,
+      Map<String, dynamic> note, NotesController notesController) {
     switch (action) {
       case 'edit':
         _showEditDialog(noteId, note, notesController);
@@ -180,8 +181,8 @@ class NotesList extends StatelessWidget {
     }
   }
 
-  void _showEditDialog(
-      String noteId, Map<String, dynamic> note, NotesController notesController) {
+  void _showEditDialog(String noteId, Map<String, dynamic> note,
+      NotesController notesController) {
     Get.bottomSheet(
       NoteEditorSheet(
         verseKeys: NotesController.verseKeysOfNote(note),

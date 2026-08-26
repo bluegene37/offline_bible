@@ -22,8 +22,7 @@ class BibleService {
 
   /// Completes when the current initialize/switch finishes (with an error if
   /// loading failed), so callers can await instead of polling.
-  static Future<void> get ready =>
-      _readyCompleter?.future ?? Future.value();
+  static Future<void> get ready => _readyCompleter?.future ?? Future.value();
 
   // Initialize the service by loading data from assets or a downloaded file
   static Future<void> initialize(AppController controller) async {
@@ -55,8 +54,8 @@ class BibleService {
       if (VersionService.byAbbrev(abbrev).bundled) {
         rawJson = await rootBundle.loadString('assets/kjv.json');
       } else {
-        rawJson = await (await VersionService.versionFile(abbrev))
-            .readAsString();
+        rawJson =
+            await (await VersionService.versionFile(abbrev)).readAsString();
       }
 
       // Parse and index off the UI thread; the KJV JSON alone is ~6.5MB.

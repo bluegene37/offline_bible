@@ -165,7 +165,9 @@ class CrossReferenceSheet extends StatelessWidget {
       if (ref.isRange) buffer.write('[$v] ');
       buffer.write(verse.text);
     }
-    return buffer.isEmpty ? 'Not available in this translation.' : buffer.toString();
+    return buffer.isEmpty
+        ? 'Not available in this translation.'
+        : buffer.toString();
   }
 
   Widget _buildAttribution(BuildContext context) {

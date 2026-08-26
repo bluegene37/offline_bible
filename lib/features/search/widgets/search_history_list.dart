@@ -12,7 +12,8 @@ class SearchHistoryList extends StatelessWidget {
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -20,7 +21,8 @@ class SearchHistoryList extends StatelessWidget {
                     controller.searchHistory.isNotEmpty
                         ? 'Recent Searches'
                         : 'No Search History',
-                    style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
                   if (controller.searchHistory.isNotEmpty)
                     TextButton.icon(
@@ -38,7 +40,8 @@ class SearchHistoryList extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.manage_search, size: 64, color: Colors.grey.shade400),
+                        Icon(Icons.manage_search,
+                            size: 64, color: Colors.grey.shade400),
                         const SizedBox(height: 16),
                         Text(
                           'No search history',
@@ -53,37 +56,35 @@ class SearchHistoryList extends StatelessWidget {
                   );
                 }
                 return ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: controller.searchHistory.length,
-                    itemBuilder: (context, index) {
-                      final reversedIndex =
-                          controller.searchHistory.length - 1 - index;
-                      final historyItem =
-                          controller.searchHistory[reversedIndex];
-                      final historyKey = historyItem['id'] as String;
-                      final historyQuery = historyItem['query'] as String;
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: controller.searchHistory.length,
+                  itemBuilder: (context, index) {
+                    final reversedIndex =
+                        controller.searchHistory.length - 1 - index;
+                    final historyItem = controller.searchHistory[reversedIndex];
+                    final historyKey = historyItem['id'] as String;
+                    final historyQuery = historyItem['query'] as String;
 
-                      // Limit history to 25 items
-                      if (index > 25) {
-                        controller.deleteHistoryItem(historyKey);
-                        return const SizedBox.shrink();
-                      }
+                    // Limit history to 25 items
+                    if (index > 25) {
+                      controller.deleteHistoryItem(historyKey);
+                      return const SizedBox.shrink();
+                    }
 
-                      return Card(
-                        child: ListTile(
-                          title: Text(historyQuery),
-                          subtitle: Text(historyKey),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () =>
-                                controller.deleteHistoryItem(historyKey),
-                          ),
-                          onTap: () =>
-                              controller.selectHistoryItem(historyQuery),
+                    return Card(
+                      child: ListTile(
+                        title: Text(historyQuery),
+                        subtitle: Text(historyKey),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () =>
+                              controller.deleteHistoryItem(historyKey),
                         ),
-                      );
-                    },
-                  );
+                        onTap: () => controller.selectHistoryItem(historyQuery),
+                      ),
+                    );
+                  },
+                );
               }),
             ),
           ],

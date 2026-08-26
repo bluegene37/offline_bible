@@ -27,7 +27,9 @@ class TtsService {
   int get currentVerseIndex => _currentVerseIndex;
 
   Future<void> init() async {
-    if (_flutterTts != null) return;
+    if (_flutterTts != null) {
+      return;
+    }
     _flutterTts = FlutterTts();
 
     if (Platform.isIOS) {
@@ -64,7 +66,8 @@ class TtsService {
   }
 
   void _onSpeechCompleted() {
-    if (_ttsState == TtsState.playing && _currentVerseIndex + 1 < _currentVersesText.length) {
+    if (_ttsState == TtsState.playing &&
+        _currentVerseIndex + 1 < _currentVersesText.length) {
       _currentVerseIndex++;
       _onVerseChanged?.call(_currentVerseIndex);
       _speakCurrentVerse();
@@ -81,10 +84,13 @@ class TtsService {
     void Function(TtsState state)? onStateChanged,
   }) async {
     await init();
-    if (versesText.isEmpty) return;
+    if (versesText.isEmpty) {
+      return;
+    }
 
     _currentVersesText = versesText;
-    _currentVerseIndex = (startIndex >= 0 && startIndex < versesText.length) ? startIndex : 0;
+    _currentVerseIndex =
+        (startIndex >= 0 && startIndex < versesText.length) ? startIndex : 0;
     _onVerseChanged = onVerseChanged;
     _onStateChanged = onStateChanged;
 
@@ -94,7 +100,10 @@ class TtsService {
   }
 
   Future<void> _speakCurrentVerse() async {
-    if (_flutterTts == null || _currentVerseIndex >= _currentVersesText.length) return;
+    if (_flutterTts == null ||
+        _currentVerseIndex >= _currentVersesText.length) {
+      return;
+    }
     final text = _currentVersesText[_currentVerseIndex];
     if (text.trim().isEmpty) {
       _onSpeechCompleted();

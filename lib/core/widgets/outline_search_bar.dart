@@ -68,7 +68,8 @@ class _OutlineSearchBarState extends State<OutlineSearchBar> {
         textInputAction: TextInputAction.search,
         decoration: InputDecoration(
           hintText: widget.hintText,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
           prefixIcon: IconButton(
             icon: Icon(Icons.search, color: widget.searchButtonIconColor),
             onPressed: () {

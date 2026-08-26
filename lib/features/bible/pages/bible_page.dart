@@ -35,8 +35,7 @@ class BiblePage extends StatelessWidget {
 
     return Scaffold(
       // Paper, not the themed app surface — see AppColors.paperLight.
-      backgroundColor:
-          isDark ? AppColors.paperDark : AppColors.paperLight,
+      backgroundColor: isDark ? AppColors.paperDark : AppColors.paperLight,
       body: GetBuilder<BibleController>(
         builder: (controller) {
           return GestureDetector(

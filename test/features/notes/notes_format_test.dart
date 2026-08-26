@@ -9,8 +9,7 @@ void main() {
         'verses': ['John:1:1', 'John:1:2'],
         'notes': 'hello',
       };
-      expect(NotesController.verseKeysOfNote(note),
-          ['John:1:1', 'John:1:2']);
+      expect(NotesController.verseKeysOfNote(note), ['John:1:1', 'John:1:2']);
     });
 
     test('falls back to the legacy stringified format', () {
@@ -18,8 +17,7 @@ void main() {
         'book': '[John:1:1, John:1:2]',
         'notes': 'hello',
       };
-      expect(NotesController.verseKeysOfNote(note),
-          ['John:1:1', 'John:1:2']);
+      expect(NotesController.verseKeysOfNote(note), ['John:1:1', 'John:1:2']);
     });
 
     test('prefers list format when both are present', () {

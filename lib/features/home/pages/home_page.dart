@@ -39,7 +39,8 @@ class HomePage extends StatelessWidget {
     });
   }
 
-  PreferredSizeWidget _buildAppBar(AppController controller, BuildContext context, int currentIndex) {
+  PreferredSizeWidget _buildAppBar(
+      AppController controller, BuildContext context, int currentIndex) {
     if (currentIndex == AppConstants.biblePageIndex) {
       return AppBar(
         centerTitle: true,
@@ -52,7 +53,8 @@ class HomePage extends StatelessWidget {
               },
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -61,9 +63,10 @@ class HomePage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Obx(() => Text(
-                      '${controller.bookSelected.value} ${controller.selectedChapter.value}',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    )),
+                          '${controller.bookSelected.value} ${controller.selectedChapter.value}',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
+                        )),
                     const SizedBox(width: 4),
                     const Icon(Icons.keyboard_arrow_down, size: 18),
                   ],
@@ -80,7 +83,8 @@ class HomePage extends StatelessWidget {
               },
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -89,9 +93,10 @@ class HomePage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Obx(() => Text(
-                      controller.bibleVersion.value.toUpperCase(),
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                    )),
+                          controller.bibleVersion.value.toUpperCase(),
+                          style: const TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w600),
+                        )),
                     const SizedBox(width: 4),
                     const Icon(Icons.keyboard_arrow_down, size: 18),
                   ],
@@ -121,15 +126,15 @@ class HomePage extends StatelessWidget {
       centerTitle: true,
       elevation: 0,
       title: Obx(() => Text(
-        currentIndex == AppConstants.chaptersPageIndex
-            ? controller.bookSelected.value
-            : controller.barTitle.value,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          letterSpacing: -0.5,
-        ),
-      )),
+            currentIndex == AppConstants.chaptersPageIndex
+                ? controller.bookSelected.value
+                : controller.barTitle.value,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.5,
+            ),
+          )),
     );
   }
 

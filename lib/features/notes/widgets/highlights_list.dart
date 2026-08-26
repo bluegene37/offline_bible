@@ -23,7 +23,8 @@ class HighlightsList extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.highlight_alt, size: 64, color: Colors.grey.shade400),
+                Icon(Icons.highlight_alt,
+                    size: 64, color: Colors.grey.shade400),
                 const SizedBox(height: 16),
                 Text(
                   'No highlights yet',
@@ -58,17 +59,20 @@ class HighlightsList extends StatelessWidget {
     );
   }
 
-  Widget _buildHighlightCard(Map<String, dynamic> highlight, String highlightKey,
-      AppController appController, NotesController notesController) {
+  Widget _buildHighlightCard(
+      Map<String, dynamic> highlight,
+      String highlightKey,
+      AppController appController,
+      NotesController notesController) {
     // A stored index can outlive the palette it was written against, so clamp
     // rather than index blindly — an out-of-range value used to take down the
     // whole list, not just one card.
     final rawColorIndex = highlight['color'];
     final colorIndex = rawColorIndex is int ? rawColorIndex : 0;
-    final highlightColor = (colorIndex >= 0 &&
-            colorIndex < AppColors.highlightColors.length)
-        ? AppColors.highlightColors[colorIndex]
-        : AppColors.highlightColors[0];
+    final highlightColor =
+        (colorIndex >= 0 && colorIndex < AppColors.highlightColors.length)
+            ? AppColors.highlightColors[colorIndex]
+            : AppColors.highlightColors[0];
 
     return GetBuilder<AppController>(
       builder: (controller) {
@@ -142,7 +146,8 @@ class HighlightsList extends StatelessWidget {
       bibleController.pendingScrollVerseIndex = verse - 1;
       bibleController.loadChapter(bookTitle, chapter);
 
-      appController.navigateToPage(AppConstants.biblePageIndex); // Switch to Bible tab
+      appController
+          .navigateToPage(AppConstants.biblePageIndex); // Switch to Bible tab
     }
   }
 

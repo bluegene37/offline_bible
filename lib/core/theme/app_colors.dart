@@ -61,7 +61,7 @@ class AppColors {
   // Background colors for the reader
   static const Color lightBackground = Color(0xFFFFFFFF);
   static const Color darkBackground = Color(0xFF000000);
-  
+
   // App bar and navigation translucency
   static const Color lightTranslucent = Color(0xD9FFFFFF);
   static const Color darkTranslucent = Color(0xD9000000);

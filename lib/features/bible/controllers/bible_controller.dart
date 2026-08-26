@@ -302,13 +302,13 @@ class BibleController extends GetxController {
   void toggleBookmarks(List<String> verseKeys) {
     final timestamp = DateUtils.timestampNow();
     int added = 0;
-    
+
     for (final key in verseKeys) {
       if (StorageService.bookmarksBox.containsKey(key)) {
         StorageService.bookmarksBox.delete(key);
       } else {
-        final verse = currentVerses
-            .firstWhereOrNull((v) => '${v.book}:${v.chapter}:${v.verse}' == key);
+        final verse = currentVerses.firstWhereOrNull(
+            (v) => '${v.book}:${v.chapter}:${v.verse}' == key);
         if (verse != null) {
           final bookmarkData = {
             'datetime': timestamp,
@@ -323,12 +323,12 @@ class BibleController extends GetxController {
         }
       }
     }
-    
+
     appController.clearTextSelection();
-    Get.snackbar(
-        'Bookmarks', added > 0 ? 'Added to bookmarks' : 'Removed from bookmarks',
+    Get.snackbar('Bookmarks',
+        added > 0 ? 'Added to bookmarks' : 'Removed from bookmarks',
         snackPosition: SnackPosition.BOTTOM);
-    appController.update(); 
+    appController.update();
     if (Get.isRegistered<NotesController>()) {
       Get.find<NotesController>().loadBookmarks();
     }

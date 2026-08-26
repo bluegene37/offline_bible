@@ -147,7 +147,8 @@ class NotesController extends GetxController {
       ..clear()
       ..addAll(StorageService.bookmarksBox.keys.map((k) => k.toString()));
 
-    final Map<dynamic, dynamic> rawBookmarks = StorageService.bookmarksBox.toMap();
+    final Map<dynamic, dynamic> rawBookmarks =
+        StorageService.bookmarksBox.toMap();
     bookmarks.value = rawBookmarks.entries.map((entry) {
       final bookmark = Map<String, dynamic>.from(entry.value as Map);
       bookmark['id'] = entry.key.toString();

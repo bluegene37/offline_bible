@@ -103,12 +103,10 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
       padding: const EdgeInsets.all(12),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: (_appController.activeThemeShade)
-            .withValues(alpha: 0.3),
+        color: (_appController.activeThemeShade).withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color:
-              _appController.activeThemeShade,
+          color: _appController.activeThemeShade,
         ),
       ),
       child: Text(
@@ -170,8 +168,7 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
             height: 50,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    _appController.activeThemeColor,
+                backgroundColor: _appController.activeThemeColor,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
                 elevation: 0,

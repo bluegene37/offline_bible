@@ -60,8 +60,8 @@ class _QuickPickerSheetState extends State<QuickPickerSheet> {
                   Text(
                     'Select Chapter',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const Spacer(),
                   IconButton(
@@ -85,56 +85,56 @@ class _QuickPickerSheetState extends State<QuickPickerSheet> {
     final bibleController = Get.find<BibleController>();
 
     return FutureBuilder<List<Book>>(
-      future: BibleService().getChapters(currentBook),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        future: BibleService().getChapters(currentBook),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        final chapters = snapshot.data!;
-        
-        return GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-          ),
-          itemCount: chapters.length,
-          itemBuilder: (context, index) {
-            final chapterNumber = index + 1;
-            final isCurrentSelection = chapterNumber == appController.selectedChapter.value;
+          final chapters = snapshot.data!;
 
-            return InkWell(
-              onTap: () {
-                appController.updateBookSelection(currentBook, chapterNumber);
-                bibleController.loadChapter(currentBook, chapterNumber);
-                Navigator.pop(context);
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isCurrentSelection 
-                      ? Theme.of(context).primaryColor 
-                      : Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '$chapterNumber',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: isCurrentSelection 
-                        ? Colors.white 
-                        : Theme.of(context).primaryColor,
+          return GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 5,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+            ),
+            itemCount: chapters.length,
+            itemBuilder: (context, index) {
+              final chapterNumber = index + 1;
+              final isCurrentSelection =
+                  chapterNumber == appController.selectedChapter.value;
+
+              return InkWell(
+                onTap: () {
+                  appController.updateBookSelection(currentBook, chapterNumber);
+                  bibleController.loadChapter(currentBook, chapterNumber);
+                  Navigator.pop(context);
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isCurrentSelection
+                        ? Theme.of(context).primaryColor
+                        : Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '$chapterNumber',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isCurrentSelection
+                          ? Colors.white
+                          : Theme.of(context).primaryColor,
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        );
-      }
-    );
+              );
+            },
+          );
+        });
   }
 }

@@ -17,6 +17,7 @@ class _VersionManagerSheetState extends State<VersionManagerSheet> {
   final AppController _appController = Get.find<AppController>();
   Set<String> _downloaded = {};
   final Set<String> _downloading = {};
+
   /// abbrev -> 0.0-1.0, or -1 when the server sent no content length.
   final Map<String, double> _progress = {};
   Map<String, int> _sizes = {};
@@ -148,9 +149,7 @@ class _VersionManagerSheetState extends State<VersionManagerSheet> {
     if (version.bundled) return '$code • Included';
     if (isAvailable) {
       final size = _formatSize(_sizes[version.abbrev] ?? 0);
-      return size.isEmpty
-          ? '$code • Downloaded'
-          : '$code • Downloaded ($size)';
+      return size.isEmpty ? '$code • Downloaded' : '$code • Downloaded ($size)';
     }
     return '$code • Tap to download (about 9 MB)';
   }

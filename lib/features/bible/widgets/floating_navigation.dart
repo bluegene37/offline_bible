@@ -126,9 +126,8 @@ class FloatingNavigation extends StatelessWidget {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = appController.activeThemeColor;
-    final textColor = isEnabled
-        ? primaryColor
-        : (isDark ? Colors.white38 : Colors.black38);
+    final textColor =
+        isEnabled ? primaryColor : (isDark ? Colors.white38 : Colors.black38);
 
     return Expanded(
       child: InkWell(

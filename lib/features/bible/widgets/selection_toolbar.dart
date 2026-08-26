@@ -147,87 +147,88 @@ class SelectionToolbar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-        _buildActionButton(
-          context,
-          icon: Icons.hub_outlined,
-          label: 'Refs',
-          onTap: () {
-            HapticFeedback.selectionClick();
-            final keys = controller.textUnderline.toList();
-            if (keys.isEmpty) return;
-            // Cross-references are per verse; use the first of a selection.
-            CrossReferenceSheet.show(context, keys.first);
-          },
-        ),
-        _buildActionButton(
-          context,
-          icon: Icons.copy_rounded,
-          label: 'Copy',
-          onTap: () {
-            HapticFeedback.selectionClick();
-            bibleController.copyVerses(controller.textUnderline.toList());
-          },
-        ),
-        _buildActionButton(
-          context,
-          icon: Icons.edit_note_rounded,
-          label: 'Note',
-          onTap: () {
-            HapticFeedback.selectionClick();
-            _openNoteEditor(context, controller.textUnderline.toList());
-          },
-        ),
-        _buildActionButton(
-          context,
-          icon: Icons.share_rounded,
-          label: 'Share',
-          onTap: () {
-            HapticFeedback.selectionClick();
-            bibleController.shareVerses(controller.textUnderline.toList());
-          },
-        ),
-        _buildActionButton(
-          context,
-          icon: Icons.bookmark_add_rounded,
-          label: 'Bookmark',
-          onTap: () {
-            HapticFeedback.selectionClick();
-            bibleController.toggleBookmarks(controller.textUnderline.toList());
-          },
-        ),
-        _buildActionButton(
-          context,
-          icon: Icons.record_voice_over_rounded,
-          label: 'Speak',
-          onTap: () {
-            HapticFeedback.selectionClick();
-            final keys = controller.textUnderline.toList();
-            if (keys.isNotEmpty) {
-              final firstKey = keys.first;
-              final index = bibleController.currentVerses.indexWhere(
-                  (v) => '${v.book}:${v.chapter}:${v.verse}' == firstKey);
-              if (index != -1) {
-                bibleController.startChapterAudio(startIndex: index);
+          _buildActionButton(
+            context,
+            icon: Icons.hub_outlined,
+            label: 'Refs',
+            onTap: () {
+              HapticFeedback.selectionClick();
+              final keys = controller.textUnderline.toList();
+              if (keys.isEmpty) return;
+              // Cross-references are per verse; use the first of a selection.
+              CrossReferenceSheet.show(context, keys.first);
+            },
+          ),
+          _buildActionButton(
+            context,
+            icon: Icons.copy_rounded,
+            label: 'Copy',
+            onTap: () {
+              HapticFeedback.selectionClick();
+              bibleController.copyVerses(controller.textUnderline.toList());
+            },
+          ),
+          _buildActionButton(
+            context,
+            icon: Icons.edit_note_rounded,
+            label: 'Note',
+            onTap: () {
+              HapticFeedback.selectionClick();
+              _openNoteEditor(context, controller.textUnderline.toList());
+            },
+          ),
+          _buildActionButton(
+            context,
+            icon: Icons.share_rounded,
+            label: 'Share',
+            onTap: () {
+              HapticFeedback.selectionClick();
+              bibleController.shareVerses(controller.textUnderline.toList());
+            },
+          ),
+          _buildActionButton(
+            context,
+            icon: Icons.bookmark_add_rounded,
+            label: 'Bookmark',
+            onTap: () {
+              HapticFeedback.selectionClick();
+              bibleController
+                  .toggleBookmarks(controller.textUnderline.toList());
+            },
+          ),
+          _buildActionButton(
+            context,
+            icon: Icons.record_voice_over_rounded,
+            label: 'Speak',
+            onTap: () {
+              HapticFeedback.selectionClick();
+              final keys = controller.textUnderline.toList();
+              if (keys.isNotEmpty) {
+                final firstKey = keys.first;
+                final index = bibleController.currentVerses.indexWhere(
+                    (v) => '${v.book}:${v.chapter}:${v.verse}' == firstKey);
+                if (index != -1) {
+                  bibleController.startChapterAudio(startIndex: index);
+                }
               }
-            }
-            controller.clearTextSelection();
-          },
-        ),
-        Container(
-          height: 24,
-          width: 1,
-          color: Theme.of(context).dividerColor,
-        ),
-        _buildActionButton(
-          context,
-          icon: Icons.close_rounded,
-          label: 'Close',
-          isDestructive: true,
-          onTap: () {
-            HapticFeedback.selectionClick();
-            controller.clearTextSelection();
-          },
-        ),
+              controller.clearTextSelection();
+            },
+          ),
+          Container(
+            height: 24,
+            width: 1,
+            color: Theme.of(context).dividerColor,
+          ),
+          _buildActionButton(
+            context,
+            icon: Icons.close_rounded,
+            label: 'Close',
+            isDestructive: true,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              controller.clearTextSelection();
+            },
+          ),
         ],
       ),
     );

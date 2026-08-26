@@ -72,7 +72,8 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   static ThemeData buildLightTheme(String colorThemeName, String fontFamily) {
-    final seedColor = AppColors.themeColors[colorThemeName] ?? AppColors.themeColors['Sapphire']!;
+    final seedColor = AppColors.themeColors[colorThemeName] ??
+        AppColors.themeColors['Sapphire']!;
     final baseScheme = ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: Brightness.light,
@@ -109,7 +110,8 @@ class MyApp extends StatelessWidget {
   }
 
   static ThemeData buildDarkTheme(String colorThemeName, String fontFamily) {
-    final seedColor = AppColors.themeColors[colorThemeName] ?? AppColors.themeColors['Sapphire']!;
+    final seedColor = AppColors.themeColors[colorThemeName] ??
+        AppColors.themeColors['Sapphire']!;
     final colorScheme = ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: Brightness.dark,

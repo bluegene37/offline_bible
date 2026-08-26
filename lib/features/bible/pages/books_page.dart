@@ -61,7 +61,8 @@ class _BooksPageState extends State<BooksPage> {
                       ),
                       contentPadding: EdgeInsets.zero,
                     ),
-                    onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
+                    onChanged: (value) =>
+                        setState(() => _searchQuery = value.toLowerCase()),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -129,23 +130,24 @@ class _BooksPageState extends State<BooksPage> {
       itemCount: displayBooks.length,
       itemBuilder: (context, index) {
         final book = displayBooks[index];
-        
+
         return Obx(() {
           final isSelected = appController.bookSelected.value == book.key;
           // The book name follows the reading font size; the chapter/verse
           // count deliberately does not, so the counts stay a quiet caption
           // however large the titles get.
           final nameSize = appController.fontSize.value;
-          
+
           return InkWell(
             onTap: () => _selectBook(book.key),
             borderRadius: BorderRadius.circular(8),
             child: Container(
               margin: const EdgeInsets.only(bottom: 2.0),
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
               decoration: BoxDecoration(
-                color: isSelected 
-                    ? Theme.of(context).primaryColor.withValues(alpha: 0.1) 
+                color: isSelected
+                    ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -165,8 +167,9 @@ class _BooksPageState extends State<BooksPage> {
                           style: TextStyle(
                             fontWeight:
                                 isSelected ? FontWeight.bold : FontWeight.w500,
-                            color:
-                                isSelected ? Theme.of(context).primaryColor : null,
+                            color: isSelected
+                                ? Theme.of(context).primaryColor
+                                : null,
                             fontSize: nameSize,
                             height: 1.25,
                           ),
@@ -178,7 +181,9 @@ class _BooksPageState extends State<BooksPage> {
                             fontSize: 11.5,
                             height: 1.3,
                             color: isSelected
-                                ? Theme.of(context).primaryColor.withValues(alpha: 0.75)
+                                ? Theme.of(context)
+                                    .primaryColor
+                                    .withValues(alpha: 0.75)
                                 : Theme.of(context)
                                     .textTheme
                                     .bodySmall
@@ -190,7 +195,8 @@ class _BooksPageState extends State<BooksPage> {
                     ),
                   ),
                   if (isSelected)
-                    Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor),
+                    Icon(Icons.check,
+                        size: 16, color: Theme.of(context).primaryColor),
                 ],
               ),
             ),

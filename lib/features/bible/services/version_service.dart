@@ -113,7 +113,7 @@ class VersionService {
     final files = await dir.list().toList();
     return files
         .whereType<File>()
-        .where((f) => f.path.endsWith('.json'))  // .json.part is excluded
+        .where((f) => f.path.endsWith('.json')) // .json.part is excluded
         .map((f) => f.uri.pathSegments.last.replaceAll('.json', ''))
         .toList();
   }

@@ -19,7 +19,8 @@ class BookmarksList extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.bookmark_border, size: 64, color: Colors.grey.shade400),
+              Icon(Icons.bookmark_border,
+                  size: 64, color: Colors.grey.shade400),
               const SizedBox(height: 16),
               Text(
                 'No bookmarks yet',
@@ -49,16 +50,16 @@ class BookmarksList extends StatelessWidget {
           final String date =
               du.DateUtils.formatForDisplay(bookmark['datetime']?.toString());
           final String book = bookmark['book']?.toString() ?? '';
-          final int chapter = bookmark['chapter'] is int
-              ? bookmark['chapter'] as int
-              : 0;
+          final int chapter =
+              bookmark['chapter'] is int ? bookmark['chapter'] as int : 0;
           final int verse =
               bookmark['verse'] is int ? bookmark['verse'] as int : 0;
           final String reference = '$book $chapter:$verse';
 
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: InkWell(
               onTap: () {
                 appController.navigateToVerse(book, chapter, verse);
@@ -87,8 +88,10 @@ class BookmarksList extends StatelessWidget {
                           onPressed: () {
                             UiUtils.showConfirmationDialog(
                               title: 'Delete Bookmark',
-                              content: 'Are you sure you want to delete this bookmark?',
-                              onConfirm: () => notesController.deleteBookmark(key),
+                              content:
+                                  'Are you sure you want to delete this bookmark?',
+                              onConfirm: () =>
+                                  notesController.deleteBookmark(key),
                             );
                           },
                           constraints: const BoxConstraints(),

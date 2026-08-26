@@ -18,7 +18,8 @@ class ContinueReadingCard extends StatelessWidget {
 
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 2,
           child: Container(
             decoration: BoxDecoration(
@@ -74,7 +75,9 @@ class ContinueReadingCard extends StatelessWidget {
                             '• $timeAgo',
                             style: TextStyle(
                               fontSize: 11,
-                              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+                              color: isDarkMode
+                                  ? Colors.grey.shade400
+                                  : Colors.grey.shade600,
                             ),
                           ),
                         ],
@@ -98,12 +101,15 @@ class ContinueReadingCard extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                   ),
                   onPressed: () {
-                    controller.navigateToPage(AppConstants.biblePageIndex); // Go to Bible page
+                    controller.navigateToPage(
+                        AppConstants.biblePageIndex); // Go to Bible page
                   },
-                  child: const Text('Resume', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: const Text('Resume',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ],
             ),

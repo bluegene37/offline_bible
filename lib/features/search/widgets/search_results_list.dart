@@ -54,7 +54,9 @@ class SearchResultsList extends StatelessWidget {
                       term: query,
                       textStyle: TextStyle(
                         fontSize: 15,
-                        color: appCtrl.themeMode.value ? Colors.white : Colors.black87,
+                        color: appCtrl.themeMode.value
+                            ? Colors.white
+                            : Colors.black87,
                         fontWeight: FontWeight.w400,
                         fontStyle: FontStyle.italic,
                       ),
@@ -70,7 +72,9 @@ class SearchResultsList extends StatelessWidget {
                       term: query,
                       textStyle: TextStyle(
                         fontSize: 17,
-                        color: appCtrl.themeMode.value ? Colors.white : Colors.black87,
+                        color: appCtrl.themeMode.value
+                            ? Colors.white
+                            : Colors.black87,
                         fontWeight: FontWeight.w300,
                       ),
                       textStyleHighlight: TextStyle(

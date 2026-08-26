@@ -169,9 +169,7 @@ class _ChapterPageState extends State<ChapterPage> {
                   margin: const EdgeInsets.all(5.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isSelected
-                        ? (controller.activeThemeShade)
-                        : null,
+                    color: isSelected ? (controller.activeThemeShade) : null,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -181,7 +179,8 @@ class _ChapterPageState extends State<ChapterPage> {
                         maxLines: 1,
                         style: TextStyle(
                           fontSize: fontSize,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w300,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.w300,
                           color: isSelected
                               ? (controller.themeMode.value
                                   ? Colors.white
@@ -207,6 +206,7 @@ class _ChapterPageState extends State<ChapterPage> {
       controller.bookSelected.value,
       chapterNumber,
     );
-    controller.navigateToPage(AppConstants.biblePageIndex); // Navigate to Bible page
+    controller
+        .navigateToPage(AppConstants.biblePageIndex); // Navigate to Bible page
   }
 }

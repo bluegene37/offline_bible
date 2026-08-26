@@ -44,7 +44,8 @@ class ErrorReporter {
 
   /// Report a caught, non-fatal error that the app recovered from. Use this
   /// where a `catch` swallows something the user cannot act on.
-  static void recordHandled(Object error, StackTrace? stack, {String? context}) {
+  static void recordHandled(Object error, StackTrace? stack,
+      {String? context}) {
     _forwardToReporter(error, stack, context: context, fatal: false);
   }
 
