@@ -287,6 +287,10 @@ class BibleController extends GetxController {
       'book': verseKeys.toString(),
       'stamp': timestamp,
       'notes': notes,
+      // The translation the note was written against. Without it the list
+      // labelled every note with whatever version happened to be loaded, so
+      // switching translations silently relabelled the whole history.
+      'version': appController.bibleVersion.value,
     };
 
     StorageService.notesBox.put(noteId, noteData);
