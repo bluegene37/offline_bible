@@ -84,7 +84,8 @@ class HighlightsList extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: " $highlightKey - ${highlight['version']} ",
+                    text: ' $highlightKey - '
+                        '${NotesController.versionOfNote(highlight, appController.bibleVersion.value)} ',
                     style: const TextStyle(
                       color: Colors.black54,
                       fontSize: 13,
