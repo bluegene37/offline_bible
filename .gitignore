@@ -83,3 +83,30 @@ key.properties
 android/key.properties
 android/app/*.jks
 android/app/*.keystore
+
+# AI assistant files & generated notes
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.claude/
+.gstack/
+.cursor/
+.windsurf/
+.antigravity/
+docs/
+plans/
+specs/
+
+# Documentation not needed to build or run the app
+CHANGELOG.md
+CONTRIBUTING.md
+RELEASING.md
+SECURITY.md
+branding/README.md
+store/
+.github/ISSUE_TEMPLATE/
+.github/pull_request_template.md
+
+# Stray / unused
+archive/
+package-lock.json
