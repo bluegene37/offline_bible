@@ -57,6 +57,8 @@ app.*.map.json
 /android/.gradle
 /android/captures/
 /android/app/.cxx
+.kotlin/
+*.kotlin/
 
 # iOS / macOS build outputs & Flutter artifacts
 **/ios/Flutter/Generated.xcconfig
