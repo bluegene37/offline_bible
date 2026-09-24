@@ -25,15 +25,17 @@ class QuickDisplaySheet extends StatelessWidget {
     return Material(
       color: bgColor,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      child: Padding(
-        padding:
-            const EdgeInsets.only(bottom: 32, left: 24, right: 24, top: 12),
-        // Scrollable because the sheet is now tall enough to overrun a short
-        // screen once the system text scale is turned up.
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding:
+              const EdgeInsets.only(bottom: 24, left: 24, right: 24, top: 12),
+          // Scrollable because the sheet is now tall enough to overrun a short
+          // screen once the system text scale is turned up.
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               Container(
                 width: 40,
                 height: 4,
@@ -136,10 +138,12 @@ class QuickDisplaySheet extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               const ColorPicker(),
+              const SizedBox(height: 8),
             ],
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }

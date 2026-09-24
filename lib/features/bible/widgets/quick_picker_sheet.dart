@@ -39,9 +39,11 @@ class _QuickPickerSheetState extends State<QuickPickerSheet> {
     return Material(
       color: bgColor,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: Column(
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: Column(
           children: [
             const SizedBox(height: 12),
             Container(
@@ -78,7 +80,8 @@ class _QuickPickerSheetState extends State<QuickPickerSheet> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildChaptersGrid() {

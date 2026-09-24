@@ -37,9 +37,11 @@ class CrossReferenceSheet extends StatelessWidget {
     return Material(
       color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.7,
-        child: Column(
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: Column(
           children: [
             const SizedBox(height: 12),
             Container(
@@ -88,7 +90,8 @@ class CrossReferenceSheet extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildList(BuildContext context, AppController appController) {
