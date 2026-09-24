@@ -56,6 +56,15 @@ class NotesController extends GetxController {
         .toList();
   }
 
+  /// The translation a note was written against. Notes saved before the
+  /// version was recorded carry no 'version', so they fall back to [fallback]
+  /// (the active translation), which is what they always displayed.
+  static String versionOfNote(Map<String, dynamic> note, String fallback) {
+    final stored = note['version']?.toString().trim();
+    final version = (stored == null || stored.isEmpty) ? fallback : stored;
+    return version.toUpperCase();
+  }
+
   @override
   void onInit() {
     super.onInit();

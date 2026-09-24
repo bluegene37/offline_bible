@@ -106,7 +106,8 @@ class NotesList extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: '$verseText - ${appController.bibleVersion.value}',
+                    text: '$verseText - '
+                        '${NotesController.versionOfNote(note, appController.bibleVersion.value)}',
                     style: TextStyle(
                       color: textColor,
                       fontSize: 13,
