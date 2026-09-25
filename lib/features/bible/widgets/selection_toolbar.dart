@@ -273,9 +273,7 @@ class SelectionToolbar extends StatelessWidget {
     HapticFeedback.selectionClick();
     final selected = controller.textUnderline.toList();
     if (colorIndex == -1) {
-      for (final key in selected) {
-        bibleController.deleteHighlight(key);
-      }
+      bibleController.deleteHighlights(selected);
     } else {
       bibleController.saveHighlight(selected, colorIndex);
     }

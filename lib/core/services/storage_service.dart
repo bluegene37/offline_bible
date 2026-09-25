@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import '../constants/app_constants.dart';
 
@@ -39,4 +40,24 @@ class StorageService {
   static Box<dynamic> get textsBox => _textsBox;
   static Box<dynamic> get bookmarksBox => _bookmarksBox;
   static Box<dynamic> get readingPlansBox => _readingPlansBox;
+
+  @visibleForTesting
+  static void initForTesting({
+    Box<dynamic>? settingsBox,
+    Box<dynamic>? highlightBox,
+    Box<dynamic>? historyBox,
+    Box<dynamic>? notesBox,
+    Box<dynamic>? textsBox,
+    Box<dynamic>? bookmarksBox,
+    Box<dynamic>? readingPlansBox,
+  }) {
+    if (settingsBox != null) _settingsBox = settingsBox;
+    if (highlightBox != null) _highlightBox = highlightBox;
+    if (historyBox != null) _historyBox = historyBox;
+    if (notesBox != null) _notesBox = notesBox;
+    if (textsBox != null) _textsBox = textsBox;
+    if (bookmarksBox != null) _bookmarksBox = bookmarksBox;
+    if (readingPlansBox != null) _readingPlansBox = readingPlansBox;
+  }
 }
+

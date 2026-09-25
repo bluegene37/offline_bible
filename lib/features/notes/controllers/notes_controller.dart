@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/controllers/app_controller.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/text_utils.dart';
@@ -113,6 +114,9 @@ class NotesController extends GetxController {
 
     filteredNotes.value = notes;
     update();
+    if (Get.isRegistered<AppController>()) {
+      Get.find<AppController>().update();
+    }
   }
 
   void loadHighlights() {
@@ -149,6 +153,9 @@ class NotesController extends GetxController {
       return dtB.compareTo(dtA);
     });
     update();
+    if (Get.isRegistered<AppController>()) {
+      Get.find<AppController>().update();
+    }
   }
 
   void loadBookmarks() {
@@ -178,6 +185,9 @@ class NotesController extends GetxController {
       return dtB.compareTo(dtA);
     });
     update();
+    if (Get.isRegistered<AppController>()) {
+      Get.find<AppController>().update();
+    }
   }
 
   void filterNotes(String query) {

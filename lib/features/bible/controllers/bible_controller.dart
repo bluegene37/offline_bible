@@ -134,14 +134,21 @@ class BibleController extends GetxController {
   }
 
   void deleteHighlight(String verseKey) {
-    if (StorageService.highlightBox.containsKey(verseKey)) {
-      StorageService.highlightBox.delete(verseKey);
-      StorageService.textsBox.delete(verseKey);
-      if (Get.isRegistered<NotesController>()) {
-        Get.find<NotesController>().loadHighlights();
-      }
-    }
+    deleteHighlights([verseKey]);
   }
+
+  void deleteHighlights(List<String> verseKeys) {
+    for (final key in verseKeys) {
+      StorageService.highlightBox.delete(key);
+      StorageService.textsBox.delete(key);
+    }
+    appController.clearTextSelection();
+    if (Get.isRegistered<NotesController>()) {
+      Get.find<NotesController>().loadHighlights();
+    }
+    appController.update();
+  }
+
 
   /// True when [book]/[chapter] is already the loaded chapter, so a rebuild
   /// does not need to reload (which would reset scroll and stop audio).
@@ -247,9 +254,14 @@ class BibleController extends GetxController {
     } else {
       appController.textUnderline.add(verseKey);
     }
+    appController.update();
   }
 
   void saveHighlight(List<String> verseKeys, int colorIndex) {
+    if (colorIndex == -1) {
+      deleteHighlights(verseKeys);
+      return;
+    }
     final timestamp = DateUtils.timestampNow();
 
     for (final key in verseKeys) {
@@ -273,6 +285,7 @@ class BibleController extends GetxController {
     if (Get.isRegistered<NotesController>()) {
       Get.find<NotesController>().loadHighlights();
     }
+    appController.update();
   }
 
   void saveNotes(List<String> verseKeys, String notes) {

@@ -375,6 +375,7 @@ class AppController extends GetxController {
 
   void clearTextSelection() {
     textUnderline.clear();
+    update();
   }
 
   void setThemePref(String pref, BuildContext context) {
