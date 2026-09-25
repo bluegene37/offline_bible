@@ -115,6 +115,7 @@ class SelectionToolbar extends StatelessWidget {
       button: true,
       label: label,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
           width: 48,
