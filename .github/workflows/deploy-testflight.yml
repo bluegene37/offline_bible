@@ -1,6 +1,23 @@
 name: Deploy to Apple TestFlight
 
+# Gene - Oct 07, 2026: Added automatic triggers on push to master/main and version tags v*
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       auto_increment_build:
+#         description: 'Use GitHub run number as build number (avoids duplicate CFBundleVersion)'
+#         type: boolean
+#         default: true
 on:
+  push:
+    branches:
+      - master
+      - main
+    tags:
+      - "v*"
+    paths-ignore:
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
   workflow_dispatch:
     inputs:
       auto_increment_build:
@@ -86,9 +103,26 @@ jobs:
           echo "Generated ios/ExportOptions.plist:"
           cat ios/ExportOptions.plist
 
+      # Gene - Oct 07, 2026: Enable auto-increment build number on automatic push events as well as workflow_dispatch
+      # - name: Build iOS IPA
+      #   run: |
+      #     if [ "${{ github.event.inputs.auto_increment_build }}" = "true" ]; then
+      #       VERSION_NAME=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+      #       BUILD_NUMBER=$(( 10 + ${{ github.run_number }} ))
+      #       echo "Building $VERSION_NAME+$BUILD_NUMBER"
+      #       flutter build ipa --release \
+      #         --build-name="$VERSION_NAME" \
+      #         --build-number="$BUILD_NUMBER" \
+      #         --export-options-plist=ios/ExportOptions.plist \
+      #         --obfuscate --split-debug-info=build/symbols/ios
+      #     else
+      #       flutter build ipa --release \
+      #         --export-options-plist=ios/ExportOptions.plist \
+      #         --obfuscate --split-debug-info=build/symbols/ios
+      #     fi
       - name: Build iOS IPA
         run: |
-          if [ "${{ github.event.inputs.auto_increment_build }}" = "true" ]; then
+          if [ "${{ github.event.inputs.auto_increment_build }}" != "false" ]; then
             VERSION_NAME=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
             # Use offset + run_number so build number is always safely incremental
             BUILD_NUMBER=$(( 10 + ${{ github.run_number }} ))
