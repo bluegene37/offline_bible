@@ -149,7 +149,6 @@ class BibleController extends GetxController {
     appController.update();
   }
 
-
   /// True when [book]/[chapter] is already the loaded chapter, so a rebuild
   /// does not need to reload (which would reset scroll and stop audio).
   bool isChapterLoaded(String book, int chapter) {

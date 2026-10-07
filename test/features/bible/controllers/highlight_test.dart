@@ -58,8 +58,18 @@ void main() {
 
     // Provide mock verses
     bibleController.currentVerses.assignAll([
-      const Book(id: '1', book: 'John', chapter: 3, verse: 16, text: 'For God so loved the world...'),
-      const Book(id: '2', book: 'John', chapter: 3, verse: 17, text: 'For God sent not his Son...'),
+      const Book(
+          id: '1',
+          book: 'John',
+          chapter: 3,
+          verse: 16,
+          text: 'For God so loved the world...'),
+      const Book(
+          id: '2',
+          book: 'John',
+          chapter: 3,
+          verse: 17,
+          text: 'For God sent not his Son...'),
     ]);
   });
 
@@ -105,7 +115,9 @@ void main() {
       expect(updateCount, equals(2));
     });
 
-    test('saveHighlight with valid color saves and notifies appController real time', () {
+    test(
+        'saveHighlight with valid color saves and notifies appController real time',
+        () {
       appController.textUnderline.add('John:3:16');
 
       var updateCalled = false;
@@ -122,7 +134,9 @@ void main() {
       expect(updateCalled, isTrue);
     });
 
-    test('deleteHighlights removes highlights and notifies appController real time', () {
+    test(
+        'deleteHighlights removes highlights and notifies appController real time',
+        () {
       // Setup highlight first
       bibleController.saveHighlight(['John:3:16', 'John:3:17'], 2);
       expect(notesController.highlightColorFor('John:3:16'), equals(2));
@@ -148,7 +162,9 @@ void main() {
       expect(updateCalled, isTrue);
     });
 
-    test('saveHighlight with -1 (no color) delegates to deleteHighlights and updates real time', () {
+    test(
+        'saveHighlight with -1 (no color) delegates to deleteHighlights and updates real time',
+        () {
       // Setup highlight first
       bibleController.saveHighlight(['John:3:16'], 3);
       expect(notesController.highlightColorFor('John:3:16'), equals(3));

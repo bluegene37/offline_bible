@@ -60,4 +60,3 @@ class StorageService {
     if (readingPlansBox != null) _readingPlansBox = readingPlansBox;
   }
 }
-
