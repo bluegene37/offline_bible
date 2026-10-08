@@ -3,7 +3,9 @@ description: A fast, elegant, and fully offline Bible app with audio playback, r
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+3
+# Gene - Oct 08, 2026: Bumped build number to +20 for Closed Testing release track to prevent version code shadowing
+# version: 1.0.0+3
+version: 1.0.0+20
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

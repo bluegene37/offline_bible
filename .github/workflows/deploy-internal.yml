@@ -1,8 +1,21 @@
-name: Deploy to Google Play Internal Testing
+# Gene - Oct 08, 2026: Renamed workflow and added track selection input to support Closed Testing (alpha) and Internal Testing
+# name: Deploy to Google Play Internal Testing
+name: Deploy to Google Play (Internal & Closed Testing)
 
 on:
   workflow_dispatch:
     inputs:
+#       auto_increment_build:
+#         description: 'Use GitHub run number as build number (avoids duplicate versionCode)'
+#         type: boolean
+#         default: true
+      track:
+        description: 'Google Play Track to deploy to (alpha = Closed Testing, internal = Internal Testing)'
+        type: choice
+        options:
+          - alpha
+          - internal
+        default: 'alpha'
       auto_increment_build:
         description: 'Use GitHub run number as build number (avoids duplicate versionCode)'
         type: boolean
@@ -13,8 +26,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+# Gene - Oct 08, 2026: Generalized job display name for Play Store tracks
+#   deploy-internal:
+#     name: Build & Deploy to Play Store (Internal)
   deploy-internal:
-    name: Build & Deploy to Play Store (Internal)
+    name: Build & Deploy to Play Store
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -70,11 +86,20 @@ jobs:
             flutter build appbundle --release
           fi
 
-      - name: Upload to Google Play Internal Track
+# Gene - Oct 08, 2026: Parameterized tracks to support deploying to Closed Testing (alpha) or Internal Testing
+#       - name: Upload to Google Play Internal Track
+#         uses: r0adkll/upload-google-play@v1
+#         with:
+#           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+#           packageName: dev.genexis.offlinebible
+#           releaseFiles: build/app/outputs/bundle/release/app-release.aab
+#           tracks: internal
+#           status: completed
+      - name: Upload to Google Play Track
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: dev.genexis.offlinebible
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          tracks: internal
+          tracks: ${{ github.event.inputs.track || 'alpha' }}
           status: completed
