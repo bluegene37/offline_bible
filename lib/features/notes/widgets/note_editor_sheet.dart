@@ -37,37 +37,74 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
     super.dispose();
   }
 
+  // Previous implementation preserved per project policy:
+  // @override
+  // Widget build(BuildContext context) {
+  //   return ConstrainedBox(
+  //     constraints: BoxConstraints(
+  //       maxHeight: MediaQuery.of(context).size.height * 0.85,
+  //     ),
+  //     child: Container(
+  //       padding: EdgeInsets.only(
+  //         bottom: MediaQuery.of(context).viewInsets.bottom,
+  //         left: 20,
+  //         right: 20,
+  //         top: 20,
+  //       ),
+  //       decoration: BoxDecoration(
+  //         color: Theme.of(context).scaffoldBackgroundColor,
+  //         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+  //         boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10)],
+  //       ),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.max,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           _buildHeader(),
+  //           const SizedBox(height: 20),
+  //           _buildVerseReference(),
+  //           const SizedBox(height: 20),
+  //           Expanded(child: _buildEditor()),
+  //           const SizedBox(height: 10),
+  //           _buildActions(),
+  //           const SizedBox(height: 20),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // Gene - Oct, 09, 2026: Positioned Save Note button at bottom with SafeArea, increased sheet height to 90%, and removed redundant viewInsets.bottom padding (which ModalBottomSheet already handles) so multiline text editor has ample room to expand.
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.85,
+        maxHeight: MediaQuery.of(context).size.height * 0.90,
       ),
       child: Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 20,
-          right: 20,
-          top: 20,
-        ),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10)],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 20),
-            _buildVerseReference(),
-            const SizedBox(height: 20),
-            Expanded(child: _buildEditor()),
-            const SizedBox(height: 10),
-            _buildActions(),
-            const SizedBox(height: 20),
-          ],
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                const SizedBox(height: 16),
+                _buildVerseReference(),
+                const SizedBox(height: 16),
+                Expanded(child: _buildEditor()),
+                const SizedBox(height: 16),
+                _buildActions(),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -120,11 +157,31 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
     );
   }
 
+  // Previous implementation preserved per project policy:
+  // Widget _buildEditor() {
+  //   return TextField(
+  //     controller: _textController,
+  //     maxLines: null,
+  //     expands: true,
+  //     textAlignVertical: TextAlignVertical.top,
+  //     autofocus: true,
+  //     style: const TextStyle(fontSize: 16, height: 1.5),
+  //     decoration: const InputDecoration(
+  //       hintText: 'Write your thoughts here...',
+  //       border: InputBorder.none,
+  //       contentPadding: EdgeInsets.all(0),
+  //     ),
+  //   );
+  // }
+
+  // Gene - Oct, 09, 2026: Added explicit TextInputType.multiline and TextInputAction.newline so the enter key creates new lines and multiline notes expand smoothly.
   Widget _buildEditor() {
     return TextField(
       controller: _textController,
       maxLines: null,
       expands: true,
+      keyboardType: TextInputType.multiline,
+      textInputAction: TextInputAction.newline,
       textAlignVertical: TextAlignVertical.top,
       autofocus: true,
       style: const TextStyle(fontSize: 16, height: 1.5),
