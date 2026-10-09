@@ -8,16 +8,24 @@ name: Deploy to Apple TestFlight
 #         description: 'Use GitHub run number as build number (avoids duplicate CFBundleVersion)'
 #         type: boolean
 #         default: true
+# Gene - Oct 09, 2026: Removed automatic push triggers so iOS TestFlight only deploys on manual command
+# on:
+#   push:
+#     branches:
+#       - master
+#       - main
+#     tags:
+#       - "v*"
+#     paths-ignore:
+#       - "**.md"
+#       - ".github/ISSUE_TEMPLATE/**"
+#   workflow_dispatch:
+#     inputs:
+#       auto_increment_build:
+#         description: 'Use GitHub run number as build number (avoids duplicate CFBundleVersion)'
+#         type: boolean
+#         default: true
 on:
-  push:
-    branches:
-      - master
-      - main
-    tags:
-      - "v*"
-    paths-ignore:
-      - "**.md"
-      - ".github/ISSUE_TEMPLATE/**"
   workflow_dispatch:
     inputs:
       auto_increment_build:
