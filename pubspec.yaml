@@ -5,7 +5,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # Gene - Oct 08, 2026: Bumped build number to +20 for Closed Testing release track to prevent version code shadowing
 # version: 1.0.0+3
-version: 1.0.0+20
+version: 1.0.0+21
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -14,7 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^2.0.0
   flutter_native_splash: ^2.3.8
   get: ^4.6.5
   substring_highlight: ^1.0.33
